@@ -1,0 +1,6 @@
+{
+  "name": "Baha Markets Pro",
+  "description": "Enterprise-grade multi-asset trading terminal featuring real-time charting, order execution, comprehensive wallet, KYC, and a premium Admin CRM.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
