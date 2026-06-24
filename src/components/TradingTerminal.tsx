@@ -22,7 +22,8 @@ import {
   Sliders,
   DollarSign,
   Briefcase,
-  X
+  X,
+  Settings
 } from "lucide-react";
 import { 
   SymbolData, 
@@ -84,8 +85,9 @@ interface TradingTerminalProps {
   symbols: SymbolData[];
   wallet: UserWallet;
   positions: Position[];
-  orders: Order[];
+  orders?: Order[];
   closedHistory: any[];
+  userId?: string;
   onPlaceOrder: (orderPayload: any) => Promise<any>;
   onClosePosition: (id: string) => Promise<any>;
 }
@@ -271,7 +273,7 @@ export default function TradingTerminal({
 
   // Navigation states
   const [selectedSymbolCode, setSelectedSymbolCode] = useState<string>("BTCUSDT");
-  const [selectedCategory, setSelectedCategory] = useState<AssetCategory | "ALL">("ALL");
+  const [selectedCategory, setSelectedCategory] = useState<any>("ALL");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activeBottomTab, setActiveBottomTab] = useState<"POSITIONS" | "PENDING" | "HISTORY" | "ALERTS">("POSITIONS");
 

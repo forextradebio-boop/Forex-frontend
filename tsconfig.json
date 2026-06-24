@@ -15,6 +15,7 @@
     "moduleDetection": "force",
     "allowJs": true,
     "jsx": "react-jsx",
+      "types": ["vite/client"],
     "paths": {
       "@/*": [
         "./*"
@@ -23,4 +24,11 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   }
+    ,
+    "exclude": [
+      "backend/**",
+      "node_modules",
+      "dist",
+      "build"
+    ]
 }

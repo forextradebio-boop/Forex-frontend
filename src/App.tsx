@@ -50,6 +50,7 @@ import CalendarScreen from "./components/CalendarScreen";
 import ProfileScreen from "./components/ProfileScreen";
 import { useAuth } from "./contexts/AuthContext";
 import { io } from "socket.io-client";
+import { API_BASE_URL, SOCKET_URL } from "./api/config";
 import * as walletService from "./services/wallet";
 import * as tradingService from "./services/trading";
 import * as watchlistService from "./services/watchlist";
@@ -89,6 +90,7 @@ export default function App() {
   // General news and economics
   const [globalNews, setGlobalNews] = useState<MarketNews[]>([]);
   const [economicCalendar, setEconomicCalendar] = useState<EconomicEvent[]>([]);
+  const [backendStatus, setBackendStatus] = useState<any>(null);
 
   // Notifications bell states
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -101,7 +103,7 @@ export default function App() {
   useEffect(() => {
     const fetchStaticMetadata = async () => {
       try {
-        const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
+        const API_BASE = API_BASE_URL;
 
         const catRes = await fetch(`${API_BASE}/market/symbols`);
         if (catRes.ok) {
@@ -120,6 +122,18 @@ export default function App() {
           const cJson = await calRes.json();
           setEconomicCalendar(cJson.calendar || []);
         }
+
+        // Health check
+        try {
+          const healthRes = await fetch(`${API_BASE}/health`);
+          if (healthRes.ok) {
+            const hJson = await healthRes.json();
+            setBackendStatus(hJson);
+            console.log('Backend health:', hJson);
+          }
+        } catch (e) {
+          console.warn('Health check failed', e);
+        }
       } catch (err) {
         console.error("Error loading server startup payloads.", err);
       }
@@ -127,7 +141,7 @@ export default function App() {
 
     fetchStaticMetadata();
 
-    const socket = io(import.meta.env.VITE_SOCKET_URL || "http://localhost:8000");
+    const socket = io(SOCKET_URL);
 
     socket.on("prices", (data: any[]) => {
       if (data?.length) {

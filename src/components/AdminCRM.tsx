@@ -38,7 +38,8 @@ import {
   UserProfile,
   AssetCategory,
   KYCStatus,
-  TransactionStatus
+  TransactionStatus,
+  TransactionType
 } from "../types";
 import * as adminService from "../services/admin";
 
@@ -149,20 +150,13 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
   const handleAdjustBalance = async (action: "ADD" | "SUBTRACT") => {
     if (!selectedUser || !balanceAdjustAmount) return;
     try {
-      const res = await fetch(`/api/admin/users/${selectedUser.profile.id}/adjust-balance`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Override": "true" },
-        body: JSON.stringify({ amount: balanceAdjustAmount, action })
-      });
-      if (res.ok) {
+      const res = await adminService.adjustUserBalance(selectedUser.profile.id, { amount: balanceAdjustAmount, action }, { headers: { 'X-Admin-Override': 'true' } });
+      if (res) {
         alert("Balance ledger updated successfully.");
         setBalanceAdjustAmount("");
         setSelectedUser(null);
         fetchCrmData();
         onRefreshAllData();
-      } else {
-        const error = await res.json();
-        alert(error.error || "Failed modification.");
       }
     } catch {
       alert("Error processing adjustment command.");
@@ -173,15 +167,9 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
   const handleToggleUserStatus = async (userId: string, currentStatus: string) => {
     const nextStatus = currentStatus === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
     try {
-      const res = await fetch(`/api/admin/users/${userId}/status`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Override": "true" },
-        body: JSON.stringify({ status: nextStatus })
-      });
-      if (res.ok) {
-        alert(`User profile is now set to ${nextStatus}.`);
-        fetchCrmData();
-      }
+      await adminService.setUserStatus(userId, { status: nextStatus }, { headers: { 'X-Admin-Override': 'true' } });
+      alert(`User profile is now set to ${nextStatus}.`);
+      fetchCrmData();
     } catch {
       alert("Error switching profile activity.");
     }
@@ -223,15 +211,10 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
   const handleForceClosePosition = async (posId: string) => {
     if (!window.confirm("Verify: Executing emergency Force-Close will settle position immediately at current spot rate. Proceed?")) return;
     try {
-      const res = await fetch(`/api/admin/trades/force-close/${posId}`, {
-        method: "POST",
-        headers: { "X-Admin-Override": "true" }
-      });
-      if (res.ok) {
-        alert("Emergent market exit settled.");
-        fetchCrmData();
-        onRefreshAllData();
-      }
+      await adminService.forceCloseTrade(posId, { headers: { 'X-Admin-Override': 'true' } });
+      alert("Emergent market exit settled.");
+      fetchCrmData();
+      onRefreshAllData();
     } catch {
       alert("Verification exit failed.");
     }
@@ -242,28 +225,19 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
     e.preventDefault();
     if (!newSymCode || !newSymPrice) return;
     try {
-      const res = await fetch("/api/admin/symbols", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Override": "true" },
-        body: JSON.stringify({
-          symbol: newSymCode,
-          name: newSymName || `${newSymCode} Index`,
-          category: newSymCategory,
-          price: newSymPrice,
-          leverageLimit: newSymLeverage,
-          spread: newSymSpread
-        })
-      });
-      if (res.ok) {
-        alert("New asset added to exchange boards.");
-        setNewSymCode("");
-        setNewSymName("");
-        setNewSymPrice("");
-        fetchCrmData();
-      } else {
-        const err = await res.json();
-        alert(err.error || "Symbol duplicate.");
-      }
+      await adminService.addSymbol({
+        symbol: newSymCode,
+        name: newSymName || `${newSymCode} Index`,
+        category: newSymCategory,
+        price: newSymPrice,
+        leverageLimit: newSymLeverage,
+        spread: newSymSpread
+      }, { headers: { 'X-Admin-Override': 'true' } });
+      alert("New asset added to exchange boards.");
+      setNewSymCode("");
+      setNewSymName("");
+      setNewSymPrice("");
+      fetchCrmData();
     } catch {
       alert("Listing failure.");
     }
@@ -272,14 +246,9 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
   // Toggle Symbol Trade Active State
   const handleToggleSymbolState = async (code: string) => {
     try {
-      const res = await fetch(`/api/admin/symbols/${code}/toggle`, {
-        method: "POST",
-        headers: { "X-Admin-Override": "true" }
-      });
-      if (res.ok) {
-        alert("Exchange trading bounds modified.");
-        fetchCrmData();
-      }
+      await adminService.toggleSymbol(code, { headers: { 'X-Admin-Override': 'true' } });
+      alert("Exchange trading bounds modified.");
+      fetchCrmData();
     } catch {
       alert("Failed toggling.");
     }
@@ -290,24 +259,18 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
     e.preventDefault();
     if (!newsTitle || !newsContent) return;
     try {
-      const res = await fetch("/api/admin/news", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Override": "true" },
-        body: JSON.stringify({
-          title: newsTitle,
-          summary: newsSummary,
-          content: newsContent,
-          category: newsCat,
-          source: "Baha Executive Bulletin"
-        })
-      });
-      if (res.ok) {
-        alert("Press article published instantly.");
-        setNewsTitle("");
-        setNewsSummary("");
-        setNewsContent("");
-        fetchCrmData();
-      }
+      await adminService.createNews({
+        title: newsTitle,
+        summary: newsSummary,
+        content: newsContent,
+        category: newsCat,
+        source: "Baha Executive Bulletin"
+      }, { headers: { 'X-Admin-Override': 'true' } });
+      alert("Press article published instantly.");
+      setNewsTitle("");
+      setNewsSummary("");
+      setNewsContent("");
+      fetchCrmData();
     } catch {
       alert("Error.");
     }
@@ -318,20 +281,10 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
     e.preventDefault();
     if (!notifTitle || !notifContent) return;
     try {
-      const res = await fetch("/api/admin/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Admin-Override": "true" },
-        body: JSON.stringify({
-          userId: notifUser,
-          title: notifTitle,
-          content: notifContent
-        })
-      });
-      if (res.ok) {
-        alert("System push-notification dispatched.");
-        setNotifTitle("");
-        setNotifContent("");
-      }
+      await adminService.dispatchNotification({ userId: notifUser, title: notifTitle, content: notifContent }, { headers: { 'X-Admin-Override': 'true' } });
+      alert("System push-notification dispatched.");
+      setNotifTitle("");
+      setNotifContent("");
     } catch {
       alert("Command failed.");
     }

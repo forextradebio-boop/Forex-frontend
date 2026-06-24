@@ -1,14 +1,17 @@
 import axios from 'axios';
+import { API_BASE_URL } from './config';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  timeout: 30000,
 });
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  console.log('[API Request] Checking for token:', token ? 'Token exists' : 'No token found');
+  if (!config.headers) (config.headers = {} as any);
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    (config.headers as any).Authorization = `Bearer ${token}`;
   }
   return config;
 }, (error) => {
@@ -19,7 +22,6 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.warn('[API Response] 401 Unauthorized detected. Token may be missing or expired.');
       localStorage.removeItem('token');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('profile');
