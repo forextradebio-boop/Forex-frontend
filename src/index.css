@@ -6,6 +6,16 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: #000000;
+}
+
 /* Custom scrollbars for trading panels */
 ::-webkit-scrollbar {
   width: 5px;
@@ -20,4 +30,85 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.4);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.backdrop-blur-xs {
+  backdrop-filter: blur(2px);
+}
+
+/* Responsive Simulator Shell Layout */
+@media (min-width: 640px) and (min-height: 640px) {
+  .app-container {
+    background-color: #070708 !important;
+    padding: 1rem !important;
+  }
+  .phone-shell {
+    width: 375px !important;
+    height: 780px !important;
+    border: 12px solid #27272a !important;
+    border-radius: 50px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.55) !important;
+  }
+  .desktop-only-notch {
+    display: flex !important;
+  }
+  .desktop-only-control-panel {
+    display: flex !important;
+  }
+  .notch-padding {
+    padding-top: 2rem !important;
+  }
+}
+
+.notch-padding {
+  padding-top: 0;
+}
+
+/* Simulated Landscape Rotation */
+.rotated-landscape {
+  transform: rotate(90deg) !important;
+  transform-origin: center !important;
+  width: 100vh !important;
+  height: 100vw !important;
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  margin-top: -50vw !important;
+  margin-left: -50vh !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background-color: #000000 !important;
+}
+
+/* Light Theme Global Filter Trick */
+.light-theme {
+  filter: invert(1) hue-rotate(180deg);
+  background-color: white !important;
+}
+
+.light-theme input, .light-theme textarea {
+  color: #111 !important;
+}
+
+.light-theme input::placeholder, .light-theme textarea::placeholder {
+  color: #777 !important;
 }

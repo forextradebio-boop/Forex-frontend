@@ -47,7 +47,7 @@ export default function CalendarScreen() {
   const [showToast, setShowToast] = useState<string | null>(null);
 
   useEffect(() => {
-    const saved = localStorage.getItem('baha_calendar_reminders');
+    const saved = localStorage.getItem('forexfactory_calendar_reminders');
     if (saved) {
       try { setReminders(JSON.parse(saved)); } catch (e) {}
     }
@@ -56,7 +56,7 @@ export default function CalendarScreen() {
   const saveReminder = (eventId: string, minutesBefore: number) => {
     const newReminders = { ...reminders, [eventId]: minutesBefore };
     setReminders(newReminders);
-    localStorage.setItem('baha_calendar_reminders', JSON.stringify(newReminders));
+    localStorage.setItem('forexfactory_calendar_reminders', JSON.stringify(newReminders));
     setShowToast(`Reminder set for ${minutesBefore} minutes before event.`);
     setTimeout(() => setShowToast(null), 3000);
   };
@@ -65,7 +65,7 @@ export default function CalendarScreen() {
     const newReminders = { ...reminders };
     delete newReminders[eventId];
     setReminders(newReminders);
-    localStorage.setItem('baha_calendar_reminders', JSON.stringify(newReminders));
+    localStorage.setItem('forexfactory_calendar_reminders', JSON.stringify(newReminders));
     setShowToast(`Reminder cleared.`);
     setTimeout(() => setShowToast(null), 3000);
   };

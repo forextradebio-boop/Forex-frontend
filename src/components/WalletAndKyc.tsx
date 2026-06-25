@@ -449,7 +449,7 @@ export default function WalletAndKyc({
                       </div>
                       <div className="text-center">
                         <p className="text-[10px] text-slate-400 uppercase font-mono">Merchant VPA</p>
-                        <p className="text-xs text-white font-bold font-mono select-all bg-slate-950 px-2 py-1 rounded border border-slate-800 mt-1">baha.merchants@axl</p>
+                        <p className="text-xs text-white font-bold font-mono select-all bg-slate-950 px-2 py-1 rounded border border-slate-800 mt-1">forexfactory.merchants@axl</p>
                       </div>
                     </div>
                   </div>

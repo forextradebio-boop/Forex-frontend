@@ -264,7 +264,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
         summary: newsSummary,
         content: newsContent,
         category: newsCat,
-        source: "Baha Executive Bulletin"
+        source: "Forex Factory Executive Bulletin"
       }, { headers: { 'X-Admin-Override': 'true' } });
       alert("Press article published instantly.");
       setNewsTitle("");
@@ -310,7 +310,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
           </div>
         </div>
 
-        {/* Baha CRM Tab Selector Row */}
+        {/* Forex Factory CRM Tab Selector Row */}
         <div className="flex bg-slate-900/60 p-1 rounded-2xl border border-slate-800 overflow-x-auto scrolling-touch">
           {([
             { id: "METRICS", key: "Metrics & Charts" },

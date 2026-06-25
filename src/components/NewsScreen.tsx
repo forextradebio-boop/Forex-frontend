@@ -24,13 +24,13 @@ export default function NewsScreen() {
 
   // Load local state
   useEffect(() => {
-    const savedBookmarks = localStorage.getItem('baha_news_bookmarks');
+    const savedBookmarks = localStorage.getItem('forexfactory_news_bookmarks');
     if (savedBookmarks) {
       try {
         setBookmarkedIds(new Set(JSON.parse(savedBookmarks)));
       } catch(e) {}
     }
-    const savedRecents = localStorage.getItem('baha_news_recents');
+    const savedRecents = localStorage.getItem('forexfactory_news_recents');
     if (savedRecents) {
       try {
         setRecentNews(JSON.parse(savedRecents));
@@ -44,7 +44,7 @@ export default function NewsScreen() {
       const newSet = new Set(prev);
       if (newSet.has(id)) newSet.delete(id);
       else newSet.add(id);
-      localStorage.setItem('baha_news_bookmarks', JSON.stringify(Array.from(newSet)));
+      localStorage.setItem('forexfactory_news_bookmarks', JSON.stringify(Array.from(newSet)));
       return newSet;
     });
   };
@@ -63,7 +63,7 @@ export default function NewsScreen() {
     setRecentNews(prev => {
       const filtered = prev.filter(n => n.id !== news.id);
       const updated = [news, ...filtered].slice(0, 5); // Keep last 5
-      localStorage.setItem('baha_news_recents', JSON.stringify(updated));
+      localStorage.setItem('forexfactory_news_recents', JSON.stringify(updated));
       return updated;
     });
   };

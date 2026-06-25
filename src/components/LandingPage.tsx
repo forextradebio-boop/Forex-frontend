@@ -256,7 +256,7 @@ export default function LandingPage({ symbols, onStartTrading, onNavigate }: Lan
       <div className="bg-slate-900/50 border-t border-b border-slate-900 py-16 px-4 md:px-8">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center space-y-2">
-            <h2 className="text-3xl font-extrabold text-white">Why Seasoned Asset Managers Select Baha Pro</h2>
+            <h2 className="text-3xl font-extrabold text-white">Why Seasoned Asset Managers Select Forex Factory Pro</h2>
             <p className="text-slate-400 text-sm">We provide high-tech pipelines to institutional liquidity pools.</p>
           </div>
 
@@ -347,7 +347,7 @@ export default function LandingPage({ symbols, onStartTrading, onNavigate }: Lan
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-left">
             <div className="space-y-3">
-              <h4 className="text-slate-300 font-bold text-sm tracking-wide">Baha Markets</h4>
+              <h4 className="text-slate-300 font-bold text-sm tracking-wide">Forex Factory</h4>
               <p className="text-slate-500 leading-relaxed text-[11px]">
                 High performance execution infrastructure for worldwide contracts. Supported by multi-asset margin engine and real-time ledger verification.
               </p>
@@ -385,7 +385,7 @@ export default function LandingPage({ symbols, onStartTrading, onNavigate }: Lan
               <strong>OTC LEVERAGE RISK WARNING:</strong> Trading contracts for difference (CFD), foreign Spot markets, commodities, and digital currencies carries excessive risk of immediate margin liquidation. Leverages up to 1:500 multiply profit scope alongside compounding stop-losses. Carefully verify your KYC credentials, and do not commit capital that falls outside of risk limits.
             </p>
             <p className="text-[11px] text-slate-600">
-              © 2026 Baha Markets Pro Ltd. All rights reserved. Secured by Nginx edge nodes.
+              © 2026 Forex Factory Pro Ltd. All rights reserved. Secured by Nginx edge nodes.
             </p>
           </div>
         </div>
