@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useCreateDeposit } from '../hooks/useDeposits';
 import { usePaymentSettings } from '../hooks/usePaymentSettings';
+import { useWallet } from '../hooks/useWallet';
 import { QrCode, UploadCloud, CheckCircle2, Copy, Building2, ArrowRight, ShieldCheck } from 'lucide-react';
 
 const depositCurrencies = [
@@ -19,6 +20,7 @@ const paymentMethods = [
 export default function DepositScreen() {
   const depositMutation = useCreateDeposit();
   const { data: paymentSettings, isLoading: loadingSettings } = usePaymentSettings();
+  const { data: wallet } = useWallet();
   const [amount, setAmount] = useState<string>('');
   const [currency, setCurrency] = useState<string>('USD');
   const [paymentMethod, setPaymentMethod] = useState<'UPI' | 'NETBANKING'>('UPI');
@@ -57,6 +59,19 @@ export default function DepositScreen() {
 
       <div className="grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 mb-8 relative z-10">
         <div className="bg-slate-950 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+          <div className="mb-6 p-5 rounded-3xl border border-slate-800 bg-slate-900/90">
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-400 font-semibold">Current Wallet Balance</p>
+            <div className="mt-3 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-2xl font-black text-white">${wallet?.balance?.toFixed(2) ?? '0.00'}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-500 font-semibold mt-1">Available balance</p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-teal-400">${wallet?.equity?.toFixed(2) ?? '0.00'}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-500 font-semibold mt-1">Equity</p>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-blue-300 font-semibold">Payment method</p>

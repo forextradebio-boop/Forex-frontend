@@ -1,30 +1,30 @@
-export const darkTheme = {
-  background: '#000000',
-  secondaryBackground: '#0e0e11',
-  cardBackground: '#0a0a0c',
-  border: '#27272a',
-  primaryText: '#FFFFFF',
-  secondaryText: '#a1a1aa',
-  mutedText: '#52525b',
-  primaryBlue: '#1E88E5',
-  success: '#089981',
-  danger: '#F23645',
-  warning: '#F59E0B',
+export const navyTheme = {
+  background: '#070f1f',
+  secondaryBackground: '#0d172d',
+  cardBackground: '#0f1b33',
+  border: '#1c2b48',
+  primaryText: '#e2e8f0',
+  secondaryText: '#94a3b8',
+  mutedText: '#64748b',
+  primaryBlue: '#5b8cff',
+  success: '#22c55e',
+  danger: '#f97316',
+  warning: '#facc15',
 
   // Cards
-  cardBorderRadius: '18px',
-  cardBorder: '1px solid #27272a',
-  cardShadow: '0 4px 18px rgba(0, 0, 0, 0.3)',
+  cardBorderRadius: '20px',
+  cardBorder: '1px solid rgba(148, 163, 184, 0.16)',
+  cardShadow: '0 32px 90px rgba(0, 0, 0, 0.45)',
 
   // Buttons
-  btnRadius: '14px',
-  btnHeight: '48px',
+  btnRadius: '16px',
+  btnHeight: '50px',
 
   // Chart specific
-  chartBackground: '#0A0E17',
-  chartGrid: 'rgba(255, 255, 255, 0.03)',
-  chartCandleGreen: '#089981',
-  chartCandleRed: '#F23645',
-  chartText: '#888888',
-  chartCrosshair: 'rgba(255, 255, 255, 0.2)'
+  chartBackground: '#0b1426',
+  chartGrid: 'rgba(255, 255, 255, 0.06)',
+  chartCandleGreen: '#22c55e',
+  chartCandleRed: '#f97316',
+  chartText: '#cbd5e1',
+  chartCrosshair: 'rgba(91, 140, 255, 0.2)'
 };

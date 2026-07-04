@@ -5,6 +5,7 @@ export const useWallet = () => {
   return useQuery({
     queryKey: ['wallet'],
     queryFn: getWallet,
+    enabled: Boolean(localStorage.getItem('token')),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     refetchOnMount: false,

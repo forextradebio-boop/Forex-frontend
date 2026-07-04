@@ -1,12 +1,13 @@
 import React, { useMemo } from 'react';
 import { AdvancedRealTimeChart } from 'react-ts-tradingview-widgets';
+import { useTheme } from '../../theme';
 
 interface TradingChartProps {
   symbol: string;
-  isNavyTheme?: boolean;
 }
 
-export const TradingChart: React.FC<TradingChartProps> = ({ symbol, isNavyTheme }) => {
+export const TradingChart: React.FC<TradingChartProps> = ({ symbol }) => {
+  const { themeMode } = useTheme();
   const [isMounted, setIsMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -24,11 +25,11 @@ export const TradingChart: React.FC<TradingChartProps> = ({ symbol, isNavyTheme 
   }, [symbol]);
 
   return (
-    <div className="w-full h-full min-h-[300px] flex-1 bg-white border-b border-slate-200">
+    <div className="w-full h-full min-h-[300px] flex-1 bg-[var(--theme-secondary-background)] border-b" style={{ borderColor: 'var(--theme-border-color)' }}>
       {isMounted && (
         <AdvancedRealTimeChart
         symbol={tvSymbol}
-        theme={isNavyTheme ? "dark" : "light"}
+        theme={themeMode === 'navy' ? 'dark' : 'light'}
         width="100%"
         height="100%"
         allow_symbol_change={false}

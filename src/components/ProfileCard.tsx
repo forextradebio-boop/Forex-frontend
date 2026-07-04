@@ -4,10 +4,17 @@ import { BadgeCheck, User as UserIcon, Calendar, CheckCircle2 } from 'lucide-rea
 
 interface Props {
   profile: UserProfile;
+  wallet?: {
+    balance?: number;
+    equity?: number;
+    margin?: number;
+    freeMargin?: number;
+    pnl?: number;
+  };
   onEditClick: () => void;
 }
 
-export default function ProfileCard({ profile, onEditClick }: Props) {
+export default function ProfileCard({ profile, wallet, onEditClick }: Props) {
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'U';
   };
@@ -61,16 +68,18 @@ export default function ProfileCard({ profile, onEditClick }: Props) {
             </button>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-4 text-xs">
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-6 gap-4 text-xs">
             <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
               <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Account ID</div>
               <div className="text-zinc-200 font-mono truncate">{profile._id.substring(0, 8).toUpperCase()}</div>
             </div>
             <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
-              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Status</div>
-              <div className="text-teal-400 font-bold flex items-center gap-1">
-                <div className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></div> Active
-              </div>
+              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Balance</div>
+              <div className="text-teal-300 font-bold truncate">${wallet?.balance?.toFixed(2) ?? '0.00'}</div>
+            </div>
+            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
+              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Equity</div>
+              <div className="text-zinc-200 font-bold truncate">${wallet?.equity?.toFixed(2) ?? '0.00'}</div>
             </div>
             <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
               <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Country</div>
@@ -84,7 +93,7 @@ export default function ProfileCard({ profile, onEditClick }: Props) {
               <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">KYC Status</div>
               <div className="text-teal-400 font-bold truncate">{profile.kycStatus || 'UNSUBMITTED'}</div>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
+            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50 md:col-span-2">
               <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px] flex items-center gap-1">
                 <Calendar className="w-3 h-3" /> Joined
               </div>

@@ -75,15 +75,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
           <div className="flex flex-col px-2 gap-0.5">
             <MenuItem icon={<Activity size={20} />} label="Trade" onClick={() => console.log('Trade clicked')} />
             <MenuItem icon={<BookOpen size={20} />} label="News" onClick={() => { onClose(); onNavigateNews(); }} />
-            <MenuItem icon={<Mail size={20} />} label="Mailbox" badge="8" onClick={() => console.log('Mailbox clicked')} />
-            <MenuItem icon={<Book size={20} />} label="Journal" onClick={() => console.log('Journal clicked')} />
+            {/* <MenuItem icon={<Mail size={20} />} label="Mailbox" badge="8" onClick={() => console.log('Mailbox clicked')} /> */}
+            {/* <MenuItem icon={<Book size={20} />} label="Journal" onClick={() => console.log('Journal clicked')} /> */}
             <MenuItem icon={<Download size={20} />} label="Deposit" onClick={() => { onClose(); onNavigateWallet?.('deposit'); }} />
             <MenuItem icon={<Upload size={20} />} label="Withdraw" onClick={() => { onClose(); onNavigateWallet?.('withdraw'); }} />
             <MenuItem icon={<User size={20} />} label="Profile" onClick={() => { onClose(); onNavigateProfile?.(); }} />
             <MenuItem icon={<Calendar size={20} />} label="Economic calendar" isAds onClick={() => { onClose(); onNavigateCalendar?.(); }} />
-            <MenuItem icon={<Users size={20} />} label="Traders Community" onClick={() => console.log('Traders Community clicked')} />
-            <MenuItem icon={<TrendingUp size={20} />} label="MQL5 Algo Trading" onClick={() => console.log('MQL5 Algo Trading clicked')} />
-            <MenuItem icon={<HelpCircle size={20} />} label="User guide" onClick={() => console.log('User guide clicked')} />
+            {/* <MenuItem icon={<Users size={20} />} label="Traders Community" onClick={() => console.log('Traders Community clicked')} /> */}
+            {/* <MenuItem icon={<TrendingUp size={20} />} label="MQL5 Algo Trading" onClick={() => console.log('MQL5 Algo Trading clicked')} /> */}
+            {/* <MenuItem icon={<HelpCircle size={20} />} label="User guide" onClick={() => console.log('User guide clicked')} /> */}
             <MenuItem icon={<Info size={20} />} label="About" onClick={() => console.log('About clicked')} />
           </div>
         </div>

@@ -96,19 +96,20 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
               </tr>
             ))}
             {activeTab === 'history' && closedHistory.map((item, idx) => {
-              if (item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL') {
+              if (item.historyType === 'transaction') {
                 return (
                   <tr key={idx} className="hover:bg-slate-50 transition-colors">
-                    <td className="px-4 py-2 font-bold font-sans text-slate-500" colSpan={8}>
-                      {item.type} - {new Date(item.timestamp).toLocaleString()}
+                    <td className="px-4 py-2 font-bold font-sans text-slate-500" colSpan={7}>
+                      {item.type === 'DEPOSIT' ? 'Deposit' : 'Withdrawal'} • {item.description || 'Wallet transaction'}
+                      <div className="text-[11px] text-slate-400 mt-1">{new Date(item.entryDate).toLocaleString()}</div>
                     </td>
                     <td className="px-4 py-2 text-right font-bold text-slate-900">{toCurrency(item.amount)}</td>
                   </tr>
                 )
               }
-              // Closed Trade
+
               return (
-                <tr key={idx} className="hover:bg-slate-50 transition-colors opacity-80">
+                <tr key={idx} className="hover:bg-slate-50 transition-colors opacity-90">
                   <td className="px-4 py-2 font-bold font-sans flex items-center gap-1.5 text-slate-700">
                     <div className={`w-1.5 h-1.5 rounded-full ${item.side === 'BUY' ? 'bg-blue-400' : 'bg-red-400'}`} />
                     {item.symbol}
@@ -119,7 +120,7 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
                   <td className="px-4 py-2 text-right">{item.entryPrice?.toFixed(5)}</td>
                   <td className="px-4 py-2 text-right">-</td>
                   <td className="px-4 py-2 text-right">-</td>
-                  <td className="px-4 py-2 text-right">{item.closePrice?.toFixed(5)}</td>
+                  <td className="px-4 py-2 text-right">{item.closePrice?.toFixed(5) || '-'}</td>
                   <td className={`px-4 py-2 text-right font-bold ${item.pnl && item.pnl >= 0 ? 'text-emerald-500' : 'text-red-500'}`}>
                     {toCurrency(item.pnl || 0)}
                   </td>

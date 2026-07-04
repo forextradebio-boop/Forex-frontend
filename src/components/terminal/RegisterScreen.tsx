@@ -17,6 +17,14 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onBack, onSubmit
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (username.trim().length < 4) {
+      setError('Username must be at least 4 characters');
+      return;
+    }
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters');
+      return;
+    }
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -26,7 +34,8 @@ export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onBack, onSubmit
     try {
       await onSubmit(username, password, confirmPassword);
     } catch (err: any) {
-      setError(err?.message || 'Registration failed');
+      const serverMessage = err?.response?.data?.error || err?.message;
+      setError(serverMessage || 'Registration failed');
     } finally {
       setLoading(false);
     }

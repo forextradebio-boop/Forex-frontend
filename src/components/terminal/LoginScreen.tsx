@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { ArrowLeft, User, Lock, LogIn } from 'lucide-react';
 
 interface LoginScreenProps {
-  onBack: () => void;
+  onBack?: () => void;
   onLoginSuccess: () => void;
   onSubmit: (username: string, password: string) => Promise<void>;
+  onRegister?: () => void;
 }
 
-export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onLoginSuccess, onSubmit }) => {
+export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onLoginSuccess, onSubmit, onRegister }) => {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -30,9 +31,13 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onLoginSuccess
   return (
     <div className="fixed inset-0 bg-slate-50 z-[110] flex flex-col animate-in slide-in-from-right font-sans">
       <div className="flex items-center p-4 bg-white shadow-sm shrink-0">
-        <button onClick={onBack} className="w-10 h-10 flex items-center justify-center text-slate-600 active:bg-slate-100 rounded-full transition-colors -ml-2">
-          <ArrowLeft size={24} />
-        </button>
+        {onBack ? (
+          <button onClick={onBack} className="w-10 h-10 flex items-center justify-center text-slate-600 active:bg-slate-100 rounded-full transition-colors -ml-2">
+            <ArrowLeft size={24} />
+          </button>
+        ) : (
+          <div className="w-10 h-10" />
+        )}
         <h1 className="text-xl font-bold text-slate-800 ml-2">Login</h1>
       </div>
 
@@ -91,6 +96,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onBack, onLoginSuccess
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
+          {onRegister && (
+            <div className="mt-4 text-center">
+              <p className="text-sm text-slate-500">Don&apos;t have an account?{' '}
+                <button
+                  type="button"
+                  onClick={onRegister}
+                  className="font-semibold text-blue-600 hover:text-blue-700"
+                >
+                  Register
+                </button>
+              </p>
+            </div>
+          )}
 
         </div>
       </div>

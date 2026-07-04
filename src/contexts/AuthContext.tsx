@@ -38,14 +38,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const fetchProfile = async () => {
       if (token) {
         try {
-          const { data } = await api.get('/auth/me');
+          const { data } = await api.get('/api/auth/me');
           if (data && data.success && data.profile) {
             setUser(data.profile);
+          } else {
+            throw new Error('Invalid auth profile response');
           }
         } catch (error) {
           console.error('Failed to fetch profile', error);
           setToken(null);
           localStorage.removeItem('token');
+          localStorage.removeItem('profile');
+          localStorage.removeItem('refreshToken');
+          setUser(null);
         }
       }
       setLoading(false);

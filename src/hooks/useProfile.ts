@@ -6,6 +6,7 @@ export const useProfile = () => {
   return useQuery({
     queryKey: ['profile'],
     queryFn: getProfile,
+    enabled: Boolean(localStorage.getItem('token')),
     refetchInterval: false, // Don't auto poll profile heavily
   });
 };

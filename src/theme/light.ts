@@ -1,30 +1,30 @@
-export const lightTheme = {
-  background: '#FFFFFF',
-  secondaryBackground: '#F7F8FA',
+export const whiteTheme = {
+  background: '#F8FAFC',
+  secondaryBackground: '#FFFFFF',
   cardBackground: '#FFFFFF',
-  border: '#E7EAF0',
-  primaryText: '#111827',
-  secondaryText: '#6B7280',
-  mutedText: '#9CA3AF',
+  border: '#E5E7EB',
+  primaryText: '#0F172A',
+  secondaryText: '#475569',
+  mutedText: '#64748B',
   primaryBlue: '#2563EB',
   success: '#10B981',
   danger: '#EF4444',
   warning: '#F59E0B',
 
   // Cards
-  cardBorderRadius: '18px',
-  cardBorder: '1px solid #E7EAF0',
-  cardShadow: '0 4px 18px rgba(15, 23, 42, 0.06)',
+  cardBorderRadius: '20px',
+  cardBorder: '1px solid #E5E7EB',
+  cardShadow: '0 24px 80px rgba(15, 23, 42, 0.08)',
 
   // Buttons
-  btnRadius: '14px',
-  btnHeight: '48px',
+  btnRadius: '16px',
+  btnHeight: '50px',
 
   // Chart specific
   chartBackground: '#FFFFFF',
-  chartGrid: '#F1F5F9',
+  chartGrid: '#E2E8F0',
   chartCandleGreen: '#10B981',
   chartCandleRed: '#EF4444',
-  chartText: '#111827',
-  chartCrosshair: 'rgba(37, 99, 235, 0.2)'
+  chartText: '#0F172A',
+  chartCrosshair: 'rgba(37, 99, 235, 0.15)'
 };

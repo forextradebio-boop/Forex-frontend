@@ -1,47 +1,43 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { lightTheme } from './light';
-import { darkTheme } from './dark';
+import { whiteTheme } from './light';
+import { navyTheme } from './dark';
 
-export type Theme = typeof lightTheme;
+export type Theme = typeof whiteTheme;
+export type ThemeMode = 'white' | 'navy';
 
 interface ThemeContextType {
   theme: Theme;
-  isLightMode: boolean;
-  setIsLightMode: (isLight: boolean) => void;
+  themeMode: ThemeMode;
+  setThemeMode: (mode: ThemeMode) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [isLightMode, setIsLightMode] = useState<boolean>(() => {
-    const saved = localStorage.getItem('forexfactory_light_mode');
-    return saved === 'true';
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem('ff_theme');
+    return saved === 'white' ? 'white' : 'navy';
   });
 
-  const theme = isLightMode ? lightTheme : darkTheme;
+  const theme = themeMode === 'white' ? whiteTheme : navyTheme;
 
   useEffect(() => {
-    localStorage.setItem('forexfactory_light_mode', isLightMode ? 'true' : 'false');
-    localStorage.setItem('ff_theme', isLightMode ? 'light' : 'dark');
-    
-    // Inject all theme properties as CSS Custom Properties on document element
+    localStorage.setItem('ff_theme', themeMode);
     const root = document.documentElement;
+
     Object.entries(theme).forEach(([key, value]) => {
       const cssKey = `--theme-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
       root.style.setProperty(cssKey, value);
     });
 
-    if (isLightMode) {
-      root.classList.add('light-mode');
-      root.classList.remove('dark-mode');
-    } else {
-      root.classList.add('dark-mode');
-      root.classList.remove('light-mode');
-    }
-  }, [isLightMode, theme]);
+    root.classList.toggle('white-theme', themeMode === 'white');
+    root.classList.toggle('navy-theme', themeMode === 'navy');
+    root.classList.toggle('light-mode', themeMode === 'white');
+    root.classList.toggle('dark-mode', themeMode === 'navy');
+  }, [themeMode, theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, isLightMode, setIsLightMode }}>
+    <ThemeContext.Provider value={{ theme, themeMode, setThemeMode }}>
       {children}
     </ThemeContext.Provider>
   );

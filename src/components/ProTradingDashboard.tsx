@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useTheme } from '../theme';
 import { useMarketStream } from '../hooks/useMarketStream';
 import { useSocket } from '../contexts/SocketContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -56,27 +57,46 @@ const ProTradingDashboard = ({
   const [historySortDesc, setHistorySortDesc] = useState(true);
   const [quoteMenuSymbol, setQuoteMenuSymbol] = useState<string | null>(null);
   const [positionMenuId, setPositionMenuId] = useState<string | null>(null);
+  const [closeConfirmationPositionId, setCloseConfirmationPositionId] = useState<string | null>(null);
   const [expandedPositionId, setExpandedPositionId] = useState<string | null>(null);
-  const [isNavyTheme, setIsNavyTheme] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [authFlowState, setAuthFlowState] = useState<'NONE' | 'REGISTER' | 'KYC' | 'LOGIN'>('NONE');
+  const [isClosingPosition, setIsClosingPosition] = useState(false);
+  const { themeMode, setThemeMode } = useTheme();
   const { login: setAuthState, user: authUser, logout: handleLogout } = useAuth();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [authFlowState, setAuthFlowState] = useState<'NONE' | 'REGISTER' | 'KYC' | 'LOGIN'>(authUser ? 'NONE' : 'LOGIN');
+
+  useEffect(() => {
+    if (authUser && authFlowState === 'LOGIN') {
+      setAuthFlowState('NONE');
+    } else if (!authUser && authFlowState === 'NONE') {
+      setAuthFlowState('LOGIN');
+    }
+  }, [authUser, authFlowState]);
   const [walletPageTab, setWalletPageTab] = useState<WalletSubTab>('dashboard');
   const [activeView, setActiveView] = useState<'terminal' | 'wallet' | 'news' | 'calendar' | 'profile'>('terminal');
 
   const handleRegister = async (username: string, password: string, confirmPassword: string) => {
     const response = await register({ username, password, confirmPassword });
-    if (response.success && response.token && response.refreshToken && response.profile) {
-      setAuthState(response.token, response.refreshToken, response.profile);
+    const token = response?.token;
+    const refreshToken = response?.refreshToken;
+    const profile = response?.profile;
+
+    if (token && refreshToken && profile) {
+      setAuthState(token, refreshToken, profile);
       setAuthFlowState('KYC');
+      return;
     }
+
+    throw new Error(response?.error || 'Registration failed. Please try again.');
   };
 
   const handleLogin = async (username: string, password: string) => {
     const response = await login({ username, password });
     if (response.success && response.token && response.refreshToken && response.profile) {
       setAuthState(response.token, response.refreshToken, response.profile);
+      return;
     }
+    throw new Error(response?.error || 'Login failed. Please try again.');
   };
 
   // Live Price derived from Market Stream
@@ -102,6 +122,14 @@ const ProTradingDashboard = ({
   }, [positions]);
 
   const liveFreeMargin = liveEquity - liveMargin;
+
+  const parseHistoryDate = (value: any, fallback?: any) => {
+    const date = new Date(value ?? fallback ?? Date.now());
+    if (Number.isNaN(date.getTime())) {
+      return new Date(fallback ?? Date.now());
+    }
+    return date;
+  };
 
   // Execution
   const executeOrder = useCallback(async (side: 'BUY' | 'SELL') => {
@@ -131,8 +159,41 @@ const ProTradingDashboard = ({
   }, [selectedSymbol, isPlacingOrder, orderVolume, orderSL, orderTP, liveAsk, liveBid, onPlaceOrder]);
 
   return (
-    <div className={`h-screen w-full flex flex-col font-sans overflow-hidden ${isNavyTheme ? 'navy-theme bg-[#0b1120]' : 'bg-slate-100'} text-slate-900`}>
+    <div className={`h-screen w-full flex flex-col font-sans overflow-hidden ${themeMode === 'navy' ? 'navy-theme' : ''} ${themeMode === 'white' ? 'bg-slate-100 text-slate-900' : 'bg-[#0b1120] text-slate-100'}`}>
       
+      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white/90 md:hidden">
+        <div>
+          <div className="text-xs uppercase tracking-[0.32em] text-slate-500">Theme</div>
+          <div className="text-sm font-bold text-slate-900">{themeMode === 'navy' ? 'Navy Blue Premium' : 'White Premium'}</div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setThemeMode('white')}
+            className={`px-3 py-2 rounded-2xl border text-sm font-bold transition ${themeMode === 'white' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50'}`}
+          >White</button>
+          <button
+            onClick={() => setThemeMode('navy')}
+            className={`px-3 py-2 rounded-2xl border text-sm font-bold transition ${themeMode === 'navy' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50'}`}
+          >Navy</button>
+        </div>
+      </div>
+
+      <div className="hidden md:flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white/90">
+        <div>
+          <div className="text-xs uppercase tracking-[0.32em] text-slate-500">Theme</div>
+          <div className="text-sm font-bold text-slate-900">{themeMode === 'navy' ? 'Navy Blue Premium' : 'White Premium'}</div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setThemeMode('white')}
+            className={`px-3 py-2 rounded-2xl border text-sm font-bold transition ${themeMode === 'white' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50'}`}
+          >White</button>
+          <button
+            onClick={() => setThemeMode('navy')}
+            className={`px-3 py-2 rounded-2xl border text-sm font-bold transition ${themeMode === 'navy' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50'}`}
+          >Navy</button>
+        </div>
+      </div>
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
@@ -144,9 +205,15 @@ const ProTradingDashboard = ({
         userProfile={authUser ? { id: authUser.id, username: authUser.username || authUser.fullName || authUser.email || 'User' } : null}
         onLogout={() => { handleLogout(); setIsSidebarOpen(false); }}
       />
-      {authFlowState === 'REGISTER' && <RegisterScreen onBack={() => setAuthFlowState('NONE')} onSubmit={handleRegister} />}
-      {authFlowState === 'KYC' && <KYCScreen onBack={() => setAuthFlowState('REGISTER')} onSubmit={() => setAuthFlowState('LOGIN')} />}
-      {authFlowState === 'LOGIN' && <LoginScreen onBack={() => setAuthFlowState('KYC')} onLoginSuccess={() => setAuthFlowState('NONE')} onSubmit={handleLogin} />}
+      {authFlowState === 'REGISTER' && <RegisterScreen onBack={() => setAuthFlowState('LOGIN')} onSubmit={handleRegister} />}
+      {authFlowState === 'KYC' && <KYCScreen onBack={() => setAuthFlowState('REGISTER')} onSubmit={() => setAuthFlowState('NONE')} />}
+      {authFlowState === 'LOGIN' && (
+        <LoginScreen
+          onLoginSuccess={() => setAuthFlowState('NONE')}
+          onSubmit={handleLogin}
+          onRegister={() => setAuthFlowState('REGISTER')}
+        />
+      )}
 
       {/* WALLETS PAGE */}
       {activeView === 'wallet' && (
@@ -224,7 +291,7 @@ const ProTradingDashboard = ({
         {/* MOBILE: Conditional Rendering based on Tabs */}
         {/* DESKTOP CENTER: Chart + OCT */}
         <main className={`flex-1 flex flex-col relative min-w-0 ${activeMobileTab !== 'chart' ? 'hidden md:flex' : 'flex'}`}>
-          <TradingChart symbol={selectedSymbol} isNavyTheme={isNavyTheme} />
+          <TradingChart symbol={selectedSymbol} />
           
           {/* Desktop Overlay OCT */}
           <div className="hidden md:block absolute top-4 right-4 shadow-2xl rounded-xl z-10">
@@ -362,7 +429,7 @@ const ProTradingDashboard = ({
                  {closedHistory
                    .filter(item => {
                      if (historyFilter === 'ALL') return true;
-                     const itemDate = new Date(item.timestamp);
+                     const itemDate = parseHistoryDate(item.timestamp ?? item.entryDate);
                      const now = new Date();
                      if (historyFilter === 'TODAY') return itemDate.toDateString() === now.toDateString();
                      if (historyFilter === 'WEEK') return now.getTime() - itemDate.getTime() < 7 * 24 * 60 * 60 * 1000;
@@ -371,45 +438,48 @@ const ProTradingDashboard = ({
                      return true;
                    })
                    .sort((a, b) => {
-                     const diff = new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+                     const diff = parseHistoryDate(b.timestamp ?? b.entryDate).getTime() - parseHistoryDate(a.timestamp ?? a.entryDate).getTime();
                      return historySortDesc ? diff : -diff;
                    })
-                   .map((item, idx) => (
-               <div key={idx} className="px-4 py-2.5 border-b border-slate-100 flex justify-between items-start bg-white">
-                 {item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL' ? (
-                   <>
-                    <div className="flex flex-col gap-0.5">
-                      <span className="font-semibold text-[15px] text-slate-900">{item.type === 'DEPOSIT' ? 'Balance' : 'Withdrawal'}</span>
-                      <span className="text-[13px] text-slate-400 font-mono tracking-tight">{item.id || `D-trial-USD-${new Date(item.timestamp).getTime().toString().slice(-10)}`}</span>
-                    </div>
-                    <div className="flex flex-col items-end gap-0.5">
-                      <span className="font-semibold text-[15px] tracking-tight text-blue-600">{item.amount.toFixed(2)}</span>
-                      <span className="text-[13px] text-slate-500 font-mono tracking-tight">
-                        {new Date(item.timestamp).toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
-                      </span>
-                    </div>
-                   </>
-                 ) : (
-                   <>
-                    <div className="flex flex-col gap-0.5">
-                      <div className="flex items-baseline gap-1">
-                        <span className="font-semibold text-slate-900 text-[15px]">{item.symbol}</span>
-                        <span className={`text-[13px] font-semibold ${item.side === 'BUY' ? 'text-blue-600' : 'text-red-500'}`}>{item.side?.toLowerCase()} {item.size?.toFixed(2) || '0.10'}</span>
-                      </div>
-                      <span className="text-[13px] text-slate-500 font-mono tracking-tight">{item.entryPrice?.toFixed(3)} → {item.closePrice?.toFixed(3)}</span>
-                    </div>
-                    <div className="flex flex-col items-end gap-0.5">
-                      <span className={`font-semibold text-[15px] tracking-tight ${item.pnl && item.pnl >= 0 ? 'text-blue-600' : 'text-red-500'}`}>
-                        {item.pnl?.toFixed(2) || '0.00'}
-                      </span>
-                      <span className="text-[13px] text-slate-500 font-mono tracking-tight">
-                        {new Date(item.timestamp).toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
-                      </span>
-                    </div>
-                   </>
-                 )}
-               </div>
-             ))}
+                   .map((item, idx) => {
+                     const historyDate = parseHistoryDate(item.timestamp ?? item.entryDate);
+                     return (
+                       <div key={idx} className="px-4 py-2.5 border-b border-slate-100 flex justify-between items-start bg-white">
+                         {item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL' ? (
+                           <>
+                             <div className="flex flex-col gap-0.5">
+                               <span className="font-semibold text-[15px] text-slate-900">{item.type === 'DEPOSIT' ? 'Balance' : 'Withdrawal'}</span>
+                               <span className="text-[13px] text-slate-400 font-mono tracking-tight">{item.id || `D-trial-USD-${historyDate.getTime().toString().slice(-10)}`}</span>
+                             </div>
+                             <div className="flex flex-col items-end gap-0.5">
+                               <span className="font-semibold text-[15px] tracking-tight text-blue-600">{item.amount.toFixed(2)}</span>
+                               <span className="text-[13px] text-slate-500 font-mono tracking-tight">
+                                 {historyDate.toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
+                               </span>
+                             </div>
+                           </>
+                         ) : (
+                           <>
+                             <div className="flex flex-col gap-0.5">
+                               <div className="flex items-baseline gap-1">
+                                 <span className="font-semibold text-slate-900 text-[15px]">{item.symbol}</span>
+                                 <span className={`text-[13px] font-semibold ${item.side === 'BUY' ? 'text-blue-600' : 'text-red-500'}`}>{item.side?.toLowerCase()} {item.size?.toFixed(2) || '0.10'}</span>
+                               </div>
+                               <span className="text-[13px] text-slate-500 font-mono tracking-tight">{item.entryPrice?.toFixed(3)} → {item.closePrice?.toFixed(3)}</span>
+                             </div>
+                             <div className="flex flex-col items-end gap-0.5">
+                               <span className={`font-semibold text-[15px] tracking-tight ${item.pnl && item.pnl >= 0 ? 'text-blue-600' : 'text-red-500'}`}>
+                                 {item.pnl?.toFixed(2) || '0.00'}
+                               </span>
+                               <span className="text-[13px] text-slate-500 font-mono tracking-tight">
+                                 {historyDate.toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
+                               </span>
+                             </div>
+                           </>
+                         )}
+                       </div>
+                     );
+                   })}
              </>
              )}
 
@@ -488,9 +558,9 @@ const ProTradingDashboard = ({
                <span className="font-normal text-slate-500 text-[11px]">{positions.find(pos => pos.id === positionMenuId)?.side === 'BUY' ? 'buy' : 'sell'} {positions.find(pos => pos.id === positionMenuId)?.size.toFixed(2)}</span>
              </div>
              <button onClick={() => { 
-                onClosePosition(positionMenuId); 
-                setPositionMenuId(null); 
-                setExpandedPositionId(null); 
+                setCloseConfirmationPositionId(positionMenuId);
+                setPositionMenuId(null);
+                setExpandedPositionId(null);
              }} className="py-4 bg-white/60 border-b border-slate-200 text-[#ff3b30] font-normal active:bg-slate-200 transition-colors text-center text-[19px]">Close position</button>
              <button onClick={() => { setPositionMenuId(null); }} className="py-4 bg-white/60 border-b border-slate-200 text-[#007aff] font-normal active:bg-slate-200 transition-colors text-center text-[19px]">Modify position</button>
              <button onClick={() => { 
@@ -509,6 +579,73 @@ const ProTradingDashboard = ({
           </div>
           <div className="bg-white rounded-2xl mx-2 mb-8 overflow-hidden flex flex-col shadow-2xl animate-in slide-in-from-bottom-4" onClick={e => e.stopPropagation()}>
              <button onClick={() => { setPositionMenuId(null); setExpandedPositionId(null); }} className="py-4 bg-white text-[#007aff] font-bold active:bg-slate-200 transition-colors text-center text-[19px]">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {closeConfirmationPositionId && (
+        <div className="md:hidden fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-2 py-4">
+          <div className="w-full max-w-lg bg-white rounded-t-3xl shadow-2xl p-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+            {(() => {
+              const position = positions.find(pos => pos.id === closeConfirmationPositionId);
+              const marketPrice = typeof liveBid === 'number' && typeof liveAsk === 'number' ? `${liveBid.toFixed(5)} / ${liveAsk.toFixed(5)}` : '- / -';
+              const positionSize = position?.size != null ? position.size.toFixed(2) : '-';
+              const positionPnl = position?.pnl != null ? position.pnl.toFixed(2) : '0.00';
+              const positionPnlClass = position?.pnl != null && position.pnl >= 0 ? 'text-emerald-600' : 'text-rose-600';
+
+              return (
+                <>
+                  <div className="text-center mb-3">
+                    <div className="text-sm text-slate-500 uppercase tracking-[0.2em] mb-2">Close Position</div>
+                    <div className="text-xl font-bold text-slate-900">
+                      {position?.symbol || 'Position'}
+                    </div>
+                    <div className="text-sm text-slate-500 mt-1">
+                      {position?.side?.toLowerCase() || ''} {positionSize} by Market
+                    </div>
+                  </div>
+                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-4">
+                    <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
+                      <span>Market Price</span>
+                      <span className="font-semibold text-slate-900">{marketPrice}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
+                      <span>Close Price</span>
+                      <span className="font-semibold text-slate-900">{position?.currentPrice != null ? position.currentPrice.toFixed(5) : '-'}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm text-slate-600">
+                      <span>Profit</span>
+                      <span className={`font-semibold ${positionPnlClass}`}>
+                        {positionPnl}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
+            <button
+              onClick={async () => {
+                setIsClosingPosition(true);
+                try {
+                  await onClosePosition(closeConfirmationPositionId);
+                } catch (error) {
+                  console.error('Close position failed', error);
+                } finally {
+                  setIsClosingPosition(false);
+                  setCloseConfirmationPositionId(null);
+                }
+              }}
+              disabled={isClosingPosition}
+              className="w-full py-4 rounded-3xl bg-[#ff3b30] text-white font-bold text-lg mb-3 disabled:opacity-60"
+            >
+              {isClosingPosition ? 'Closing...' : 'Close by Market'}
+            </button>
+            <button
+              onClick={() => setCloseConfirmationPositionId(null)}
+              className="w-full py-4 rounded-3xl bg-slate-100 text-slate-900 font-bold text-lg"
+            >
+              Cancel
+            </button>
           </div>
         </div>
       )}

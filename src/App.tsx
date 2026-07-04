@@ -5,6 +5,7 @@ import { useMarketStream } from "./hooks/useMarketStream";
 import * as marketService from "./services/market";
 import * as walletService from "./services/wallet";
 import * as tradingService from "./services/trading";
+import * as transactionService from "./services/transaction";
 import { UserWallet, Position } from "./types";
 
 // Lazy load the massive dashboard to optimize initial bundle size
@@ -74,6 +75,28 @@ export default function App() {
           tpPrice: p.tp
         })));
       }
+
+      const closedPositions = await tradingService.getClosedPositions();
+      const transactions = await transactionService.getTransactions();
+
+      const historyItems = [
+        ...(closedPositions || []).map((item: any) => ({
+          ...item,
+          id: item.id || item._id || item._id?.toString(),
+          entryDate: item.updatedAt || item.createdAt,
+          timestamp: item.updatedAt || item.createdAt,
+          historyType: 'trade',
+        })),
+        ...(transactions || []).map((tx: any) => ({
+          ...tx,
+          id: tx.id || tx._id || tx._id?.toString(),
+          entryDate: tx.createdAt,
+          timestamp: tx.createdAt,
+          historyType: 'transaction',
+        })),
+      ].sort((a: any, b: any) => new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime());
+
+      setClosedHistory(historyItems);
     } catch (err) {
       console.error("Error synchronizing client ledger portfolios.", err);
     }
