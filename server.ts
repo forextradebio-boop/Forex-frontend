@@ -15,7 +15,22 @@ import { PriceEngine } from './backend/src/services/priceEngine';
 console.log("MONGO URI =", process.env.MONGODB_URI);
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5174",
+
+  // Production
+  "https://forex-frontend-tau.vercel.app"
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
