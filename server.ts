@@ -16,14 +16,6 @@ console.log("MONGO URI =", process.env.MONGODB_URI);
 
 const app = express();
 const allowedOrigins = [
-  "http://localhost:3000",
-  "http://127.0.0.1:3000",
-  "http://localhost:5173",
-  "http://127.0.0.1:5173",
-  "http://localhost:5174",
-  "http://127.0.0.1:5174",
-
-  // Production
   "https://forex-frontend-tau.vercel.app"
 ];
 
