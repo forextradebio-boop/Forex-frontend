@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getKyc, submitKyc } from '../services/kycService';
+import { getKyc, submitKyc } from '../services/kyc';
 import { KycSubmitPayload } from '../types';
 
 export const useKyc = () => {

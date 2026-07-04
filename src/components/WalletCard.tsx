@@ -1,8 +1,8 @@
 import React from 'react';
-import { WalletData } from '../services/walletService';
+import { UserWallet } from '../types';
 
 interface Props {
-  wallet: WalletData;
+  wallet: UserWallet;
 }
 
 export default function WalletCard({ wallet }: Props) {

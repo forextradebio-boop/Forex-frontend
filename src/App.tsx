@@ -1,71 +1,56 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, lazy } from "react";
 import { useAuth } from "./contexts/AuthContext";
-import { io } from "socket.io-client";
-import { API_BASE_URL, SOCKET_URL } from "./api/config";
+import { useSocket } from "./contexts/SocketContext";
+import { useMarketStream } from "./hooks/useMarketStream";
+import * as marketService from "./services/market";
 import * as walletService from "./services/wallet";
 import * as tradingService from "./services/trading";
-import MT5Simulator from "./components/MT5Simulator";
-import { SymbolData, UserWallet, Position } from "./types";
+import { UserWallet, Position } from "./types";
+
+// Lazy load the massive dashboard to optimize initial bundle size
+const ProTradingDashboard = lazy(() => import("./components/ProTradingDashboard"));
 
 export default function App() {
   const { user: userProfile, loading: authLoading } = useAuth();
+  const { socket } = useSocket();
 
-  // Live updates states (synced from SSE or polling)
-  const [symbols, setSymbols] = useState<SymbolData[]>([]);
+  // Live updates states
   const [walletMetrics, setWalletMetrics] = useState<UserWallet>({ balance: 0, equity: 0, margin: 0, freeMargin: 0, pnl: 0 });
   const [activePositions, setActivePositions] = useState<Position[]>([]);
   const [closedHistory, setClosedHistory] = useState<any[]>([]);
 
-  // Sync pricing data via SSE stream on component mount
+  // Listen for targeted wallet/pnl socket events
   useEffect(() => {
-    const fetchStaticMetadata = async () => {
-      try {
-        const catRes = await fetch(`${API_BASE_URL}/market/symbols`);
-        if (catRes.ok) {
-          const symJson = await catRes.json();
-          setSymbols(symJson.symbols || []);
-        }
-      } catch (err) {
-        console.error("Error loading server startup payloads.", err);
-      }
+    if (!socket) return;
+
+    const handlePnl = (positions: any[]) => {
+      setActivePositions(
+        positions.map((p: any) => ({
+          id: p._id,
+          symbol: p.symbol,
+          side: p.type,
+          size: p.volume,
+          entryPrice: p.openPrice,
+          currentPrice: p.currentPrice,
+          pnl: p.pnl,
+          slPrice: p.sl,
+          tpPrice: p.tp
+        }))
+      );
     };
 
-    fetchStaticMetadata();
+    const handleWallet = (wallet: any) => {
+      setWalletMetrics(wallet);
+    };
 
-    const socket = io(SOCKET_URL);
-
-    socket.on("prices", (data: any[]) => {
-      if (data?.length) {
-        setSymbols(data);
-      }
-    });
-
-    if (userProfile?.id) {
-      socket.on(`pnl_${userProfile.id}`, (positions: any[]) => {
-        setActivePositions(
-          positions.map((p: any) => ({
-            id: p._id,
-            symbol: p.symbol,
-            side: p.type,
-            size: p.volume,
-            entryPrice: p.openPrice,
-            currentPrice: p.currentPrice,
-            pnl: p.pnl,
-            slPrice: p.sl,
-            tpPrice: p.tp
-          }))
-        );
-      });
-
-      socket.on(`wallet_${userProfile.id}`, (wallet: any) => {
-        setWalletMetrics(wallet);
-      });
-    }
+    socket.on("pnl", handlePnl);
+    socket.on("wallet", handleWallet);
 
     return () => {
-      socket.disconnect();
+      socket.off("pnl", handlePnl);
+      socket.off("wallet", handleWallet);
     };
-  }, [userProfile?.id]);
+  }, [socket]);
 
   const fetchClientPortfolioStats = async () => {
     if (!userProfile) return;
@@ -99,7 +84,7 @@ export default function App() {
   }, [userProfile]);
 
   // Handle Order entry placements
-  const handlePlaceOrder = async (orderPayload: any) => {
+  const handlePlaceOrder = React.useCallback(async (orderPayload: any) => {
     try {
       if (orderPayload.type === 'MARKET') {
         const res = await tradingService.createPosition({
@@ -116,29 +101,30 @@ export default function App() {
       alert(`Reject logic: ${err.response?.data?.error || err.message}`);
       throw err;
     }
-  };
+  }, []);
 
   // Close Active Position manually
-  const handleClosePosition = async (posId: string) => {
+  const handleClosePosition = React.useCallback(async (posId: string) => {
     try {
       await tradingService.closePosition(posId);
       fetchClientPortfolioStats();
     } catch (err) {
       alert("Error liquidating.");
     }
-  };
+  }, []);
 
   if (authLoading) return null;
 
   return (
-    <MT5Simulator
-      symbols={symbols}
-      wallet={walletMetrics}
-      positions={activePositions}
-      closedHistory={closedHistory}
-      userId={userProfile?.id || "USER_GUEST"}
-      onPlaceOrder={handlePlaceOrder}
-      onClosePosition={handleClosePosition}
-    />
+    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center bg-[#0b0e14] text-white">Loading Terminal...</div>}>
+      <ProTradingDashboard
+        wallet={walletMetrics}
+        positions={activePositions}
+        closedHistory={closedHistory}
+        userId={userProfile?.id || "USER_GUEST"}
+        onPlaceOrder={handlePlaceOrder}
+        onClosePosition={handleClosePosition}
+      />
+    </Suspense>
   );
 }

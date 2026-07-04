@@ -9,7 +9,7 @@ export default function OrdersScreen() {
 
   const filteredOrders = useMemo(() => {
     if (!orders) return [];
-    return orders.filter(order => {
+    return orders?.filter(order => {
       const matchesSearch = order.symbol.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesStatus = statusFilter === 'ALL' || order.status === statusFilter;
       return matchesSearch && matchesStatus;

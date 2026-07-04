@@ -49,6 +49,7 @@ export default function ProfileCard({ profile, onEditClick }: Props) {
               <h2 className="text-2xl font-black text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
                 {profile.name}
               </h2>
+              <p className="text-zinc-400 font-mono text-sm mt-1">@{profile.username || 'user'}</p>
               <p className="text-zinc-400 font-mono text-sm mt-1">{profile.email}</p>
             </div>
             
@@ -78,6 +79,10 @@ export default function ProfileCard({ profile, onEditClick }: Props) {
             <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
               <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Phone Number</div>
               <div className="text-zinc-200 font-bold truncate">{profile.phone || 'Not Set'}</div>
+            </div>
+            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
+              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">KYC Status</div>
+              <div className="text-teal-400 font-bold truncate">{profile.kycStatus || 'UNSUBMITTED'}</div>
             </div>
             <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
               <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px] flex items-center gap-1">

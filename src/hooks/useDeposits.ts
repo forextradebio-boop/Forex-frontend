@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createDeposit } from '../services/depositService';
+import { createDeposit } from '../services/deposit';
 import { DepositRequest } from '../types';
 
 export const useCreateDeposit = () => {

@@ -50,7 +50,7 @@ interface AdminCRMProps {
 
 export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
   // CRM Navigation
-  const [crmTab, setCrmTab] = useState<"METRICS" | "USERS" | "KYC" | "TRANSACTIONS" | "TRADES" | "MARKETS" | "NEWS">("METRICS");
+  const [crmTab, setCrmTab] = useState<"METRICS" | "USERS" | "KYC" | "TRANSACTIONS" | "TRADES" | "PAYMENTS" | "MARKETS" | "NEWS">("METRICS");
 
   // Metrics state
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -85,6 +85,18 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
   const [notifTitle, setNotifTitle] = useState<string>("");
   const [notifContent, setNotifContent] = useState<string>("");
   const [notifUser, setNotifUser] = useState<string>("ALL");
+
+  // Payment settings for UPI / Netbanking
+  const [paymentSettings, setPaymentSettings] = useState<any>({});
+  const [paymentSettingsForm, setPaymentSettingsForm] = useState({
+    upiId: '',
+    qrCodeUrl: '',
+    bankName: '',
+    accountHolder: '',
+    bankAccount: '',
+    ifscCode: ''
+  });
+  const [paymentSettingsLoading, setPaymentSettingsLoading] = useState(false);
 
   // Fetch all Administrative context maps
   const fetchCrmData = async () => {
@@ -140,11 +152,48 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
     }
   };
 
+  const fetchPaymentSettings = async () => {
+    try {
+      setPaymentSettingsLoading(true);
+      const result = await adminService.getPaymentSettings();
+      if (result?.settings) {
+        setPaymentSettings(result.settings);
+        setPaymentSettingsForm({
+          upiId: result.settings.upiId || '',
+          qrCodeUrl: result.settings.qrCodeUrl || '',
+          bankName: result.settings.bankName || '',
+          accountHolder: result.settings.accountHolder || '',
+          bankAccount: result.settings.bankAccount || '',
+          ifscCode: result.settings.ifscCode || ''
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load payment settings', error);
+    } finally {
+      setPaymentSettingsLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchCrmData();
-    const interval = setInterval(fetchCrmData, 5000);
+    fetchPaymentSettings();
+    const interval = setInterval(() => {
+      fetchCrmData();
+      fetchPaymentSettings();
+    }, 5000);
     return () => clearInterval(interval);
   }, [crmTab]);
+
+  const handleSavePaymentSettings = async () => {
+    try {
+      await adminService.updatePaymentSettings(paymentSettingsForm, { headers: { 'X-Admin-Override': 'true' } });
+      await fetchPaymentSettings();
+      alert('Payment settings saved successfully.');
+    } catch (error: any) {
+      console.error(error);
+      alert(error?.response?.data?.error || 'Failed to save payment settings.');
+    }
+  };
 
   // Adjust User Balance handler
   const handleAdjustBalance = async (action: "ADD" | "SUBTRACT") => {
@@ -318,6 +367,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
             { id: "KYC", key: "KYC Compliance Queue" },
             { id: "TRANSACTIONS", key: "Wallets Deposits Ledger" },
             { id: "TRADES", key: "Overruled Trading Terminal" },
+            { id: "PAYMENTS", key: "Payment Settings" },
             { id: "MARKETS", key: "Market Assets CRUD" },
             { id: "NEWS", key: "Bulletin press & Dispatch" }
           ] as const).map(tab => (
@@ -663,6 +713,123 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                   <p>Select "Review ID" on the compliant list to view birth dates, ID hashes, and actual image files uploaded.</p>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {crmTab === "PAYMENTS" && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-8 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-black text-slate-100">Payment Destination Settings</h3>
+                  <p className="text-sm text-slate-500 mt-1">Configure UPI and Netbanking details that users will use for deposit verification.</p>
+                </div>
+                {paymentSettingsLoading ? (
+                  <span className="text-xs text-slate-400 uppercase tracking-wider">Loading…</span>
+                ) : (
+                  <span className="text-xs text-emerald-400 uppercase tracking-wider">Loaded</span>
+                )}
+              </div>
+
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">UPI ID</label>
+                  <input
+                    type="text"
+                    value={paymentSettingsForm.upiId}
+                    onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, upiId: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                    placeholder="demo@upi"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">QR Code URL</label>
+                  <input
+                    type="text"
+                    value={paymentSettingsForm.qrCodeUrl}
+                    onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, qrCodeUrl: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                    placeholder="https://example.com/qr-code.png"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Bank Name</label>
+                    <input
+                      type="text"
+                      value={paymentSettingsForm.bankName}
+                      onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, bankName: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                      placeholder="Demo Bank"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Account Holder</label>
+                    <input
+                      type="text"
+                      value={paymentSettingsForm.accountHolder}
+                      onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, accountHolder: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                      placeholder="Demo Trading LLC"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Account Number</label>
+                    <input
+                      type="text"
+                      value={paymentSettingsForm.bankAccount}
+                      onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, bankAccount: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                      placeholder="1234567890"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">IFSC Code</label>
+                    <input
+                      type="text"
+                      value={paymentSettingsForm.ifscCode}
+                      onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, ifscCode: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                      placeholder="DEMO0001234"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={handleSavePaymentSettings}
+                    className="w-full rounded-2xl bg-gradient-to-r from-blue-500 via-sky-500 to-teal-400 py-3 text-sm font-black text-slate-950 hover:brightness-110 transition shadow-xl shadow-cyan-500/20"
+                  >
+                    Save Payment Settings
+                  </button>
+                  <p className="text-xs text-slate-500 leading-relaxed">These values will be shown to users on the premium deposit page when they choose UPI or Netbanking.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-4 bg-slate-950 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4">
+              <h4 className="text-sm font-semibold text-slate-200 uppercase tracking-[0.24em]">Preview for users</h4>
+              <div className="rounded-3xl bg-slate-900 border border-slate-800 p-4 space-y-4">
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-slate-500">UPI</p>
+                  <p className="text-white font-bold">{paymentSettingsForm.upiId || 'Not configured'}</p>
+                  <p className="text-slate-400 text-sm">Displayed in the deposit portal under UPI transfer.</p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-slate-500">Bank details</p>
+                  <p className="text-white font-bold">{paymentSettingsForm.accountHolder || 'Not configured'}</p>
+                  <p className="text-slate-400 text-sm">{paymentSettingsForm.bankName || 'Not configured'}</p>
+                  <p className="text-sm text-slate-300">{paymentSettingsForm.bankAccount || 'Not configured'} · IFSC {paymentSettingsForm.ifscCode || 'Not configured'}</p>
+                </div>
+              </div>
             </div>
           </div>
         )}

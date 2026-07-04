@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getTransactions } from '../services/transactionService';
+import { getTransactions } from '../services/transaction';
 
 export const useTransactions = () => {
   return useQuery({

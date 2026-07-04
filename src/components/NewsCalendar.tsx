@@ -36,7 +36,8 @@ export default function NewsCalendar({ news, calendar }: NewsCalendarProps) {
   });
 
   const filteredCalendar = calendar.filter(ev => {
-    return impactFilter === "ALL" || ev.impact === impactFilter;
+    const normalizedImpact = ev.impact?.toUpperCase?.() ?? 'LOW';
+    return impactFilter === 'ALL' || normalizedImpact === impactFilter;
   });
 
   return (
@@ -125,8 +126,9 @@ export default function NewsCalendar({ news, calendar }: NewsCalendarProps) {
             {/* Calendar Events List */}
             <div className="space-y-3">
               {filteredCalendar.map(ev => {
-                const isHigh = ev.impact === "HIGH";
-                const isMed = ev.impact === "MEDIUM";
+                const normalizedImpact = ev.impact?.toUpperCase?.() ?? 'LOW';
+                const isHigh = normalizedImpact === 'HIGH';
+                const isMed = normalizedImpact === 'MEDIUM';
 
                 return (
                   <div key={ev.id} className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 flex justify-between items-center gap-4 text-left">

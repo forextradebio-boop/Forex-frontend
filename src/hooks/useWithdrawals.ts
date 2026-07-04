@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createWithdrawal } from '../services/withdrawService';
+import { createWithdrawal } from '../services/withdraw';
 import { WithdrawRequest } from '../types';
 
 export const useCreateWithdrawal = () => {

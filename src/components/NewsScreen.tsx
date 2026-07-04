@@ -10,17 +10,19 @@ import {
   X,
   History
 } from 'lucide-react';
-import { useNews } from '../hooks/useNews';
+import { useNews, useForexNews, useSearchNews } from '../hooks/useNews';
 import { NewsItem } from '../types';
 
 export default function NewsScreen() {
   const { data, isLoading, isError, refetch, isFetching } = useNews();
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'LATEST' | 'FOREX' | 'POSITIVE' | 'NEGATIVE' | 'BOOKMARKS' | 'RECENT'>('LATEST');
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const { data: searchData, isFetching: isSearching } = useSearchNews(searchQuery);
+  const { data: forexData } = useForexNews(activeTab === 'FOREX');
   
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
   const [recentNews, setRecentNews] = useState<NewsItem[]>([]);
-  const [activeTab, setActiveTab] = useState<'LATEST' | 'BOOKMARKS' | 'RECENT'>('LATEST');
 
   // Load local state
   useEffect(() => {
@@ -79,21 +81,27 @@ export default function NewsScreen() {
     return rtf.format(daysDifference, 'day');
   };
 
-  const allNews = data?.news || [];
+  const latestNews = data?.news || [];
+  const forexNews = forexData?.news || [];
+  const searchNews = searchData?.news || [];
   
-  let displayedNews = allNews;
-  if (activeTab === 'BOOKMARKS') {
-    displayedNews = allNews.filter(n => bookmarkedIds.has(n.id));
+  const sourceNews = searchQuery.trim().length > 2 ? searchNews : latestNews;
+  let displayedNews = sourceNews;
+
+  if (activeTab === 'FOREX') {
+    displayedNews = forexNews;
+  } else if (activeTab === 'POSITIVE') {
+    displayedNews = sourceNews.filter(n => n.sentiment === 'Positive');
+  } else if (activeTab === 'NEGATIVE') {
+    displayedNews = sourceNews.filter(n => n.sentiment === 'Negative');
+  } else if (activeTab === 'BOOKMARKS') {
+    displayedNews = sourceNews.filter(n => bookmarkedIds.has(n.id));
   } else if (activeTab === 'RECENT') {
     displayedNews = recentNews;
   }
 
-  if (searchQuery) {
-    displayedNews = displayedNews.filter(n => 
-      n.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-      n.summary.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }
+  const isSearchingMode = searchQuery.trim().length > 2;
+  const hasNoResults = !displayedNews.length && !isLoading && !isError;
 
   return (
     <div className="flex flex-col h-full bg-[#09090b] font-sans text-zinc-300">
@@ -105,12 +113,12 @@ export default function NewsScreen() {
           <h2 className="text-xl font-bold text-white tracking-wide">Financial News</h2>
         </div>
 
-        <div className="flex bg-zinc-900 rounded p-1">
-          {(['LATEST', 'BOOKMARKS', 'RECENT'] as const).map(tab => (
+        <div className="flex bg-zinc-900 rounded p-1 overflow-x-auto">
+          {(['LATEST', 'FOREX', 'POSITIVE', 'NEGATIVE', 'BOOKMARKS', 'RECENT'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-1.5 rounded text-xs font-bold transition-colors flex items-center ${
+              className={`px-3 py-1.5 rounded text-xs font-bold transition-colors flex items-center whitespace-nowrap ${
                 activeTab === tab 
                   ? 'bg-emerald-500 text-black shadow-sm' 
                   : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
@@ -118,7 +126,7 @@ export default function NewsScreen() {
             >
               {tab === 'BOOKMARKS' && <Bookmark className="w-3.5 h-3.5 mr-1.5" />}
               {tab === 'RECENT' && <History className="w-3.5 h-3.5 mr-1.5" />}
-              {tab}
+              {tab === 'FOREX' ? 'Forex' : tab === 'POSITIVE' ? 'Positive' : tab === 'NEGATIVE' ? 'Negative' : tab}
             </button>
           ))}
         </div>
@@ -173,7 +181,12 @@ export default function NewsScreen() {
 
         {!isLoading && !isError && (
           <div className="space-y-4">
-            {displayedNews.length > 0 ? (
+            {hasNoResults ? (
+              <div className="text-center py-20 text-zinc-500">
+                <FileText className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                <p>{isSearchingMode ? 'No search results found.' : 'No news found.'}</p>
+              </div>
+            ) : (
               displayedNews.map(news => (
                 <div 
                   key={news.id} 
@@ -189,23 +202,46 @@ export default function NewsScreen() {
                     </button>
                   </div>
 
-                  <div className="flex items-center space-x-3 mb-3 text-xs font-mono">
-                    <span className="text-emerald-400 font-bold bg-emerald-400/10 px-2 py-0.5 rounded border border-emerald-400/20">{news.source}</span>
-                    <span className="text-zinc-500 flex items-center">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {getRelativeTime(news.publishedAt)}
-                    </span>
+                  <div className="grid gap-4 lg:grid-cols-[140px_1fr]">
+                    <div className="rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800 h-44 lg:h-full">
+                      {news.imageUrl ? (
+                        <img src={news.imageUrl} alt={news.title} loading="lazy" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-zinc-500 text-xs uppercase tracking-[0.24em] font-semibold">
+                          No Image
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-4">
+                      <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-zinc-400">
+                        <span className="px-2 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-emerald-400">{news.source}</span>
+                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{getRelativeTime(news.publishedAt)}</span>
+                        <span className={`px-2 py-1 rounded-full text-[11px] font-bold ${news.sentiment === 'Positive' ? 'bg-teal-500/10 text-teal-200 border border-teal-500/20' : news.sentiment === 'Negative' ? 'bg-rose-500/10 text-rose-200 border border-rose-500/20' : 'bg-zinc-800 text-zinc-300 border border-zinc-700'}`}>{news.sentiment}</span>
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-zinc-100 leading-snug group-hover:text-emerald-400 transition-colors">{news.title}</h3>
+                        <p className="text-sm text-zinc-400 leading-relaxed line-clamp-3 mt-2">{news.summary}</p>
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-xs text-zinc-400">
+                        {news.relatedSymbols?.slice(0, 6).map(symbol => (
+                          <span key={symbol} className="px-2 py-1 rounded-full bg-zinc-900 border border-zinc-800">{symbol}</span>
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <button onClick={(e) => { e.stopPropagation(); window.open(news.url, '_blank'); }} className="px-4 py-2 rounded-2xl bg-emerald-500 text-black text-xs font-bold hover:bg-emerald-400 transition">
+                          Open Article
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); toggleBookmark(e, news.id); }} className="px-4 py-2 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 hover:text-white transition">
+                          {bookmarkedIds.has(news.id) ? 'Bookmarked' : 'Bookmark'}
+                        </button>
+                        <button onClick={(e) => { e.stopPropagation(); handleShare(e, news.title); }} className="px-4 py-2 rounded-2xl bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 hover:text-white transition">
+                          Share
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  
-                  <h3 className="text-lg font-bold text-zinc-100 mb-2 leading-snug group-hover:text-emerald-400 transition-colors pr-16">{news.title}</h3>
-                  <p className="text-sm text-zinc-400 line-clamp-2 leading-relaxed">{news.summary}</p>
                 </div>
               ))
-            ) : (
-              <div className="text-center py-20 text-zinc-500">
-                <FileText className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                <p>No news found.</p>
-              </div>
             )}
           </div>
         )}

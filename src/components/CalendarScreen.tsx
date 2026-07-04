@@ -72,6 +72,30 @@ export default function CalendarScreen() {
 
   const allEvents = data?.calendar || [];
 
+  const parseEventDateTime = (date: string, time: string) => {
+    const baseDate = new Date(date);
+    if (Number.isNaN(baseDate.getTime())) return new Date(date);
+
+    const timeValue = time?.trim();
+    if (!timeValue || /^all day$/i.test(timeValue)) {
+      return baseDate;
+    }
+
+    const matches = timeValue.match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)$/i);
+    if (!matches) {
+      return baseDate;
+    }
+
+    const hour = Number(matches[1]);
+    const minute = Number(matches[2] ?? '0');
+    const period = matches[3].toLowerCase();
+    const normalizedHour = period === 'pm' ? (hour === 12 ? 12 : hour + 12) : hour === 12 ? 0 : hour;
+
+    const fullDate = new Date(baseDate);
+    fullDate.setHours(normalizedHour, minute, 0, 0);
+    return fullDate;
+  };
+
   // Derived state for filters
   const availableCountries = useMemo(() => {
     const countries = new Set(allEvents.map(e => e.country));
@@ -113,8 +137,8 @@ export default function CalendarScreen() {
 
       // Date
       if (dateFilter !== 'ALL') {
-        const evDate = new Date(ev.date);
-        const evDay = new Date(evDate.getFullYear(), evDate.getMonth(), evDate.getDate());
+        const eventDate = parseEventDateTime(ev.date, ev.time);
+        const evDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
 
         if (dateFilter === 'TODAY') {
           if (evDay.getTime() !== today.getTime()) return false;
@@ -128,14 +152,14 @@ export default function CalendarScreen() {
       }
 
       return true;
-    }).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    }).sort((a, b) => parseEventDateTime(a.date, a.time).getTime() - parseEventDateTime(b.date, b.time).getTime());
   }, [allEvents, searchQuery, impactFilter, countryFilter, dateFilter]);
 
   // Group by Date for display
   const groupedEvents = useMemo(() => {
     const groups: Record<string, EconomicEvent[]> = {};
     filteredEvents.forEach(ev => {
-      const d = new Date(ev.date);
+      const d = parseEventDateTime(ev.date, ev.time);
       const dateKey = d.toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(ev);
@@ -223,8 +247,8 @@ export default function CalendarScreen() {
               className="bg-transparent text-zinc-300 border-none outline-none text-xs font-bold py-1 px-2 cursor-pointer max-w-[120px]"
             >
               <option value="ALL">All Countries</option>
-              {availableCountries.map(c => (
-                <option key={c} value={c}>{c}</option>
+              {availableCountries.map((c, idx) => (
+                <option key={`${c}-${idx}`} value={c}>{c}</option>
               ))}
             </select>
           </div>
@@ -273,14 +297,16 @@ export default function CalendarScreen() {
                   <div className="bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden shadow-2xl">
                     <table className="w-full text-left text-sm font-mono whitespace-nowrap">
                       <tbody className="divide-y divide-zinc-800/50">
-                        {groupedEvents[dateKey].map(ev => {
-                          const dateObj = new Date(ev.date);
-                          const timeStr = dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                        {groupedEvents[dateKey].map((ev, evIndex) => {
+                          const dateObj = parseEventDateTime(ev.date, ev.time);
+                          const timeStr = ev.time && !/^all day$/i.test(ev.time)
+                            ? ev.time
+                            : dateObj.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
                           const hasReminder = !!reminders[ev.id];
                           
                           return (
                             <tr 
-                              key={ev.id} 
+                              key={`${ev.id}-${evIndex}`} 
                               onClick={() => setSelectedEvent(ev)}
                               className="hover:bg-zinc-900/50 transition-colors cursor-pointer group"
                             >
@@ -346,7 +372,7 @@ export default function CalendarScreen() {
               
               <div className="flex items-center gap-4 text-sm font-mono text-zinc-400 bg-zinc-900/50 p-3 rounded-lg border border-zinc-800/50">
                 <div className="flex items-center"><CalendarIcon className="w-4 h-4 mr-2 text-indigo-400" /> {new Date(selectedEvent.date).toLocaleDateString()}</div>
-                <div className="flex items-center"><Clock className="w-4 h-4 mr-2 text-indigo-400" /> {new Date(selectedEvent.date).toLocaleTimeString()}</div>
+                <div className="flex items-center"><Clock className="w-4 h-4 mr-2 text-indigo-400" /> {parseEventDateTime(selectedEvent.date, selectedEvent.time).toLocaleTimeString()}</div>
               </div>
             </div>
 

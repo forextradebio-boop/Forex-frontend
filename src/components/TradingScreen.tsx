@@ -62,12 +62,12 @@ export default function TradingScreen() {
       type: form.type,
       volume,
       price: targetPrice,
-      status: 'PENDING' // Assuming new orders start as pending for demo
+      // status is set by the backend
     });
   };
 
   const filteredOrders = useMemo(() => {
-    return orders.filter(order => {
+    return orders?.filter(order => {
       if (activeTab === 'OPEN') return order.status === 'EXECUTED';
       if (activeTab === 'PENDING') return order.status === 'PENDING';
       if (activeTab === 'HISTORY') return order.status === 'CANCELLED' || order.status === 'EXECUTED';

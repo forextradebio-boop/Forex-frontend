@@ -3,8 +3,9 @@ import api from '../api/axios';
 
 interface User {
   id: string;
-  fullName: string;
-  email: string;
+  username?: string;
+  fullName?: string;
+  email?: string;
   role: string;
 }
 

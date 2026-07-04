@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { useCreateWithdrawal } from '../hooks/useWithdrawals';
-import { useWallet } from '../hooks/useWallet';
+import { useKyc } from '../hooks/useKyc';
 import { Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
 
-export default function WithdrawScreen() {
-  const { data: wallet } = useWallet();
+interface WithdrawScreenProps {
+  wallet?: {
+    balance?: number;
+    freeMargin?: number;
+  };
+}
+
+export default function WithdrawScreen({ wallet }: WithdrawScreenProps) {
+  const { data: kyc } = useKyc();
   const withdrawMutation = useCreateWithdrawal();
   
   const [amount, setAmount] = useState<string>('');
+  const [currency, setCurrency] = useState<'USD' | 'INR' | 'EUR'>('USD');
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,9 +34,23 @@ export default function WithdrawScreen() {
       setError('Insufficient balance available for withdrawal.');
       return;
     }
+    if (!kyc?.accountNumber || !kyc?.ifscCode || !kyc?.bankName || !kyc?.accountHolderName) {
+      setError('Your withdrawal payout details are missing. Complete KYC first.');
+      return;
+    }
     
     withdrawMutation.mutate(
-      { amount: numAmount },
+      {
+        amount: numAmount,
+        currency,
+        method: 'BANK',
+        bankDetails: {
+          accountHolderName: kyc.accountHolderName,
+          bankName: kyc.bankName,
+          accountNumber: kyc.accountNumber,
+          ifscCode: kyc.ifscCode,
+        }
+      },
       {
         onSuccess: () => {
           setIsSuccess(true);
@@ -86,8 +108,39 @@ export default function WithdrawScreen() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4 relative z-10">
-        <div className="space-y-1.5">
-          <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Requested Amount (USD)</label>
+        <div className="space-y-3 bg-zinc-900/70 border border-zinc-800 rounded-3xl p-4">
+          <div className="text-xs text-zinc-400 uppercase tracking-[0.2em] font-bold">Saved Withdrawal Payout</div>
+          <div className="grid gap-2 text-sm text-white">
+            <div className="flex justify-between items-center text-slate-300">
+              <span>Account Holder</span>
+              <strong>{kyc?.accountHolderName || 'Not configured'}</strong>
+            </div>
+            <div className="flex justify-between items-center text-slate-300">
+              <span>Bank</span>
+              <strong>{kyc?.bankName || 'Not configured'}</strong>
+            </div>
+            <div className="flex justify-between items-center text-slate-300">
+              <span>Account No.</span>
+              <strong>{kyc?.accountNumber || 'Not configured'}</strong>
+            </div>
+            <div className="flex justify-between items-center text-slate-300">
+              <span>IFSC</span>
+              <strong>{kyc?.ifscCode || 'Not configured'}</strong>
+            </div>
+          </div>
+        </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Currency</label>
+          <select value={currency} onChange={(e) => setCurrency(e.target.value as 'USD' | 'INR' | 'EUR')} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-3 text-sm text-white focus:outline-none">
+            <option value="USD">USD - US Dollar</option>
+            <option value="INR">INR - Indian Rupee</option>
+            <option value="EUR">EUR - Euro</option>
+          </select>
+        </div>
+        <div>
+          <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Withdrawal Amount</label>
           <input 
             type="number" 
             min="1"
@@ -100,24 +153,26 @@ export default function WithdrawScreen() {
             placeholder="0.00"
           />
         </div>
+      </div>
 
-        <button 
-          type="button"
-          onClick={() => setAmount(availableBalance.toString())}
-          className="w-full py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-bold text-xs rounded-lg transition-colors"
-        >
-          Withdraw Max Amount
-        </button>
+      <button 
+        type="button"
+        onClick={() => setAmount(availableBalance.toString())}
+        className="w-full py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 font-bold text-xs rounded-lg transition-colors"
+      >
+        Withdraw Max Amount
+      </button>
 
-        <button 
-          type="submit"
-          disabled={withdrawMutation.isPending || availableBalance <= 0 || Number(amount) > availableBalance}
-          className="w-full mt-4 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-black py-4 rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)]"
-        >
-          <Upload className="w-5 h-5" />
-          {withdrawMutation.isPending ? 'Processing...' : 'Confirm Withdrawal'}
-        </button>
+      <button 
+        type="submit"
+        disabled={withdrawMutation.isPending || availableBalance <= 0 || Number(amount) > availableBalance}
+        className="w-full mt-4 bg-purple-500 hover:bg-purple-600 disabled:opacity-50 text-white font-black py-4 rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_25px_rgba(168,85,247,0.5)]"
+      >
+        <Upload className="w-5 h-5" />
+        {withdrawMutation.isPending ? 'Processing...' : 'Confirm Withdrawal'}
+      </button>
       </form>
     </div>
   );
 }
+

@@ -1,11 +1,12 @@
 import api from '../api/axios';
+import { WithdrawRequest } from '../types';
 
-export const createWithdrawal = async (payload: { amount: number }) => {
-  const res = await api.post('/withdrawals', payload);
+export const createWithdrawal = async (payload: WithdrawRequest) => {
+  const res = await api.post('/api/withdrawals', payload);
   return res.data;
 };
 
 export const getWithdrawals = async () => {
-  const res = await api.get('/withdrawals');
+  const res = await api.get('/api/withdrawals');
   return res.data;
 };

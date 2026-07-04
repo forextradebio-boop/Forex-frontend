@@ -253,7 +253,9 @@ export default function WalletAndKyc({
       }
 
       await createWithdrawal({
-        amount: parsedAmount
+        amount: parsedAmount,
+        currency: 'USD',
+        method: 'BANK'
       });
       alert(`Success! Withdrawal request of $${parsedAmount} submitted. Admin review pending.`);
       setWithdrawAmount("");

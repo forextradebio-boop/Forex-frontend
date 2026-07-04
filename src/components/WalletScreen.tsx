@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useWallet } from '../hooks/useWallet';
 import WalletCard from './WalletCard';
 import DepositScreen from './DepositScreen';
 import WithdrawScreen from './WithdrawScreen';
 import TransactionHistoryScreen from './TransactionHistoryScreen';
-import { Wallet, RefreshCw, AlertCircle, TrendingUp, Download, Upload } from 'lucide-react';
+import { Wallet, RefreshCw, AlertCircle, TrendingUp, Download, Upload, ArrowLeft } from 'lucide-react';
 
-export default function WalletScreen() {
+export type WalletSubTab = 'dashboard' | 'deposit' | 'withdraw' | 'transactions';
+
+interface WalletScreenProps {
+  initialTab?: WalletSubTab;
+  onBack?: () => void;
+}
+
+export default function WalletScreen({ initialTab = 'dashboard', onBack }: WalletScreenProps) {
   const { data: wallet, isLoading, isError, refetch, isFetching } = useWallet();
-  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'deposit' | 'withdraw' | 'transactions'>('dashboard');
+  const [activeSubTab, setActiveSubTab] = useState<WalletSubTab>(initialTab);
+
+  useEffect(() => {
+    setActiveSubTab(initialTab);
+  }, [initialTab]);
 
   if (isError) {
     return (
@@ -43,13 +54,20 @@ export default function WalletScreen() {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#09090b] font-sans text-zinc-300 relative overflow-y-auto">
+    <div className="flex flex-col h-screen bg-[#09090b] font-sans text-zinc-300 relative" style={{ WebkitOverflowScrolling: 'touch' }}>
       
       {/* Header */}
       <div className="border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md p-4 lg:px-8 sticky top-0 z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h2 className="text-xl font-black text-white tracking-wide flex items-center gap-2">
-          <Wallet className="w-5 h-5 text-blue-500" /> Financial Dashboard
-        </h2>
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button onClick={onBack} className="p-2 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-300 hover:text-white transition">
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          )}
+          <h2 className="text-xl font-black text-white tracking-wide flex items-center gap-2">
+            <Wallet className="w-5 h-5 text-blue-500" /> Financial Dashboard
+          </h2>
+        </div>
         
         <div className="flex items-center gap-2">
           <div className="flex bg-zinc-900 rounded-xl p-1 border border-zinc-800">
@@ -89,7 +107,7 @@ export default function WalletScreen() {
         </div>
       </div>
 
-      <div className="flex-1 p-4 lg:p-8 max-w-5xl mx-auto w-full space-y-8">
+      <div className="flex-1 p-4 lg:p-8 max-w-5xl mx-auto w-full space-y-8 pt-20 md:pt-8 overflow-y-auto pb-28">
         
         {activeSubTab === 'dashboard' ? (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -141,7 +159,7 @@ export default function WalletScreen() {
           </div>
         ) : activeSubTab === 'withdraw' ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 py-4">
-            <WithdrawScreen />
+            <WithdrawScreen wallet={wallet} />
           </div>
         ) : activeSubTab === 'transactions' ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
