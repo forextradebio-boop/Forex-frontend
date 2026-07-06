@@ -139,7 +139,7 @@ export default function App() {
   if (authLoading) return null;
 
   return (
-    <Suspense fallback={<div className="h-screen w-full flex items-center justify-center bg-[#0b0e14] text-white">Loading Terminal...</div>}>
+    <Suspense fallback={<div className="h-[100dvh] w-full flex items-center justify-center bg-[#0b0e14] text-white">Loading Terminal...</div>}>
       <ProTradingDashboard
         wallet={walletMetrics}
         positions={activePositions}

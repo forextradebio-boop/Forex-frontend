@@ -159,7 +159,7 @@ const ProTradingDashboard = ({
   }, [selectedSymbol, isPlacingOrder, orderVolume, orderSL, orderTP, liveAsk, liveBid, onPlaceOrder]);
 
   return (
-    <div className={`h-screen w-full flex flex-col font-sans overflow-hidden ${themeMode === 'navy' ? 'navy-theme' : ''} ${themeMode === 'white' ? 'bg-slate-100 text-slate-900' : 'bg-[#0b1120] text-slate-100'}`}>
+    <div className={`h-[100dvh] w-full flex flex-col font-sans overflow-hidden ${themeMode === 'navy' ? 'navy-theme' : ''} ${themeMode === 'white' ? 'bg-slate-100 text-slate-900' : 'bg-[#0b1120] text-slate-100'}`}>
       
       <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white/90 md:hidden">
         <div>
