@@ -25,9 +25,9 @@ export default function ProfileCard({ profile, wallet, onEditClick }: Props) {
   });
 
   return (
-    <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
+    <div className="bg-lb-panel border border-lb-border rounded-2xl p-6 shadow-2xl relative overflow-hidden group">
       {/* Decorative background glow */}
-      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl group-hover:bg-teal-500/20 transition-all duration-500"></div>
+      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-lb-accent/10 rounded-full blur-3xl group-hover:bg-lb-accent/20 transition-all duration-500"></div>
 
       <div className="flex flex-col md:flex-row gap-6 items-center md:items-start relative z-10">
         
@@ -37,15 +37,15 @@ export default function ProfileCard({ profile, wallet, onEditClick }: Props) {
             <img 
               src={profile.avatar} 
               alt={profile.name} 
-              className="w-24 h-24 rounded-full border-4 border-zinc-900 object-cover shadow-xl"
+              className="w-24 h-24 rounded-full border-4 border-lb-bg object-cover shadow-xl"
             />
           ) : (
-            <div className="w-24 h-24 rounded-full border-4 border-zinc-900 bg-zinc-800 flex items-center justify-center shadow-xl text-3xl font-black text-zinc-500">
+            <div className="w-24 h-24 rounded-full border-4 border-lb-bg bg-lb-panel-hover flex items-center justify-center shadow-xl text-3xl font-black text-lb-text-muted">
               {getInitials(profile.name)}
             </div>
           )}
-          <div className="absolute -bottom-2 -right-2 bg-zinc-900 rounded-full p-1 border border-zinc-800" title="Verified Account">
-            <CheckCircle2 className="w-6 h-6 fill-teal-500 text-black" />
+          <div className="absolute -bottom-2 -right-2 bg-lb-bg rounded-full p-1 border border-lb-border" title="Verified Account">
+            <CheckCircle2 className="w-6 h-6 fill-lb-accent text-lb-bg" />
           </div>
         </div>
 
@@ -53,51 +53,51 @@ export default function ProfileCard({ profile, wallet, onEditClick }: Props) {
         <div className="flex-1 text-center md:text-left">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-black text-white tracking-tight flex items-center justify-center md:justify-start gap-2">
+              <h2 className="text-2xl font-black text-lb-text tracking-tight flex items-center justify-center md:justify-start gap-2">
                 {profile.name}
               </h2>
-              <p className="text-zinc-400 font-mono text-sm mt-1">@{profile.username || 'user'}</p>
-              <p className="text-zinc-400 font-mono text-sm mt-1">{profile.email}</p>
+              <p className="text-lb-text-muted font-mono text-sm mt-1">@{profile.username || 'user'}</p>
+              <p className="text-lb-text-muted font-mono text-sm mt-1">{profile.email}</p>
             </div>
             
             <button 
               onClick={onEditClick}
-              className="px-6 py-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-teal-500/50 text-white font-bold text-xs rounded-xl transition-all shadow-sm"
+              className="px-6 py-2 bg-lb-bg hover:bg-lb-panel-hover border border-lb-border hover:border-lb-accent/50 text-lb-text font-bold text-xs rounded-xl transition-all shadow-sm"
             >
               Edit Profile
             </button>
           </div>
 
           <div className="mt-6 grid grid-cols-2 md:grid-cols-6 gap-4 text-xs">
-            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
-              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Account ID</div>
-              <div className="text-zinc-200 font-mono truncate">{profile._id.substring(0, 8).toUpperCase()}</div>
+            <div className="bg-lb-bg/50 rounded-lg p-3 border border-lb-border/50">
+              <div className="text-lb-text-muted font-bold mb-1 uppercase tracking-wider text-[10px]">Account ID</div>
+              <div className="text-lb-text font-mono truncate">{profile._id.substring(0, 8).toUpperCase()}</div>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
-              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Balance</div>
-              <div className="text-teal-300 font-bold truncate">${wallet?.balance?.toFixed(2) ?? '0.00'}</div>
+            <div className="bg-lb-bg/50 rounded-lg p-3 border border-lb-border/50">
+              <div className="text-lb-text-muted font-bold mb-1 uppercase tracking-wider text-[10px]">Balance</div>
+              <div className="text-lb-accent font-bold truncate">${wallet?.balance?.toFixed(2) ?? '0.00'}</div>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
-              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Equity</div>
-              <div className="text-zinc-200 font-bold truncate">${wallet?.equity?.toFixed(2) ?? '0.00'}</div>
+            <div className="bg-lb-bg/50 rounded-lg p-3 border border-lb-border/50">
+              <div className="text-lb-text-muted font-bold mb-1 uppercase tracking-wider text-[10px]">Equity</div>
+              <div className="text-lb-text font-bold truncate">${wallet?.equity?.toFixed(2) ?? '0.00'}</div>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
-              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Country</div>
-              <div className="text-zinc-200 font-bold truncate">{profile.country || 'Not Set'}</div>
+            <div className="bg-lb-bg/50 rounded-lg p-3 border border-lb-border/50">
+              <div className="text-lb-text-muted font-bold mb-1 uppercase tracking-wider text-[10px]">Country</div>
+              <div className="text-lb-text font-bold truncate">{profile.country || 'Not Set'}</div>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
-              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">Phone Number</div>
-              <div className="text-zinc-200 font-bold truncate">{profile.phone || 'Not Set'}</div>
+            <div className="bg-lb-bg/50 rounded-lg p-3 border border-lb-border/50">
+              <div className="text-lb-text-muted font-bold mb-1 uppercase tracking-wider text-[10px]">Phone Number</div>
+              <div className="text-lb-text font-bold truncate">{profile.phone || 'Not Set'}</div>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50">
-              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px]">KYC Status</div>
-              <div className="text-teal-400 font-bold truncate">{profile.kycStatus || 'UNSUBMITTED'}</div>
+            <div className="bg-lb-bg/50 rounded-lg p-3 border border-lb-border/50">
+              <div className="text-lb-text-muted font-bold mb-1 uppercase tracking-wider text-[10px]">KYC Status</div>
+              <div className="text-lb-accent font-bold truncate">{profile.kycStatus || 'UNSUBMITTED'}</div>
             </div>
-            <div className="bg-zinc-900/50 rounded-lg p-3 border border-zinc-800/50 md:col-span-2">
-              <div className="text-zinc-500 font-bold mb-1 uppercase tracking-wider text-[10px] flex items-center gap-1">
+            <div className="bg-lb-bg/50 rounded-lg p-3 border border-lb-border/50 md:col-span-2">
+              <div className="text-lb-text-muted font-bold mb-1 uppercase tracking-wider text-[10px] flex items-center gap-1">
                 <Calendar className="w-3 h-3" /> Joined
               </div>
-              <div className="text-zinc-200 font-bold">{joinDate}</div>
+              <div className="text-lb-text font-bold">{joinDate}</div>
             </div>
           </div>
 

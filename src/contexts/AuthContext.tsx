@@ -58,6 +58,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchProfile();
   }, [token]);
 
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setToken(null);
+      setRefreshToken(null);
+      setUser(null);
+    };
+    window.addEventListener('auth:unauthorized', handleUnauthorized);
+    return () => window.removeEventListener('auth:unauthorized', handleUnauthorized);
+  }, []);
+
+
   const login = (newToken: string, newRefreshToken: string, newUser: User) => {
     localStorage.setItem('token', newToken);
     localStorage.setItem('refreshToken', newRefreshToken);

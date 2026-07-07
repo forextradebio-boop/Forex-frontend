@@ -17,22 +17,22 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol }: Marke
   }, [symbols, search]);
 
   return (
-    <aside className="w-full md:w-80 flex-1 md:flex-none md:h-full min-h-0 flex flex-col border-r bg-white border-slate-200">
-      <div className="p-2 border-b border-slate-200 flex items-center gap-2">
+    <aside className="w-full md:w-80 flex-1 md:flex-none md:h-full min-h-0 flex flex-col border-r bg-lb-panel border-lb-border">
+      <div className="p-2 border-b border-lb-border flex items-center gap-2">
         <div className="relative flex-1">
-          <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
+          <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-lb-text-muted" />
           <input
             type="text"
             placeholder="Search symbols..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8 pr-2 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded outline-none focus:border-blue-500 transition-colors text-slate-900"
+            className="w-full pl-8 pr-2 py-2 text-xs bg-lb-bg border border-lb-border rounded-xl outline-none focus:border-lb-accent focus:shadow-[0_0_15px_rgba(20,184,166,0.2)] transition-all text-lb-text placeholder:text-lb-text-muted"
           />
         </div>
       </div>
       
       {/* Table Header */}
-      <div className="grid grid-cols-[30px_1fr_70px_70px] gap-2 px-2 py-1.5 border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+      <div className="grid grid-cols-[30px_1fr_70px_70px] gap-2 px-2 py-1.5 border-b border-lb-border bg-lb-bg text-[11px] font-bold text-lb-text-muted uppercase tracking-wider">
         <div className="flex justify-center"><Star className="w-3 h-3" /></div>
         <div>Symbol</div>
         <div className="text-right">Bid</div>
@@ -51,40 +51,40 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol }: Marke
             <div 
               key={sym.symbol} 
               onClick={() => onSelectSymbol(rawSymbol)}
-              className={`group flex flex-col cursor-pointer border-b transition-colors ${
+              className={`group flex flex-col cursor-pointer border-b transition-all duration-300 ${
                 isSelected 
-                  ? 'bg-blue-50 border-blue-100' 
-                  : 'border-slate-100 hover:bg-slate-50'
+                  ? 'bg-lb-accent/10 border-l-2 border-l-lb-accent border-y border-lb-accent/30 shadow-[0_0_15px_rgba(20,184,166,0.05)] scale-[1.02] rounded-r-lg my-1' 
+                  : 'border-lb-border hover:bg-lb-panel-hover border-l-2 border-l-transparent'
               }`}
             >
               <div className="grid grid-cols-[30px_1fr_70px_70px] gap-2 px-2 py-2.5 items-center">
-                <div className="flex justify-center text-slate-300 hover:text-amber-400 transition-colors">
+                <div className="flex justify-center text-lb-text-muted hover:text-lb-accent transition-colors">
                   <Star className="w-4 h-4" />
                 </div>
                 
                 <div className="flex flex-col">
-                  <span className={`text-[14px] font-extrabold ${isSelected ? 'text-blue-700' : 'text-slate-900'}`}>
+                  <span className={`text-[14px] font-extrabold ${isSelected ? 'text-lb-accent' : 'text-lb-text'}`}>
                     {rawSymbol}
                   </span>
-                  <span className={`text-[11px] font-bold mt-0.5 ${isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
+                  <span className={`text-[11px] font-bold mt-0.5 ${isPositive ? 'text-lb-accent' : 'text-lb-down'}`}>
                     {isPositive ? '+' : ''}{(sym.changePercent || 0).toFixed(2)}%
                   </span>
                 </div>
                 
                 <div className="flex flex-col items-end">
-                  <span className={`text-[14px] font-mono font-bold tracking-tight ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
+                  <span className={`text-[14px] font-mono font-bold tracking-tight ${isPositive ? 'text-lb-accent' : 'text-lb-down'}`}>
                     {sym.bid?.toFixed(5) || sym.price?.toFixed(5)}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                  <span className="text-[10px] text-lb-text-muted font-mono mt-0.5">
                     L: {sym.low?.toFixed(5) || '0.00000'}
                   </span>
                 </div>
                 
                 <div className="flex flex-col items-end">
-                  <span className={`text-[14px] font-mono font-bold tracking-tight ${isPositive ? 'text-emerald-600' : 'text-red-600'}`}>
+                  <span className={`text-[14px] font-mono font-bold tracking-tight ${isPositive ? 'text-lb-accent' : 'text-lb-down'}`}>
                     {sym.ask?.toFixed(5) || sym.price?.toFixed(5)}
                   </span>
-                  <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                  <span className="text-[10px] text-lb-text-muted font-mono mt-0.5">
                     H: {sym.high?.toFixed(5) || '0.00000'}
                   </span>
                 </div>

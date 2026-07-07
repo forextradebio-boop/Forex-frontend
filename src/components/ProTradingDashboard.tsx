@@ -21,6 +21,13 @@ import { LoginScreen } from './terminal/LoginScreen';
 import WalletScreen from './WalletScreen';
 import NewsScreen from './NewsScreen';
 import CalendarScreen from './CalendarScreen';
+import { AboutScreen } from './terminal/AboutScreen';
+import { FilePlus } from 'lucide-react';
+
+const formatPrice = (price: number | undefined | null) => {
+  if (price == null) return '-';
+  return price.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 5 }).replace(/,/g, ' ');
+};
 
 interface ProTradingDashboardProps {
   wallet: UserWallet;
@@ -73,7 +80,7 @@ const ProTradingDashboard = ({
     }
   }, [authUser, authFlowState]);
   const [walletPageTab, setWalletPageTab] = useState<WalletSubTab>('dashboard');
-  const [activeView, setActiveView] = useState<'terminal' | 'wallet' | 'news' | 'calendar' | 'profile'>('terminal');
+  const [activeView, setActiveView] = useState<'terminal' | 'wallet' | 'news' | 'calendar' | 'profile' | 'about'>('terminal');
 
   const handleRegister = async (username: string, password: string, confirmPassword: string) => {
     const response = await register({ username, password, confirmPassword });
@@ -116,7 +123,7 @@ const ProTradingDashboard = ({
   const liveMargin = useMemo(() => {
     return positions.reduce((sum, p) => {
       const pPrice = p.currentPrice || p.entryPrice;
-      const nominal = (p.size || 0) * 100000 * pPrice;
+      const nominal = (p.size || 0) * pPrice;
       return sum + (nominal / 100); // Assuming 1:100 leverage for display
     }, 0);
   }, [positions]);
@@ -159,41 +166,7 @@ const ProTradingDashboard = ({
   }, [selectedSymbol, isPlacingOrder, orderVolume, orderSL, orderTP, liveAsk, liveBid, onPlaceOrder]);
 
   return (
-    <div className={`h-[100dvh] w-full flex flex-col font-sans overflow-hidden ${themeMode === 'navy' ? 'navy-theme' : ''} ${themeMode === 'white' ? 'bg-slate-100 text-slate-900' : 'bg-[#0b1120] text-slate-100'}`}>
-      
-      <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white/90 md:hidden">
-        <div>
-          <div className="text-xs uppercase tracking-[0.32em] text-slate-500">Theme</div>
-          <div className="text-sm font-bold text-slate-900">{themeMode === 'navy' ? 'Navy Blue Premium' : 'White Premium'}</div>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setThemeMode('white')}
-            className={`px-3 py-2 rounded-2xl border text-sm font-bold transition ${themeMode === 'white' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50'}`}
-          >White</button>
-          <button
-            onClick={() => setThemeMode('navy')}
-            className={`px-3 py-2 rounded-2xl border text-sm font-bold transition ${themeMode === 'navy' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50'}`}
-          >Navy</button>
-        </div>
-      </div>
-
-      <div className="hidden md:flex items-center justify-between px-4 py-3 border-b border-slate-200 bg-white/90">
-        <div>
-          <div className="text-xs uppercase tracking-[0.32em] text-slate-500">Theme</div>
-          <div className="text-sm font-bold text-slate-900">{themeMode === 'navy' ? 'Navy Blue Premium' : 'White Premium'}</div>
-        </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setThemeMode('white')}
-            className={`px-3 py-2 rounded-2xl border text-sm font-bold transition ${themeMode === 'white' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50'}`}
-          >White</button>
-          <button
-            onClick={() => setThemeMode('navy')}
-            className={`px-3 py-2 rounded-2xl border text-sm font-bold transition ${themeMode === 'navy' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-900 border-slate-200 hover:bg-slate-50'}`}
-          >Navy</button>
-        </div>
-      </div>
+    <div className="h-[100dvh] w-full flex flex-col font-sans overflow-hidden bg-lb-bg text-lb-text">
       <Sidebar 
         isOpen={isSidebarOpen} 
         onClose={() => setIsSidebarOpen(false)} 
@@ -202,6 +175,7 @@ const ProTradingDashboard = ({
         onNavigateProfile={() => { setActiveView('profile'); setIsSidebarOpen(false); }}
         onNavigateNews={() => { setActiveView('news'); setIsSidebarOpen(false); }}
         onNavigateCalendar={() => { setActiveView('calendar'); setIsSidebarOpen(false); }}
+        onNavigateAbout={() => { setActiveView('about'); setIsSidebarOpen(false); }}
         userProfile={authUser ? { id: authUser.id, username: authUser.username || authUser.fullName || authUser.email || 'User' } : null}
         onLogout={() => { handleLogout(); setIsSidebarOpen(false); }}
       />
@@ -222,36 +196,47 @@ const ProTradingDashboard = ({
         </div>
       )}
       {activeView === 'news' && (
-        <div className="flex-1 flex flex-col min-h-0 bg-[#09090b] text-zinc-300">
-          <div className="border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
-            <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-300 hover:text-white transition">
+        <div className="flex-1 flex flex-col min-h-0 bg-lb-bg text-lb-text">
+          <div className="border-b border-lb-border bg-lb-panel/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
+            <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-lb-panel hover:bg-lb-panel-hover border border-lb-border rounded-xl text-lb-text transition">
               Back to Terminal
             </button>
-            <h1 className="text-lg font-black text-white tracking-wide">Premium Market News</h1>
+            <h1 className="text-lg font-black text-lb-text tracking-wide">Premium Market News</h1>
           </div>
           <NewsScreen />
         </div>
       )}
       {activeView === 'calendar' && (
-        <div className="flex-1 flex flex-col min-h-0 bg-[#09090b] text-zinc-300">
-          <div className="border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
-            <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-300 hover:text-white transition">
+        <div className="flex-1 flex flex-col min-h-0 bg-lb-bg text-lb-text">
+          <div className="border-b border-lb-border bg-lb-panel/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
+            <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-lb-panel hover:bg-lb-panel-hover border border-lb-border rounded-xl text-lb-text transition">
               Back to Terminal
             </button>
-            <h1 className="text-lg font-black text-white tracking-wide">Economic Calendar</h1>
+            <h1 className="text-lg font-black text-lb-text tracking-wide">Economic Calendar</h1>
           </div>
           <CalendarScreen />
         </div>
       )}
       {activeView === 'profile' && (
-        <div className="flex-1 flex flex-col min-h-0 bg-[#09090b] text-zinc-300">
-          <div className="border-b border-zinc-800 bg-zinc-950/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
-            <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-xl text-zinc-300 hover:text-white transition">
+        <div className="flex-1 flex flex-col min-h-0 bg-lb-bg text-lb-text">
+          <div className="border-b border-lb-border bg-lb-panel/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
+            <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-lb-panel hover:bg-lb-panel-hover border border-lb-border rounded-xl text-lb-text transition">
               Back to Terminal
             </button>
-            <h1 className="text-lg font-black text-white tracking-wide">Profile</h1>
+            <h1 className="text-lg font-black text-lb-text tracking-wide">Profile</h1>
           </div>
           <ProfileScreen />
+        </div>
+      )}
+      {activeView === 'about' && (
+        <div className="flex-1 flex flex-col min-h-0 bg-lb-bg text-lb-text">
+          <div className="border-b border-lb-border bg-lb-panel/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
+            <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-lb-panel hover:bg-lb-panel-hover border border-lb-border rounded-xl text-lb-text transition">
+              Back to Terminal
+            </button>
+            <h1 className="text-lg font-black text-lb-text tracking-wide">About</h1>
+          </div>
+          <AboutScreen />
         </div>
       )}
       {activeView === 'terminal' && (
@@ -267,17 +252,27 @@ const ProTradingDashboard = ({
       </div>
 
       {/* MOBILE TOP BAR (For Chart/Quotes) */}
-      <div className={`md:hidden shrink-0 bg-white border-b border-slate-200 items-center justify-between px-4 shadow-sm relative ${activeMobileTab === 'trade' || activeMobileTab === 'new_order' ? 'hidden' : 'flex h-12'}`}>
-         <button onClick={() => setIsSidebarOpen(true)} className="w-9 h-9 flex items-center justify-center text-slate-700 active:bg-slate-100 rounded-full -ml-2">
+      <div className={`md:hidden shrink-0 bg-lb-panel border-b border-lb-border items-center justify-between px-4 shadow-sm relative ${activeMobileTab === 'trade' || activeMobileTab === 'new_order' ? 'hidden' : 'flex h-12'}`}>
+         <button onClick={() => setIsSidebarOpen(true)} className="w-9 h-9 flex items-center justify-center text-lb-text active:bg-lb-panel-hover rounded-full -ml-2">
            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
          </button>
-         <span className="font-bold text-slate-800 tracking-wide capitalize absolute left-1/2 -translate-x-1/2">
+         <span className="font-bold text-lb-text tracking-wide capitalize absolute left-1/2 -translate-x-1/2">
            {activeMobileTab === 'quotes' && 'Quotes'}
            {activeMobileTab === 'chart' && selectedSymbol}
            {activeMobileTab === 'history' && 'History'}
            {activeMobileTab === 'profile' && 'Profile'}
          </span>
-         <div className="w-9 h-9" />
+         <div className="w-9 h-9 flex items-center justify-center">
+           {activeMobileTab === 'chart' && (
+             <button 
+               onClick={() => setActiveMobileTab('new_order')} 
+               className="text-lb-accent bg-lb-accent/10 hover:bg-lb-accent/20 p-2 rounded-full transition-all active:scale-95 shadow-[0_0_10px_rgba(20,184,166,0.15)]"
+               title="New Order"
+             >
+               <FilePlus className="w-4 h-4" strokeWidth={2.5} />
+             </button>
+           )}
+         </div>
       </div>
 
       {/* WORKSPACE */}
@@ -307,71 +302,71 @@ const ProTradingDashboard = ({
         </main>
 
         {/* MOBILE PANELS */}
-        <div className={`flex-1 flex flex-col bg-white overflow-hidden ${activeMobileTab !== 'quotes' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
+        <div className={`flex-1 flex flex-col bg-lb-bg overflow-hidden ${activeMobileTab !== 'quotes' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
            <MarketWatch selectedSymbol={selectedSymbol} onSelectSymbol={(sym) => {
              setSelectedSymbol(sym);
              setQuoteMenuSymbol(sym);
            }} />
         </div>
 
-        <div className={`flex-1 flex flex-col bg-white overflow-y-auto ${activeMobileTab !== 'trade' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
+        <div className={`flex-1 flex flex-col bg-lb-bg overflow-y-auto ${activeMobileTab !== 'trade' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
            {/* Top Header replacement for Trade Tab */}
-           <div className="p-4 pt-6 flex flex-col bg-white">
+           <div className="p-4 pt-6 flex flex-col bg-lb-panel mx-4 mt-4 rounded-2xl shadow-lg border border-lb-border">
              <div className="flex justify-center items-start w-full">
-               <span className="text-2xl font-bold text-blue-600 tracking-tight">{(liveEquity - wallet.balance).toFixed(2)} USD</span>
+               <span className="text-3xl font-bold text-lb-accent tracking-tight">{(liveEquity - wallet.balance).toFixed(2)} USD</span>
              </div>
              
              <div className="flex flex-col gap-1.5 text-[13px] mt-6 px-1">
-               <div className="flex justify-between"><span className="text-slate-700">Balance:</span><span className="font-mono">{wallet.balance.toFixed(2)}</span></div>
-               <div className="flex justify-between"><span className="text-slate-700">Equity:</span><span className="font-mono">{liveEquity.toFixed(2)}</span></div>
-               <div className="flex justify-between"><span className="text-slate-700">Margin:</span><span className="font-mono">{liveMargin.toFixed(2)}</span></div>
-               <div className="flex justify-between"><span className="text-slate-700">Free Margin:</span><span className="font-mono">{liveFreeMargin.toFixed(2)}</span></div>
-               <div className="flex justify-between"><span className="text-slate-700">Margin Level (%):</span><span className="font-mono">{liveMargin > 0 ? ((liveEquity / liveMargin) * 100).toFixed(2) : '0.00'}</span></div>
+               <div className="flex justify-between"><span className="text-lb-text-muted">Balance:</span><span className="font-mono text-lb-text">{wallet.balance.toFixed(2)} USD</span></div>
+               <div className="flex justify-between"><span className="text-lb-text-muted">Equity:</span><span className="font-mono text-lb-text">{liveEquity.toFixed(2)} USD</span></div>
+               <div className="flex justify-between"><span className="text-lb-text-muted">Margin:</span><span className="font-mono text-lb-text">{liveMargin.toFixed(2)} USD</span></div>
+               <div className="flex justify-between"><span className="text-lb-text-muted">Free Margin:</span><span className="font-mono text-lb-text">{liveFreeMargin.toFixed(2)} USD</span></div>
+               <div className="flex justify-between"><span className="text-lb-text-muted">Margin Level (%):</span><span className="font-mono text-lb-text">{liveMargin > 0 ? ((liveEquity / liveMargin) * 100).toFixed(2) : '0.00'}</span></div>
              </div>
            </div>
            
-           <div className="bg-slate-100 px-3 py-1.5 font-bold text-sm text-slate-800 flex justify-between items-center">
+           <div className="px-4 py-3 mt-4 font-bold text-sm text-lb-text flex justify-between items-center">
              <span>Positions</span>
-             <span className="text-slate-400 tracking-widest text-lg leading-none -mt-2">...</span>
+             <span className="text-lb-text-muted tracking-widest text-lg leading-none -mt-2">...</span>
            </div>
            
            {/* Mobile Positions List */}
-           <div className="flex-1 overflow-y-auto bg-white pb-32">
+           <div className="flex-1 overflow-y-auto bg-lb-bg pb-32 px-4 flex flex-col gap-2">
              {positions.map(p => (
-               <div key={p.id} className="border-b border-slate-100 bg-white flex flex-col">
-                 <div className="px-4 py-3 flex justify-between items-center" 
+               <div key={p.id} className="bg-lb-panel border border-lb-border rounded-2xl flex flex-col overflow-hidden">
+                 <div className="px-4 py-3 flex justify-between items-center cursor-pointer hover:bg-lb-panel-hover transition" 
                       onClick={() => {
                         setExpandedPositionId(p.id);
                         setPositionMenuId(p.id);
                       }}>
                    <div className="flex flex-col gap-0.5">
                      <div className="flex items-baseline gap-1">
-                       <span className="font-bold text-slate-900 text-[15px]">{p.symbol}</span>
-                       <span className={`text-[13px] font-semibold ${p.side === 'BUY' ? 'text-blue-600' : 'text-red-500'}`}>{p.side.toLowerCase()} {p.size.toFixed(2)}</span>
+                       <span className="font-bold text-lb-text text-[15px]">{p.symbol}</span>
+                       <span className={`text-[12px] px-1.5 py-0.5 rounded ${p.side === 'BUY' ? 'bg-lb-accent/10 text-lb-accent' : 'bg-lb-down/10 text-lb-down'}`}>{p.side.toLowerCase()} {p.size.toFixed(2)}</span>
                      </div>
-                     <span className="text-[13px] text-slate-500 font-mono tracking-tight">{p.entryPrice.toFixed(5)} → {p.currentPrice?.toFixed(5)}</span>
+                     <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">{formatPrice(p.entryPrice)} → {formatPrice(p.currentPrice)}</span>
                    </div>
-                   <span className={`font-bold text-[19px] tracking-tight ${p.pnl && p.pnl >= 0 ? 'text-blue-600' : 'text-red-500'}`}>
+                   <span className={`font-bold text-[19px] tracking-tight ${p.pnl && p.pnl >= 0 ? 'text-lb-accent' : 'text-lb-down'}`}>
                      {p.pnl?.toFixed(2) || '0.00'}
                    </span>
                  </div>
                  {expandedPositionId === p.id && (
-                   <div className="px-4 pb-3 flex flex-col gap-1 text-[13px] text-slate-500 bg-slate-50/50 pt-2 border-t border-slate-50">
+                   <div className="px-4 pb-3 flex flex-col gap-1 text-[13px] text-lb-text-muted bg-lb-bg/50 pt-2 border-t border-lb-border">
                      <div className="flex justify-between">
                        <span className="w-16">S/L:</span>
-                       <span className="text-slate-800 flex-1">-</span>
+                       <span className="text-lb-text flex-1">-</span>
                        <span className="w-16 text-right">Swap:</span>
-                       <span className="text-slate-800 w-16 text-right">0.00</span>
+                       <span className="text-lb-text w-16 text-right">0.00</span>
                      </div>
                      <div className="flex justify-between">
                        <span className="w-16">T/P:</span>
-                       <span className="text-slate-800 flex-1">-</span>
+                       <span className="text-lb-text flex-1">-</span>
                        <span className="w-16 text-right">Taxes:</span>
-                       <span className="text-slate-800 w-16 text-right">0.00</span>
+                       <span className="text-lb-text w-16 text-right">0.00</span>
                      </div>
-                     <div className="flex justify-between mt-1 pt-1 border-t border-slate-100">
+                     <div className="flex justify-between mt-1 pt-1 border-t border-lb-border">
                        <span>Time:</span>
-                       <span className="text-slate-800">{new Date(p.timestamp).toLocaleString()}</span>
+                       <span className="text-lb-text">{new Date(p.timestamp).toLocaleString()}</span>
                      </div>
                    </div>
                  )}
@@ -380,52 +375,52 @@ const ProTradingDashboard = ({
            </div>
         </div>
 
-        <div className={`flex-1 flex flex-col bg-slate-50 overflow-hidden ${activeMobileTab !== 'history' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
+        <div className={`flex-1 flex flex-col bg-lb-bg overflow-hidden ${activeMobileTab !== 'history' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
           {/* MT5 Style History Header */}
-          <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-slate-100 z-10 relative">
+          <div className="flex items-center justify-between px-3 py-2 bg-lb-panel border-b border-lb-border z-10 relative">
             <button 
               onClick={() => setHistorySortDesc(!historySortDesc)}
-              className="w-8 h-8 rounded-full bg-blue-50/50 text-blue-600 flex items-center justify-center transition-transform"
+              className="w-8 h-8 rounded-full bg-lb-accent/10 text-lb-accent flex items-center justify-center transition-transform"
               style={{ transform: historySortDesc ? 'rotate(0deg)' : 'rotate(180deg)' }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 15l5 5 5-5"/><path d="M7 9l5-5 5 5"/></svg>
             </button>
-            <div className="flex bg-slate-100/80 rounded-full p-1 text-[13px] font-semibold text-slate-600">
+            <div className="flex bg-lb-bg rounded-full p-1 text-[13px] font-semibold text-lb-text-muted">
               <button 
                 onClick={() => setHistorySubTab('POSITIONS')}
-                className={`px-3 py-1 rounded-full transition-all ${historySubTab === 'POSITIONS' ? 'bg-white shadow-sm text-slate-900' : ''}`}>Positions</button>
+                className={`px-3 py-1 rounded-full transition-all ${historySubTab === 'POSITIONS' ? 'bg-lb-panel shadow-sm text-lb-text' : ''}`}>Positions</button>
               <button 
                 onClick={() => setHistorySubTab('ORDERS')}
-                className={`px-3 py-1 rounded-full transition-all ${historySubTab === 'ORDERS' ? 'bg-white shadow-sm text-slate-900' : ''}`}>Orders</button>
+                className={`px-3 py-1 rounded-full transition-all ${historySubTab === 'ORDERS' ? 'bg-lb-panel shadow-sm text-lb-text' : ''}`}>Orders</button>
               <button 
                 onClick={() => setHistorySubTab('DEALS')}
-                className={`px-3 py-1 rounded-full transition-all ${historySubTab === 'DEALS' ? 'bg-white shadow-sm text-slate-900' : ''}`}>Deals</button>
+                className={`px-3 py-1 rounded-full transition-all ${historySubTab === 'DEALS' ? 'bg-lb-panel shadow-sm text-lb-text' : ''}`}>Deals</button>
             </div>
             <div className="relative">
               <button 
                 onClick={() => setShowHistoryMenu(!showHistoryMenu)}
-                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showHistoryMenu ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-700'}`}>
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${showHistoryMenu ? 'bg-lb-accent/20 text-lb-accent' : 'bg-lb-bg text-lb-text-muted'}`}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
               </button>
               {showHistoryMenu && (
-                <div className="absolute top-10 right-0 bg-white shadow-xl border border-slate-100 rounded-xl w-36 py-1 z-50 text-sm font-semibold text-slate-700">
-                  <div className="px-4 py-2 hover:bg-slate-50 cursor-pointer" onClick={() => { setHistoryFilter('TODAY'); setShowHistoryMenu(false); }}>Today</div>
-                  <div className="px-4 py-2 hover:bg-slate-50 cursor-pointer" onClick={() => { setHistoryFilter('WEEK'); setShowHistoryMenu(false); }}>Last Week</div>
-                  <div className="px-4 py-2 hover:bg-slate-50 cursor-pointer" onClick={() => { setHistoryFilter('MONTH'); setShowHistoryMenu(false); }}>Last Month</div>
-                  <div className="px-4 py-2 hover:bg-slate-50 cursor-pointer" onClick={() => { setHistoryFilter('YEAR'); setShowHistoryMenu(false); }}>Last Year</div>
-                  <div className="px-4 py-2 hover:bg-slate-50 cursor-pointer text-blue-600" onClick={() => { setHistoryFilter('ALL'); setShowHistoryMenu(false); }}>All History</div>
+                <div className="absolute top-10 right-0 bg-lb-panel shadow-xl border border-lb-border rounded-xl w-36 py-1 z-50 text-sm font-semibold text-lb-text">
+                  <div className="px-4 py-2 hover:bg-lb-panel-hover cursor-pointer" onClick={() => { setHistoryFilter('TODAY'); setShowHistoryMenu(false); }}>Today</div>
+                  <div className="px-4 py-2 hover:bg-lb-panel-hover cursor-pointer" onClick={() => { setHistoryFilter('WEEK'); setShowHistoryMenu(false); }}>Last Week</div>
+                  <div className="px-4 py-2 hover:bg-lb-panel-hover cursor-pointer" onClick={() => { setHistoryFilter('MONTH'); setShowHistoryMenu(false); }}>Last Month</div>
+                  <div className="px-4 py-2 hover:bg-lb-panel-hover cursor-pointer" onClick={() => { setHistoryFilter('YEAR'); setShowHistoryMenu(false); }}>Last Year</div>
+                  <div className="px-4 py-2 hover:bg-lb-panel-hover cursor-pointer text-lb-accent" onClick={() => { setHistoryFilter('ALL'); setShowHistoryMenu(false); }}>All History</div>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto bg-white relative">
+          <div className="flex-1 overflow-y-auto bg-lb-bg relative pb-32">
              {historySubTab !== 'POSITIONS' ? (
-               <div className="flex flex-col items-center justify-center h-48 text-slate-400 text-sm font-semibold">
+               <div className="flex flex-col items-center justify-center h-48 text-lb-text-muted text-sm font-semibold">
                  No {historySubTab.toLowerCase()} found for this period.
                </div>
              ) : (
-               <>
+               <div className="flex flex-col gap-2 p-4">
                  {closedHistory
                    .filter(item => {
                      if (historyFilter === 'ALL') return true;
@@ -444,16 +439,16 @@ const ProTradingDashboard = ({
                    .map((item, idx) => {
                      const historyDate = parseHistoryDate(item.timestamp ?? item.entryDate);
                      return (
-                       <div key={idx} className="px-4 py-2.5 border-b border-slate-100 flex justify-between items-start bg-white">
+                       <div key={idx} className="px-4 py-3 rounded-2xl border border-lb-border flex justify-between items-start bg-lb-panel">
                          {item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL' ? (
                            <>
                              <div className="flex flex-col gap-0.5">
-                               <span className="font-semibold text-[15px] text-slate-900">{item.type === 'DEPOSIT' ? 'Balance' : 'Withdrawal'}</span>
-                               <span className="text-[13px] text-slate-400 font-mono tracking-tight">{item.id || `D-trial-USD-${historyDate.getTime().toString().slice(-10)}`}</span>
+                               <span className="font-semibold text-[15px] text-lb-text">{item.type === 'DEPOSIT' ? 'Balance' : 'Withdrawal'}</span>
+                               <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">{item.id || `D-trial-USD-${historyDate.getTime().toString().slice(-10)}`}</span>
                              </div>
                              <div className="flex flex-col items-end gap-0.5">
-                               <span className="font-semibold text-[15px] tracking-tight text-blue-600">{item.amount.toFixed(2)}</span>
-                               <span className="text-[13px] text-slate-500 font-mono tracking-tight">
+                               <span className={`font-semibold text-[15px] tracking-tight ${item.type === 'DEPOSIT' ? 'text-lb-accent' : 'text-lb-down'}`}>{item.amount.toFixed(2)}</span>
+                               <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">
                                  {historyDate.toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
                                </span>
                              </div>
@@ -462,16 +457,16 @@ const ProTradingDashboard = ({
                            <>
                              <div className="flex flex-col gap-0.5">
                                <div className="flex items-baseline gap-1">
-                                 <span className="font-semibold text-slate-900 text-[15px]">{item.symbol}</span>
-                                 <span className={`text-[13px] font-semibold ${item.side === 'BUY' ? 'text-blue-600' : 'text-red-500'}`}>{item.side?.toLowerCase()} {item.size?.toFixed(2) || '0.10'}</span>
+                                 <span className="font-semibold text-lb-text text-[15px]">{item.symbol}</span>
+                                 <span className={`text-[12px] px-1.5 py-0.5 rounded ${item.side === 'BUY' ? 'bg-lb-accent/10 text-lb-accent' : 'bg-lb-down/10 text-lb-down'}`}>{item.side?.toLowerCase()} {item.size?.toFixed(2) || '0.10'}</span>
                                </div>
-                               <span className="text-[13px] text-slate-500 font-mono tracking-tight">{item.entryPrice?.toFixed(3)} → {item.closePrice?.toFixed(3)}</span>
+                               <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">{formatPrice(item.entryPrice)} → {formatPrice(item.closePrice)}</span>
                              </div>
                              <div className="flex flex-col items-end gap-0.5">
-                               <span className={`font-semibold text-[15px] tracking-tight ${item.pnl && item.pnl >= 0 ? 'text-blue-600' : 'text-red-500'}`}>
+                               <span className={`font-semibold text-[15px] tracking-tight ${item.pnl && item.pnl >= 0 ? 'text-lb-accent' : 'text-lb-down'}`}>
                                  {item.pnl?.toFixed(2) || '0.00'}
                                </span>
-                               <span className="text-[13px] text-slate-500 font-mono tracking-tight">
+                               <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">
                                  {historyDate.toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
                                </span>
                              </div>
@@ -480,34 +475,34 @@ const ProTradingDashboard = ({
                        </div>
                      );
                    })}
-             </>
+               </div>
              )}
 
              {/* History Summary Footer */}
-             <div className="px-4 py-4 bg-white flex flex-col gap-2 text-[14px]">
+             <div className="mx-4 mt-2 px-4 py-4 rounded-2xl bg-lb-panel border border-lb-border flex flex-col gap-2 text-[14px]">
                <div className="flex justify-between">
-                 <span className="text-slate-800">Deposit</span>
-                 <span className="font-bold text-slate-900 font-mono">
+                 <span className="text-lb-text-muted">Deposit</span>
+                 <span className="font-bold text-lb-text font-mono">
                    {closedHistory.filter(h => h.type === 'DEPOSIT').reduce((s, h) => s + h.amount, 0).toFixed(2)}
                  </span>
                </div>
                <div className="flex justify-between">
-                 <span className="text-slate-800">Profit</span>
-                 <span className="font-bold text-slate-900 font-mono">
+                 <span className="text-lb-text-muted">Profit</span>
+                 <span className="font-bold text-lb-text font-mono">
                    {closedHistory.filter(h => h.type !== 'DEPOSIT' && h.type !== 'WITHDRAWAL').reduce((s, h) => s + (h.pnl || 0), 0).toFixed(2)}
                  </span>
                </div>
                <div className="flex justify-between">
-                 <span className="text-slate-800">Swap</span>
-                 <span className="font-bold text-slate-900 font-mono">0.00</span>
+                 <span className="text-lb-text-muted">Swap</span>
+                 <span className="font-bold text-lb-text font-mono">0.00</span>
                </div>
                <div className="flex justify-between">
-                 <span className="text-slate-800">Commission</span>
-                 <span className="font-bold text-slate-900 font-mono">0.00</span>
+                 <span className="text-lb-text-muted">Commission</span>
+                 <span className="font-bold text-lb-text font-mono">0.00</span>
                </div>
-               <div className="flex justify-between border-t border-slate-100 pt-2 mt-1">
-                 <span className="text-slate-800">Balance</span>
-                 <span className="font-bold text-slate-900 font-mono">
+               <div className="flex justify-between border-t border-lb-border pt-2 mt-1">
+                 <span className="text-lb-text-muted">Balance</span>
+                 <span className="font-bold text-lb-text font-mono">
                    {(
                      closedHistory.filter(h => h.type === 'DEPOSIT').reduce((s, h) => s + h.amount, 0) + 
                      closedHistory.filter(h => h.type !== 'DEPOSIT' && h.type !== 'WITHDRAWAL').reduce((s, h) => s + (h.pnl || 0), 0) - 
@@ -519,7 +514,7 @@ const ProTradingDashboard = ({
           </div>
         </div>
 
-        <div className={`flex-1 flex flex-col bg-[#09090b] overflow-y-auto ${activeMobileTab !== 'profile' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
+        <div className={`flex-1 flex flex-col bg-lb-panel overflow-y-auto ${activeMobileTab !== 'profile' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
           <ProfileScreen />
         </div>
 
@@ -538,12 +533,12 @@ const ProTradingDashboard = ({
       {/* MOBILE POPUP MENU */}
       {quoteMenuSymbol && (
         <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/40 animate-in fade-in">
-          <div className="bg-white rounded-t-3xl p-4 pb-8 flex flex-col gap-3 relative shadow-2xl animate-in slide-in-from-bottom-4">
-             <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-2" />
-             <div className="font-bold text-center text-lg mb-2">{quoteMenuSymbol}: Forex</div>
-             <button onClick={() => { setQuoteMenuSymbol(null); setActiveMobileTab('new_order'); }} className="py-3.5 bg-slate-100 rounded-xl font-bold text-slate-800 active:bg-slate-200 transition-colors text-center text-lg">Trade</button>
-             <button onClick={() => { setQuoteMenuSymbol(null); setActiveMobileTab('chart'); }} className="py-3.5 bg-slate-100 rounded-xl font-bold text-slate-800 active:bg-slate-200 transition-colors text-center text-lg">Chart</button>
-             <button onClick={() => setQuoteMenuSymbol(null)} className="py-3.5 mt-1 bg-red-50 text-red-600 rounded-xl font-bold active:bg-red-100 transition-colors text-center text-lg">Cancel</button>
+          <div className="bg-lb-panel rounded-t-3xl p-4 pb-8 flex flex-col gap-3 relative shadow-2xl animate-in slide-in-from-bottom-4">
+             <div className="w-12 h-1.5 bg-lb-border rounded-full mx-auto mb-2" />
+             <div className="font-bold text-center text-lg mb-2 text-lb-text">{quoteMenuSymbol}: Forex</div>
+             <button onClick={() => { setQuoteMenuSymbol(null); setActiveMobileTab('new_order'); }} className="py-3.5 bg-lb-bg rounded-xl font-bold text-lb-text active:bg-lb-panel-hover transition-colors text-center text-lg">Trade</button>
+             <button onClick={() => { setQuoteMenuSymbol(null); setActiveMobileTab('chart'); }} className="py-3.5 bg-lb-bg rounded-xl font-bold text-lb-text active:bg-lb-panel-hover transition-colors text-center text-lg">Chart</button>
+             <button onClick={() => setQuoteMenuSymbol(null)} className="py-3.5 mt-1 bg-lb-down/10 text-lb-down rounded-xl font-bold active:bg-lb-down/20 transition-colors text-center text-lg">Cancel</button>
           </div>
         </div>
       )}
@@ -551,69 +546,69 @@ const ProTradingDashboard = ({
       {/* MOBILE ORDER SCREEN */}
       {/* POSITION MENU */}
       {positionMenuId && (
-        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/40 animate-in fade-in" onClick={() => { setPositionMenuId(null); setExpandedPositionId(null); }}>
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl mx-2 mb-4 overflow-hidden flex flex-col shadow-2xl animate-in slide-in-from-bottom-4" onClick={e => e.stopPropagation()}>
-             <div className="py-2.5 bg-white/60 border-b border-slate-200 text-center text-[13px] font-bold text-slate-800 flex flex-col">
+        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/60 animate-in fade-in" onClick={() => { setPositionMenuId(null); setExpandedPositionId(null); }}>
+          <div className="bg-lb-panel/95 backdrop-blur-md rounded-2xl mx-2 mb-4 overflow-hidden flex flex-col shadow-2xl animate-in slide-in-from-bottom-4 border border-lb-border" onClick={e => e.stopPropagation()}>
+             <div className="py-2.5 bg-lb-panel/60 border-b border-lb-border text-center text-[13px] font-bold text-lb-text flex flex-col">
                {positions.find(pos => pos.id === positionMenuId)?.symbol}
-               <span className="font-normal text-slate-500 text-[11px]">{positions.find(pos => pos.id === positionMenuId)?.side === 'BUY' ? 'buy' : 'sell'} {positions.find(pos => pos.id === positionMenuId)?.size.toFixed(2)}</span>
+               <span className="font-normal text-lb-text-muted text-[11px]">{positions.find(pos => pos.id === positionMenuId)?.side === 'BUY' ? 'buy' : 'sell'} {positions.find(pos => pos.id === positionMenuId)?.size.toFixed(2)}</span>
              </div>
              <button onClick={() => { 
                 setCloseConfirmationPositionId(positionMenuId);
                 setPositionMenuId(null);
                 setExpandedPositionId(null);
-             }} className="py-4 bg-white/60 border-b border-slate-200 text-[#ff3b30] font-normal active:bg-slate-200 transition-colors text-center text-[19px]">Close position</button>
-             <button onClick={() => { setPositionMenuId(null); }} className="py-4 bg-white/60 border-b border-slate-200 text-[#007aff] font-normal active:bg-slate-200 transition-colors text-center text-[19px]">Modify position</button>
+             }} className="py-4 bg-lb-panel/60 border-b border-lb-border text-lb-down font-normal active:bg-lb-panel-hover transition-colors text-center text-[19px]">Close position</button>
+             <button onClick={() => { setPositionMenuId(null); }} className="py-4 bg-lb-panel/60 border-b border-lb-border text-lb-accent font-normal active:bg-lb-panel-hover transition-colors text-center text-[19px]">Modify position</button>
              <button onClick={() => { 
                 const p = positions.find(pos => pos.id === positionMenuId);
                 setPositionMenuId(null); 
                 if (p) setSelectedSymbol(p.symbol);
                 setActiveMobileTab('new_order'); 
-             }} className="py-4 bg-white/60 border-b border-slate-200 text-[#007aff] font-normal active:bg-slate-200 transition-colors text-center text-[19px]">Trade</button>
+             }} className="py-4 bg-lb-panel/60 border-b border-lb-border text-lb-accent font-normal active:bg-lb-panel-hover transition-colors text-center text-[19px]">Trade</button>
              <button onClick={() => { 
                 const p = positions.find(pos => pos.id === positionMenuId);
                 setPositionMenuId(null); 
                 if (p) setSelectedSymbol(p.symbol);
                 setActiveMobileTab('chart'); 
-             }} className="py-4 bg-white/60 border-b border-slate-200 text-[#007aff] font-normal active:bg-slate-200 transition-colors text-center text-[19px]">Chart</button>
-             <button onClick={() => { setPositionMenuId(null); }} className="py-4 bg-white/60 text-[#007aff] font-normal active:bg-slate-200 transition-colors text-center text-[19px]">Bulk Operations...</button>
+             }} className="py-4 bg-lb-panel/60 border-b border-lb-border text-lb-accent font-normal active:bg-lb-panel-hover transition-colors text-center text-[19px]">Chart</button>
+             <button onClick={() => { setPositionMenuId(null); }} className="py-4 bg-lb-panel/60 text-lb-accent font-normal active:bg-lb-panel-hover transition-colors text-center text-[19px]">Bulk Operations...</button>
           </div>
-          <div className="bg-white rounded-2xl mx-2 mb-8 overflow-hidden flex flex-col shadow-2xl animate-in slide-in-from-bottom-4" onClick={e => e.stopPropagation()}>
-             <button onClick={() => { setPositionMenuId(null); setExpandedPositionId(null); }} className="py-4 bg-white text-[#007aff] font-bold active:bg-slate-200 transition-colors text-center text-[19px]">Cancel</button>
+          <div className="bg-lb-panel border border-lb-border rounded-2xl mx-2 mb-8 overflow-hidden flex flex-col shadow-2xl animate-in slide-in-from-bottom-4" onClick={e => e.stopPropagation()}>
+             <button onClick={() => { setPositionMenuId(null); setExpandedPositionId(null); }} className="py-4 bg-lb-panel text-lb-accent font-bold active:bg-lb-panel-hover transition-colors text-center text-[19px]">Cancel</button>
           </div>
         </div>
       )}
 
       {closeConfirmationPositionId && (
         <div className="md:hidden fixed inset-0 z-50 flex items-end justify-center bg-black/60 px-2 py-4">
-          <div className="w-full max-w-lg bg-white rounded-t-3xl shadow-2xl p-4 overflow-hidden" onClick={e => e.stopPropagation()}>
+          <div className="w-full max-w-lg bg-lb-panel rounded-t-3xl shadow-2xl p-4 overflow-hidden border border-lb-border" onClick={e => e.stopPropagation()}>
             {(() => {
               const position = positions.find(pos => pos.id === closeConfirmationPositionId);
               const marketPrice = typeof liveBid === 'number' && typeof liveAsk === 'number' ? `${liveBid.toFixed(5)} / ${liveAsk.toFixed(5)}` : '- / -';
               const positionSize = position?.size != null ? position.size.toFixed(2) : '-';
               const positionPnl = position?.pnl != null ? position.pnl.toFixed(2) : '0.00';
-              const positionPnlClass = position?.pnl != null && position.pnl >= 0 ? 'text-emerald-600' : 'text-rose-600';
+              const positionPnlClass = position?.pnl != null && position.pnl >= 0 ? 'text-lb-accent' : 'text-lb-down';
 
               return (
                 <>
                   <div className="text-center mb-3">
-                    <div className="text-sm text-slate-500 uppercase tracking-[0.2em] mb-2">Close Position</div>
-                    <div className="text-xl font-bold text-slate-900">
+                    <div className="text-sm text-lb-text-muted uppercase tracking-[0.2em] mb-2">Close Position</div>
+                    <div className="text-xl font-bold text-lb-text">
                       {position?.symbol || 'Position'}
                     </div>
-                    <div className="text-sm text-slate-500 mt-1">
+                    <div className="text-sm text-lb-text-muted mt-1">
                       {position?.side?.toLowerCase() || ''} {positionSize} by Market
                     </div>
                   </div>
-                  <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 mb-4">
-                    <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
+                  <div className="rounded-3xl border border-lb-border bg-lb-bg p-4 mb-4">
+                    <div className="flex items-center justify-between text-sm text-lb-text-muted mb-2">
                       <span>Market Price</span>
-                      <span className="font-semibold text-slate-900">{marketPrice}</span>
+                      <span className="font-semibold text-lb-text">{marketPrice}</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm text-slate-600 mb-2">
+                    <div className="flex items-center justify-between text-sm text-lb-text-muted mb-2">
                       <span>Close Price</span>
-                      <span className="font-semibold text-slate-900">{position?.currentPrice != null ? position.currentPrice.toFixed(5) : '-'}</span>
+                      <span className="font-semibold text-lb-text">{position?.currentPrice != null ? position.currentPrice.toFixed(5) : '-'}</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm text-slate-600">
+                    <div className="flex items-center justify-between text-sm text-lb-text-muted">
                       <span>Profit</span>
                       <span className={`font-semibold ${positionPnlClass}`}>
                         {positionPnl}
@@ -636,13 +631,13 @@ const ProTradingDashboard = ({
                 }
               }}
               disabled={isClosingPosition}
-              className="w-full py-4 rounded-3xl bg-[#ff3b30] text-white font-bold text-lg mb-3 disabled:opacity-60"
+              className="w-full py-4 rounded-3xl bg-lb-down text-lb-text font-bold text-lg mb-3 disabled:opacity-60"
             >
               {isClosingPosition ? 'Closing...' : 'Close by Market'}
             </button>
             <button
               onClick={() => setCloseConfirmationPositionId(null)}
-              className="w-full py-4 rounded-3xl bg-slate-100 text-slate-900 font-bold text-lg"
+              className="w-full py-4 rounded-3xl bg-lb-bg text-lb-text font-bold text-lg"
             >
               Cancel
             </button>

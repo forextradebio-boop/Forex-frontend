@@ -76,22 +76,22 @@ export default function TradingScreen() {
   }, [orders, activeTab]);
 
   return (
-    <div className="flex flex-col lg:flex-row h-full bg-[#09090b] font-sans text-zinc-300">
+    <div className="flex flex-col lg:flex-row h-full bg-lb-panel font-sans text-lb-text">
       
       {/* Left Panel - Order Entry */}
-      <div className="w-full lg:w-80 bg-zinc-950 border-r border-zinc-800 p-6 flex flex-col relative z-20 shadow-2xl">
-        <h2 className="text-xl font-black text-white flex items-center gap-2 mb-6">
-          <Crosshair className="w-5 h-5 text-teal-500" /> New Order
+      <div className="w-full lg:w-80 bg-lb-panel border-r border-lb-border p-6 flex flex-col relative z-20 shadow-2xl">
+        <h2 className="text-xl font-black text-lb-text flex items-center gap-2 mb-6">
+          <Crosshair className="w-5 h-5 text-lb-accent" /> New Order
         </h2>
 
         {successMsg && (
-          <div className="mb-4 p-3 bg-teal-500/10 border border-teal-500/30 rounded-xl flex items-center gap-2 text-teal-400 text-xs font-bold">
+          <div className="mb-4 p-3 bg-lb-accent/10 border border-lb-accent/30 rounded-xl flex items-center gap-2 text-lb-accent text-xs font-bold">
             <CheckCircle2 className="w-4 h-4" /> {successMsg}
           </div>
         )}
         
         {errorMsg && (
-          <div className="mb-4 p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-center gap-2 text-rose-400 text-xs font-bold">
+          <div className="mb-4 p-3 bg-lb-down/10 border border-lb-down/30 rounded-xl flex items-center gap-2 text-lb-down text-xs font-bold">
             <AlertCircle className="w-4 h-4" /> {errorMsg}
           </div>
         )}
@@ -99,48 +99,48 @@ export default function TradingScreen() {
         <form onSubmit={handleSubmit} className="space-y-5 flex-1">
           
           <div className="space-y-1.5">
-            <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Trading Pair</label>
+            <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Trading Pair</label>
             <select 
               value={form.symbol}
               onChange={e => setForm({...form, symbol: e.target.value})}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-teal-500 outline-none transition-all"
+              className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm font-bold text-lb-text focus:border-lb-accent outline-none transition-all"
             >
               {SYMBOLS.map(sym => <option key={sym} value={sym}>{sym}</option>)}
             </select>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Order Type</label>
+            <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Order Type</label>
             <select 
               value={form.type}
               onChange={e => setForm({...form, type: e.target.value})}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-teal-500 outline-none transition-all"
+              className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm font-bold text-lb-text focus:border-lb-accent outline-none transition-all"
             >
               {ORDER_TYPES.map(type => <option key={type} value={type}>{type.replace('_', ' ')}</option>)}
             </select>
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Volume (Lots)</label>
+            <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Volume (Lots)</label>
             <input 
               type="number"
               step="0.01"
               value={form.volume}
               onChange={e => setForm({...form, volume: e.target.value})}
               placeholder="1.00"
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono text-white focus:border-teal-500 outline-none transition-all"
+              className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm font-mono text-lb-text focus:border-lb-accent outline-none transition-all"
             />
           </div>
 
           <div className="space-y-1.5">
-            <label className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">Target Price</label>
+            <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Target Price</label>
             <input 
               type="number"
               step="0.00001"
               value={form.targetPrice}
               onChange={e => setForm({...form, targetPrice: e.target.value})}
               placeholder="0.00000"
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-sm font-mono text-white focus:border-teal-500 outline-none transition-all"
+              className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm font-mono text-lb-text focus:border-lb-accent outline-none transition-all"
             />
           </div>
 
@@ -149,7 +149,7 @@ export default function TradingScreen() {
               type="submit" 
               disabled={createOrderMutation.isPending}
               className={`w-full py-4 font-black rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 ${
-                form.type.includes('BUY') ? 'bg-teal-500 hover:bg-teal-400 text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]' : 'bg-rose-500 hover:bg-rose-400 text-white shadow-[0_0_15px_rgba(244,63,94,0.3)]'
+                form.type.includes('BUY') ? 'bg-lb-accent hover:bg-lb-accent text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]' : 'bg-lb-down hover:bg-rose-400 text-lb-text shadow-[0_0_15px_rgba(244,63,94,0.3)]'
               }`}
             >
               {createOrderMutation.isPending ? 'Processing...' : `Place ${form.type.replace('_', ' ')}`}
@@ -160,23 +160,23 @@ export default function TradingScreen() {
       </div>
 
       {/* Right Panel - Orders Book */}
-      <div className="flex-1 flex flex-col bg-[#09090b]">
+      <div className="flex-1 flex flex-col bg-lb-panel">
         
         {/* Tabs */}
-        <div className="flex border-b border-zinc-800 bg-zinc-950/50 backdrop-blur-sm sticky top-0 z-10 px-4">
+        <div className="flex border-b border-lb-border bg-lb-panel/50 backdrop-blur-sm sticky top-0 z-10 px-4">
           {(['OPEN', 'PENDING', 'HISTORY'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-6 py-4 text-xs font-bold tracking-wider uppercase border-b-2 transition-all ${
-                activeTab === tab ? 'border-teal-500 text-teal-400' : 'border-transparent text-zinc-500 hover:text-zinc-300'
+                activeTab === tab ? 'border-lb-accent text-lb-accent' : 'border-transparent text-lb-text-muted hover:text-lb-text'
               }`}
             >
               {tab} Orders
             </button>
           ))}
           <div className="ml-auto flex items-center pr-2">
-            <button onClick={() => refetch()} className="p-2 text-zinc-500 hover:text-white transition-colors">
+            <button onClick={() => refetch()} className="p-2 text-lb-text-muted hover:text-lb-text transition-colors">
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
@@ -186,14 +186,14 @@ export default function TradingScreen() {
         <div className="flex-1 overflow-y-auto p-4 lg:p-6">
           {isLoading ? (
              <div className="space-y-4 animate-pulse">
-               {[1, 2, 3].map(i => <div key={i} className="h-16 bg-zinc-900 rounded-xl border border-zinc-800"></div>)}
+               {[1, 2, 3].map(i => <div key={i} className="h-16 bg-lb-bg rounded-xl border border-lb-border"></div>)}
              </div>
           ) : isError ? (
-            <div className="text-center p-8 text-rose-500 font-bold flex flex-col items-center">
+            <div className="text-center p-8 text-lb-down font-bold flex flex-col items-center">
               <AlertCircle className="w-8 h-8 mb-2" /> Failed to load order book.
             </div>
           ) : filteredOrders.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-zinc-500 min-h-[300px]">
+            <div className="h-full flex flex-col items-center justify-center text-lb-text-muted min-h-[300px]">
               <FileText className="w-12 h-12 mb-4 opacity-20" />
               <p className="text-sm">No {activeTab.toLowerCase()} orders found.</p>
             </div>
@@ -202,37 +202,37 @@ export default function TradingScreen() {
               {filteredOrders.map(order => {
                 const isBuy = order.type.includes('BUY');
                 const isSell = order.type.includes('SELL');
-                const typeColor = isBuy ? 'text-teal-400' : isSell ? 'text-rose-400' : 'text-zinc-400';
+                const typeColor = isBuy ? 'text-lb-accent' : isSell ? 'text-lb-down' : 'text-lb-text-muted';
                 
                 const statusColor = order.status === 'PENDING' ? 'text-amber-400 border-amber-400/20 bg-amber-400/10' :
                                     order.status === 'EXECUTED' ? 'text-emerald-400 border-emerald-400/20 bg-emerald-400/10' :
-                                    'text-rose-400 border-rose-400/20 bg-rose-400/10';
+                                    'text-lb-down border-rose-400/20 bg-rose-400/10';
                 
                 return (
-                  <div key={order._id} className="bg-zinc-950 border border-zinc-800 rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 hover:border-zinc-700 transition-colors">
+                  <div key={order._id} className="bg-lb-panel border border-lb-border rounded-xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 hover:border-lb-accent/50 transition-colors">
                     
                     <div className="flex items-center gap-4 w-full sm:w-auto">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center border border-zinc-800 bg-zinc-900 ${typeColor}`}>
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center border border-lb-border bg-lb-bg ${typeColor}`}>
                         {isBuy ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
                       </div>
                       <div>
-                        <h4 className="text-white font-black">{order.symbol}</h4>
+                        <h4 className="text-lb-text font-black">{order.symbol}</h4>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className={`text-[10px] font-bold uppercase tracking-widest ${typeColor}`}>{order.type.replace('_', ' ')}</span>
                           <span className="text-zinc-700 text-xs">•</span>
-                          <span className="text-zinc-500 text-xs font-mono">{new Date(order.createdAt).toLocaleString()}</span>
+                          <span className="text-lb-text-muted text-xs font-mono">{new Date(order.createdAt).toLocaleString()}</span>
                         </div>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
                       <div className="text-left sm:text-right">
-                        <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-0.5">Target</div>
-                        <div className="text-white font-mono font-bold">{order.targetPrice.toLocaleString('en-US', { minimumFractionDigits: 5 })}</div>
+                        <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-widest mb-0.5">Target</div>
+                        <div className="text-lb-text font-mono font-bold">{order.targetPrice.toLocaleString('en-US', { minimumFractionDigits: 5 })}</div>
                       </div>
                       <div className="text-left sm:text-right">
-                        <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mb-0.5">Vol</div>
-                        <div className="text-white font-mono font-bold">{order.volume.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
+                        <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-widest mb-0.5">Vol</div>
+                        <div className="text-lb-text font-mono font-bold">{order.volume.toLocaleString('en-US', { minimumFractionDigits: 2 })}</div>
                       </div>
                       <div className={`px-2.5 py-1 rounded border flex items-center justify-center min-w-[80px] ${statusColor}`}>
                         <span className="text-[9px] font-bold uppercase tracking-widest">{order.status}</span>

@@ -115,13 +115,13 @@ export const KYCScreen: React.FC<KYCScreenProps> = ({ onBack, onSubmit }) => {
 
   return (
     <div className="fixed inset-0 bg-slate-50 z-[110] flex flex-col animate-in slide-in-from-right font-sans">
-      <div className="flex items-center p-4 bg-white shadow-sm shrink-0 sticky top-0 z-10">
+      <div className="flex items-center p-4 bg-lb-text shadow-sm shrink-0 sticky top-0 z-10">
         <button onClick={onBack} className="w-10 h-10 flex items-center justify-center text-slate-600 active:bg-slate-100 rounded-full transition-colors -ml-2">
           <ArrowLeft size={24} />
         </button>
         <div className="flex flex-col ml-2">
-          <h1 className="text-[19px] font-bold text-slate-900 leading-tight">Identity Verification</h1>
-          <span className="text-[12px] text-slate-500 font-medium">KYC & Bank Details</span>
+          <h1 className="text-[19px] font-bold text-lb-bg leading-tight">Identity Verification</h1>
+          <span className="text-[12px] text-lb-text-muted font-medium">KYC & Bank Details</span>
         </div>
       </div>
 
@@ -130,9 +130,9 @@ export const KYCScreen: React.FC<KYCScreenProps> = ({ onBack, onSubmit }) => {
         <form id="kyc-form" onSubmit={handleSubmit} className="flex flex-col gap-6">
           
           {/* Identity Section */}
-          <div className="bg-white rounded-[24px] p-5 shadow-sm border border-slate-100 flex flex-col gap-5">
+          <div className="bg-lb-text rounded-[24px] p-5 shadow-sm border border-slate-100 flex flex-col gap-5">
             <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-lb-accent">
                 <UserCircle2 size={18} />
               </div>
               <h2 className="text-[17px] font-bold text-slate-800">Personal Identity</h2>
@@ -140,16 +140,16 @@ export const KYCScreen: React.FC<KYCScreenProps> = ({ onBack, onSubmit }) => {
 
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-bold text-slate-700 ml-1">Aadhar Number</label>
-              <input type="text" required value={aadhar} onChange={e => setAadhar(e.target.value)} placeholder="0000 0000 0000" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" />
+              <input type="text" required value={aadhar} onChange={e => setAadhar(e.target.value)} placeholder="0000 0000 0000" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-lb-accent focus:bg-lb-text transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-bold text-slate-700 ml-1">Aadhar Photo</label>
               <div 
                 onClick={() => triggerFileInput(aadharFileInputRef)}
-                className="w-full h-24 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50 text-slate-500 active:bg-slate-100 hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer"
+                className="w-full h-24 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50 text-lb-text-muted active:bg-slate-100 hover:border-blue-400 hover:bg-lb-accent/10 transition-colors cursor-pointer"
               >
-                <Upload size={20} className="mb-1 text-slate-400" />
+                <Upload size={20} className="mb-1 text-lb-text-muted" />
                 <span className="text-[13px] font-medium">{aadharFile ? aadharFile.name : 'Tap to upload Aadhar'}</span>
               </div>
               <input
@@ -163,16 +163,16 @@ export const KYCScreen: React.FC<KYCScreenProps> = ({ onBack, onSubmit }) => {
 
             <div className="flex flex-col gap-2 mt-2">
               <label className="text-[13px] font-bold text-slate-700 ml-1">PAN Number</label>
-              <input type="text" required value={pan} onChange={e => setPan(e.target.value)} placeholder="ABCDE1234F" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 uppercase focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" />
+              <input type="text" required value={pan} onChange={e => setPan(e.target.value)} placeholder="ABCDE1234F" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 uppercase focus:outline-none focus:border-lb-accent focus:bg-lb-text transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-bold text-slate-700 ml-1">PAN Photo</label>
               <div 
                 onClick={() => triggerFileInput(panFileInputRef)}
-                className="w-full h-24 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50 text-slate-500 active:bg-slate-100 hover:border-blue-400 hover:bg-blue-50 transition-colors cursor-pointer"
+                className="w-full h-24 border-2 border-dashed border-slate-300 rounded-xl flex flex-col items-center justify-center bg-slate-50 text-lb-text-muted active:bg-slate-100 hover:border-blue-400 hover:bg-lb-accent/10 transition-colors cursor-pointer"
               >
-                <Upload size={20} className="mb-1 text-slate-400" />
+                <Upload size={20} className="mb-1 text-lb-text-muted" />
                 <span className="text-[13px] font-medium">{panFile ? panFile.name : 'Tap to upload PAN'}</span>
               </div>
               <input
@@ -186,7 +186,7 @@ export const KYCScreen: React.FC<KYCScreenProps> = ({ onBack, onSubmit }) => {
           </div>
 
           {/* Banking Section */}
-          <div className="bg-white rounded-[24px] p-5 shadow-sm border border-slate-100 flex flex-col gap-5">
+          <div className="bg-lb-text rounded-[24px] p-5 shadow-sm border border-slate-100 flex flex-col gap-5">
             <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
               <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
                 <Building2 size={18} />
@@ -196,30 +196,30 @@ export const KYCScreen: React.FC<KYCScreenProps> = ({ onBack, onSubmit }) => {
 
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-bold text-slate-700 ml-1">Account Holder Name</label>
-              <input type="text" required value={holderName} onChange={e => setHolderName(e.target.value)} placeholder="Name as per bank record" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" />
+              <input type="text" required value={holderName} onChange={e => setHolderName(e.target.value)} placeholder="Name as per bank record" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-lb-accent focus:bg-lb-text transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-bold text-slate-700 ml-1">Bank Name</label>
-              <input type="text" required value={bankName} onChange={e => setBankName(e.target.value)} placeholder="e.g. HDFC Bank" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" />
+              <input type="text" required value={bankName} onChange={e => setBankName(e.target.value)} placeholder="e.g. HDFC Bank" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-lb-accent focus:bg-lb-text transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-bold text-slate-700 ml-1">Account Number</label>
-              <input type="text" required value={bankAccount} onChange={e => setBankAccount(e.target.value)} placeholder="Account Number" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" />
+              <input type="text" required value={bankAccount} onChange={e => setBankAccount(e.target.value)} placeholder="Account Number" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-lb-accent focus:bg-lb-text transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2">
               <label className="text-[13px] font-bold text-slate-700 ml-1">IFSC Code</label>
-              <input type="text" required value={ifsc} onChange={e => setIfsc(e.target.value)} placeholder="IFSC Code" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 uppercase focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" />
+              <input type="text" required value={ifsc} onChange={e => setIfsc(e.target.value)} placeholder="IFSC Code" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 uppercase focus:outline-none focus:border-lb-accent focus:bg-lb-text transition-colors" />
             </div>
 
             <div className="flex flex-col gap-2 mt-2">
               <div className="flex justify-between items-end">
                 <label className="text-[13px] font-bold text-slate-700 ml-1">UPI ID</label>
-                <span className="text-[11px] text-slate-400 font-medium">Optional</span>
+                <span className="text-[11px] text-lb-text-muted font-medium">Optional</span>
               </div>
-              <input type="text" value={upi} onChange={e => setUpi(e.target.value)} placeholder="user@upi" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-blue-500 focus:bg-white transition-colors" />
+              <input type="text" value={upi} onChange={e => setUpi(e.target.value)} placeholder="user@upi" className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-[15px] text-slate-800 focus:outline-none focus:border-lb-accent focus:bg-lb-text transition-colors" />
             </div>
           </div>
 
@@ -242,12 +242,12 @@ export const KYCScreen: React.FC<KYCScreenProps> = ({ onBack, onSubmit }) => {
         </form>
       </div>
 
-      <div className="bg-white border-t border-slate-200 p-4 shrink-0 pb-safe">
+      <div className="bg-lb-text border-t border-slate-200 p-4 shrink-0 pb-safe">
         <button 
           type="submit"
           form="kyc-form"
           disabled={isLoading}
-          className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold py-4 rounded-xl text-[17px] shadow-lg shadow-blue-600/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:cursor-not-allowed"
+          className="w-full bg-lb-accent hover:bg-blue-700 disabled:bg-blue-400 text-lb-text font-bold py-4 rounded-xl text-[17px] shadow-lg shadow-blue-600/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>

@@ -27,25 +27,25 @@ export default function WalletCard({ wallet }: Props) {
   const isLoss = pnl < 0;
 
   return (
-    <div className="bg-zinc-950 border border-zinc-800 rounded-3xl p-6 lg:p-8 shadow-2xl relative overflow-hidden group">
+    <div className="bg-lb-panel border border-lb-border rounded-3xl p-6 lg:p-8 shadow-2xl relative overflow-hidden group">
       {/* Decorative Glow */}
-      <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20 transition-all duration-700 ${isProfit ? 'bg-teal-500' : isLoss ? 'bg-rose-500' : 'bg-blue-500'}`}></div>
+      <div className={`absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20 transition-all duration-700 ${isProfit ? 'bg-lb-accent' : isLoss ? 'bg-lb-down' : 'bg-lb-accent/100'}`}></div>
 
       <div className="relative z-10 flex flex-col gap-8">
         
         {/* Main Balance Row */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
           <div>
-            <div className="text-zinc-500 font-bold uppercase tracking-widest text-xs mb-2">Account Balance</div>
-            <div className="text-4xl md:text-6xl font-black text-white tracking-tighter flex items-baseline gap-2">
-              <span className="text-zinc-500 font-medium text-3xl">$</span>
+            <div className="text-lb-text-muted font-bold uppercase tracking-widest text-xs mb-2">Account Balance</div>
+            <div className="text-4xl md:text-6xl font-black text-lb-text tracking-tighter flex items-baseline gap-2">
+              <span className="text-lb-text-muted font-medium text-3xl">$</span>
               {formatMoney(balance)}
             </div>
           </div>
           
           <div className="text-right">
-            <div className="text-zinc-500 font-bold uppercase tracking-widest text-xs mb-2">Unrealized PnL</div>
-            <div className={`text-2xl md:text-3xl font-black tracking-tight ${isProfit ? 'text-teal-400 drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]' : isLoss ? 'text-rose-400 drop-shadow-[0_0_8px_rgba(244,63,94,0.5)]' : 'text-zinc-300'}`}>
+            <div className="text-lb-text-muted font-bold uppercase tracking-widest text-xs mb-2">Unrealized PnL</div>
+            <div className={`text-2xl md:text-3xl font-black tracking-tight ${isProfit ? 'text-lb-accent drop-shadow-[0_0_8px_rgba(45,212,191,0.5)]' : isLoss ? 'text-lb-down drop-shadow-[0_0_8px_rgba(244,63,94,0.5)]' : 'text-lb-text'}`}>
               {isProfit ? '+' : ''}{formatMoney(pnl)}
             </div>
           </div>
@@ -55,24 +55,24 @@ export default function WalletCard({ wallet }: Props) {
 
         {/* Secondary Metrics Row */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-4 transition-colors hover:bg-zinc-900/80">
-            <div className="text-zinc-500 font-bold uppercase tracking-wider text-[10px] mb-1">Equity</div>
-            <div className="text-xl font-bold text-white flex items-baseline gap-1">
-              <span className="text-zinc-500 text-sm">$</span>{formatMoney(equity)}
+          <div className="bg-lb-bg/40 border border-lb-border/50 rounded-2xl p-4 transition-colors hover:bg-lb-bg/80">
+            <div className="text-lb-text-muted font-bold uppercase tracking-wider text-[10px] mb-1">Equity</div>
+            <div className="text-xl font-bold text-lb-text flex items-baseline gap-1">
+              <span className="text-lb-text-muted text-sm">$</span>{formatMoney(equity)}
             </div>
           </div>
 
-          <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-4 transition-colors hover:bg-zinc-900/80">
-            <div className="text-zinc-500 font-bold uppercase tracking-wider text-[10px] mb-1">Margin Used</div>
-            <div className="text-xl font-bold text-white flex items-baseline gap-1">
-              <span className="text-zinc-500 text-sm">$</span>{formatMoney(margin)}
+          <div className="bg-lb-bg/40 border border-lb-border/50 rounded-2xl p-4 transition-colors hover:bg-lb-bg/80">
+            <div className="text-lb-text-muted font-bold uppercase tracking-wider text-[10px] mb-1">Margin Used</div>
+            <div className="text-xl font-bold text-lb-text flex items-baseline gap-1">
+              <span className="text-lb-text-muted text-sm">$</span>{formatMoney(margin)}
             </div>
           </div>
 
-          <div className="bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-4 transition-colors hover:bg-zinc-900/80">
-            <div className="text-zinc-500 font-bold uppercase tracking-wider text-[10px] mb-1">Free Margin</div>
-            <div className="text-xl font-bold text-white flex items-baseline gap-1">
-              <span className="text-zinc-500 text-sm">$</span>{formatMoney(freeMargin)}
+          <div className="bg-lb-bg/40 border border-lb-border/50 rounded-2xl p-4 transition-colors hover:bg-lb-bg/80">
+            <div className="text-lb-text-muted font-bold uppercase tracking-wider text-[10px] mb-1">Free Margin</div>
+            <div className="text-xl font-bold text-lb-text flex items-baseline gap-1">
+              <span className="text-lb-text-muted text-sm">$</span>{formatMoney(freeMargin)}
             </div>
           </div>
         </div>

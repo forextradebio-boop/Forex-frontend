@@ -56,12 +56,17 @@ export default function App() {
   const fetchClientPortfolioStats = async () => {
     if (!userProfile) return;
     try {
-      const walletData = await walletService.getWallet();
+      const [walletData, posData, closedPositions, transactions] = await Promise.all([
+        walletService.getWallet(),
+        tradingService.getPositions(),
+        tradingService.getClosedPositions(),
+        transactionService.getTransactions()
+      ]);
+
       if (walletData) {
         setWalletMetrics(walletData);
       }
 
-      const posData = await tradingService.getPositions();
       if (posData) {
         setActivePositions(posData.map((p: any) => ({
           id: p._id,
@@ -75,9 +80,6 @@ export default function App() {
           tpPrice: p.tp
         })));
       }
-
-      const closedPositions = await tradingService.getClosedPositions();
-      const transactions = await transactionService.getTransactions();
 
       const historyItems = [
         ...(closedPositions || []).map((item: any) => ({
@@ -118,7 +120,7 @@ export default function App() {
           sl: orderPayload.slPrice,
           tp: orderPayload.tpPrice
         });
-        if (res) fetchClientPortfolioStats();
+        if (res) await fetchClientPortfolioStats();
       }
     } catch (err: any) {
       alert(`Reject logic: ${err.response?.data?.error || err.message}`);
@@ -130,7 +132,7 @@ export default function App() {
   const handleClosePosition = React.useCallback(async (posId: string) => {
     try {
       await tradingService.closePosition(posId);
-      fetchClientPortfolioStats();
+      await fetchClientPortfolioStats();
     } catch (err) {
       alert("Error liquidating.");
     }

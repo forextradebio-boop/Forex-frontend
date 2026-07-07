@@ -4,6 +4,16 @@
 @theme {
   --font-sans: "Inter", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-lb-bg: #090C09;
+  --color-lb-panel: #111512;
+  --color-lb-panel-hover: #191E1A;
+  --color-lb-border: #1C231E;
+  --color-lb-accent: #C6F953;
+  --color-lb-text: #FFFFFF;
+  --color-lb-text-muted: #8A958D;
+  --color-lb-up: #C6F953;
+  --color-lb-down: #FF4D4D;
 }
 
 html, body, #root {
@@ -13,13 +23,12 @@ html, body, #root {
   height: 100%;
   height: 100dvh;
   overflow: hidden;
-  background-color: var(--theme-background);
-  color: var(--theme-primary-text);
+  background-color: var(--color-lb-bg);
+  color: var(--color-lb-text);
   font-family: var(--font-sans);
   font-size: 13px;
   line-height: 1.45;
   letter-spacing: -0.01em;
-  transition: background-color 200ms ease-in-out, color 200ms ease-in-out;
 }
 
 /* Custom scrollbars for trading panels */
@@ -31,11 +40,11 @@ html, body, #root {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
+  background: var(--color-lb-border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.6);
+  background: var(--color-lb-text-muted);
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -47,11 +56,11 @@ html, body, #root {
 }
 
 @keyframes flashGreen {
-  0% { background-color: rgba(16, 185, 129, 0.2); }
+  0% { background-color: rgba(198, 249, 83, 0.2); }
   100% { background-color: transparent; }
 }
 @keyframes flashRed {
-  0% { background-color: rgba(239, 68, 68, 0.2); }
+  0% { background-color: rgba(255, 77, 77, 0.2); }
   100% { background-color: transparent; }
 }
 .flash-up { animation: flashGreen 0.5s ease-out; }
@@ -121,47 +130,16 @@ html, body, #root {
   z-index: 9999 !important;
   display: flex !important;
   flex-direction: column !important;
-  background-color: var(--theme-background) !important;
+  background-color: var(--color-lb-bg) !important;
 }
 
-/* Native Light Theme Utility Classes */
-.light-mode input, .light-mode textarea, .light-mode select {
-  background-color: var(--theme-background);
-  color: var(--theme-primary-text);
-  border-color: var(--theme-border);
+input, textarea, select {
+  background-color: var(--color-lb-panel);
+  color: var(--color-lb-text);
+  border-color: var(--color-lb-border);
 }
 
-/* Navy Blue Theme Overrides */
-.navy-theme {
-  --theme-bg: #0b1120;
-  --theme-fg: #f8fafc;
-  --theme-panel: #0f172a;
-  --theme-border: #1e293b;
-  --theme-text-muted: #94a3b8;
-  --theme-header: #020617;
-}
-
-.navy-theme {
-  background-color: var(--theme-bg) !important;
-  color: var(--theme-fg) !important;
-}
-.navy-theme .bg-white, .navy-theme .bg-slate-50, .navy-theme .bg-slate-100, .navy-theme .bg-\[\#f2f2f7\] {
-  background-color: var(--theme-panel) !important;
-}
-.navy-theme .border-slate-100, .navy-theme .border-slate-200, .navy-theme .border-slate-50, .navy-theme .border-b {
-  border-color: var(--theme-border) !important;
-}
-.navy-theme .text-slate-900, .navy-theme .text-slate-800, .navy-theme .text-slate-700 {
-  color: var(--theme-fg) !important;
-}
-.navy-theme .text-slate-600, .navy-theme .text-slate-500, .navy-theme .text-slate-400 {
-  color: var(--theme-text-muted) !important;
-}
-.navy-theme header, .navy-theme .TerminalHeader, .navy-theme .md\:hidden.h-12, .navy-theme .md\:hidden.h-16 {
-  background-color: var(--theme-header) !important;
-  border-color: var(--theme-border) !important;
-}
-/* Ensure the theme applies smoothly */
-.navy-theme * {
-  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+/* Custom Checkbox for LittleBee Theme */
+input[type="checkbox"] {
+  accent-color: var(--color-lb-accent);
 }

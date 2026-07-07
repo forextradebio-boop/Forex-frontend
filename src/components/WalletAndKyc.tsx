@@ -309,28 +309,28 @@ export default function WalletAndKyc({
   };
 
   return (
-    <div id="wallet-kyc" className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
+    <div id="wallet-kyc" className="min-h-screen bg-lb-panel text-slate-100 p-4 md:p-8 font-sans">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Toggle Head Header Row */}
-        <div className="flex border-b border-slate-900 pb-0 justify-between items-center bg-slate-900/40 p-4 rounded-xl border border-slate-800">
+        <div className="flex border-b border-slate-900 pb-0 justify-between items-center bg-lb-bg/40 p-4 rounded-xl border border-lb-border">
           <div className="flex space-x-6">
             <button 
               onClick={() => setActiveSegment("WALLET")}
-              className={`pb-4 text-sm font-extrabold transition flex items-center space-x-2 border-b-2 tracking-wide cursor-pointer select-none ${activeSegment === "WALLET" ? 'border-teal-500 text-teal-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+              className={`pb-4 text-sm font-extrabold transition flex items-center space-x-2 border-b-2 tracking-wide cursor-pointer select-none ${activeSegment === "WALLET" ? 'border-lb-accent text-lb-accent' : 'border-transparent text-lb-text-muted hover:text-lb-text'}`}
             >
               <Wallet className="w-4 h-4" />
               <span>Wallet Ledger & Deposits</span>
             </button>
             <button 
               onClick={() => setActiveSegment("KYC")}
-              className={`pb-4 text-sm font-extrabold transition flex items-center space-x-2 border-b-2 tracking-wide cursor-pointer select-none ${activeSegment === "KYC" ? 'border-teal-500 text-teal-400' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+              className={`pb-4 text-sm font-extrabold transition flex items-center space-x-2 border-b-2 tracking-wide cursor-pointer select-none ${activeSegment === "KYC" ? 'border-lb-accent text-lb-accent' : 'border-transparent text-lb-text-muted hover:text-lb-text'}`}
             >
               <UserCheck className="w-4 h-4" />
               <span>KYC Identity Verification</span>
             </button>
           </div>
-          <span className="text-xs text-slate-500 font-mono hidden md:inline">KYC Stat: <strong className="text-teal-400">{kycStatus?.status || "UNSUBMITTED"}</strong></span>
+          <span className="text-xs text-lb-text-muted font-mono hidden md:inline">KYC Stat: <strong className="text-lb-accent">{kycStatus?.status || "UNSUBMITTED"}</strong></span>
         </div>
 
         {activeSegment === "WALLET" && (
@@ -338,45 +338,45 @@ export default function WalletAndKyc({
             
             {/* Left 4 cols: Wallet metrics Card */}
             <div className="lg:col-span-4 space-y-6">
-              <div className="relative bg-gradient-to-br from-slate-900 to-indigo-950/80 border border-slate-800 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full blur-2xl pointer-events-none" />
+              <div className="relative bg-gradient-to-br from-slate-900 to-indigo-950/80 border border-lb-border rounded-3xl p-6 shadow-xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-lb-accent/10 rounded-full blur-2xl pointer-events-none" />
                 <div className="flex justify-between items-center">
-                  <span className="text-slate-400 text-xs font-mono tracking-wider font-extrabold uppercase">Premium Wallet Card</span>
-                  <div className="px-2 py-0.5 bg-teal-450/15 border border-teal-500/20 text-teal-400 text-[10px] font-bold rounded uppercase tracking-wide">Standard Portfolio</div>
+                  <span className="text-lb-text-muted text-xs font-mono tracking-wider font-extrabold uppercase">Premium Wallet Card</span>
+                  <div className="px-2 py-0.5 bg-teal-450/15 border border-lb-accent/20 text-lb-accent text-[10px] font-bold rounded uppercase tracking-wide">Standard Portfolio</div>
                 </div>
 
                 {walletLoading ? (
                   <div className="py-12 flex justify-center items-center">
-                    <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-8 h-8 border-2 border-lb-accent border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 ) : walletError ? (
-                  <div className="py-12 flex justify-center items-center flex-col text-rose-400 space-y-2">
+                  <div className="py-12 flex justify-center items-center flex-col text-lb-down space-y-2">
                     <AlertCircle className="w-8 h-8" />
                     <p className="text-xs font-bold">{walletError}</p>
                   </div>
                 ) : (
                   <>
                     <div className="space-y-1.5 mt-8">
-                      <p className="text-slate-500 text-xs uppercase font-mono font-bold font-mono">Wallet Balance</p>
-                      <p className="text-3xl font-black font-mono tracking-tight text-white">${(wallet?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                      <p className="text-lb-text-muted text-xs uppercase font-mono font-bold font-mono">Wallet Balance</p>
+                      <p className="text-3xl font-black font-mono tracking-tight text-lb-text">${(wallet?.balance ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-slate-800">
+                    <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-lb-border">
                       <div>
-                        <span className="text-slate-500 text-[10px] block font-mono">Equity</span>
-                        <strong className="text-sm font-mono text-teal-400 font-extrabold">${(wallet?.equity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
+                        <span className="text-lb-text-muted text-[10px] block font-mono">Equity</span>
+                        <strong className="text-sm font-mono text-lb-accent font-extrabold">${(wallet?.equity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-500 text-[10px] block font-mono">Used Margin</span>
+                        <span className="text-lb-text-muted text-[10px] block font-mono">Used Margin</span>
                         <strong className="text-sm font-mono text-slate-100 font-bold">${(wallet?.margin ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-500 text-[10px] block font-mono">Free Margin</span>
+                        <span className="text-lb-text-muted text-[10px] block font-mono">Free Margin</span>
                         <strong className="text-sm font-mono text-slate-100 font-bold">${(wallet?.freeMargin ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</strong>
                       </div>
                       <div>
-                        <span className="text-slate-500 text-[10px] block font-mono">Profit & Loss</span>
-                        <strong className={`text-sm font-mono font-bold ${(wallet?.pnl ?? 0) >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                        <span className="text-lb-text-muted text-[10px] block font-mono">Profit & Loss</span>
+                        <strong className={`text-sm font-mono font-bold ${(wallet?.pnl ?? 0) >= 0 ? "text-emerald-400" : "text-lb-down"}`}>
                           {(wallet?.pnl ?? 0) >= 0 ? "+" : ""}{(wallet?.pnl ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </strong>
                       </div>
@@ -387,30 +387,30 @@ export default function WalletAndKyc({
             </div>
 
             {/* Right 8 cols: Deposits and Withdrawal worksheets */}
-            <div className="lg:col-span-8 bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-sm">
+            <div className="lg:col-span-8 bg-lb-bg border border-lb-border rounded-3xl p-6 shadow-sm">
               {/* Secondary Navigation buttons */}
-              <div className="flex border-b border-slate-800 pb-0 mb-6 gap-6">
+              <div className="flex border-b border-lb-border pb-0 mb-6 gap-6">
                 <button 
                   onClick={() => setWalletTab("DEPOSIT")}
-                  className={`pb-3 text-xs font-extrabold tracking-wider transition uppercase select-none ${walletTab === "DEPOSIT" ? 'border-b-2 border-teal-500 text-teal-400' : 'text-slate-400 hover:text-slate-200'}`}
+                  className={`pb-3 text-xs font-extrabold tracking-wider transition uppercase select-none ${walletTab === "DEPOSIT" ? 'border-b-2 border-lb-accent text-lb-accent' : 'text-lb-text-muted hover:text-lb-text'}`}
                 >
                   Request Deposit Option
                 </button>
                 <button 
                   onClick={() => setWalletTab("WITHDRAW")}
-                  className={`pb-3 text-xs font-extrabold tracking-wider transition uppercase select-none ${walletTab === "WITHDRAW" ? 'border-b-2 border-teal-500 text-teal-400' : 'text-slate-400 hover:text-slate-200'}`}
+                  className={`pb-3 text-xs font-extrabold tracking-wider transition uppercase select-none ${walletTab === "WITHDRAW" ? 'border-b-2 border-lb-accent text-lb-accent' : 'text-lb-text-muted hover:text-lb-text'}`}
                 >
                   Brokerage Withdrawal
                 </button>
                 <button 
                   onClick={() => setWalletTab("LEDGER")}
-                  className={`pb-3 text-xs font-extrabold tracking-wider transition uppercase select-none ${walletTab === "LEDGER" ? 'border-b-2 border-teal-500 text-teal-400' : 'text-slate-400 hover:text-slate-200'}`}
+                  className={`pb-3 text-xs font-extrabold tracking-wider transition uppercase select-none ${walletTab === "LEDGER" ? 'border-b-2 border-lb-accent text-lb-accent' : 'text-lb-text-muted hover:text-lb-text'}`}
                 >
                   Ledger Transactions
                 </button>
                 <button 
                   onClick={() => setWalletTab("WITHDRAW_HISTORY")}
-                  className={`pb-3 text-xs font-extrabold tracking-wider transition uppercase select-none ${walletTab === "WITHDRAW_HISTORY" ? 'border-b-2 border-teal-500 text-teal-400' : 'text-slate-400 hover:text-slate-200'}`}
+                  className={`pb-3 text-xs font-extrabold tracking-wider transition uppercase select-none ${walletTab === "WITHDRAW_HISTORY" ? 'border-b-2 border-lb-accent text-lb-accent' : 'text-lb-text-muted hover:text-lb-text'}`}
                 >
                   Withdrawal History
                 </button>
@@ -419,7 +419,7 @@ export default function WalletAndKyc({
               {walletTab === "DEPOSIT" && (
                 <form onSubmit={handleDepositSubmit} className="space-y-6 text-left">
                   {depositError && (
-                    <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-450 rounded-xl text-xs flex items-start">
+                    <div className="p-3 bg-lb-down/10 border border-lb-down/20 text-rose-450 rounded-xl text-xs flex items-start">
                       <AlertCircle className="w-4 h-4 mr-2 shrink-0 mt-0.5" />
                       <span>{depositError}</span>
                     </div>
@@ -427,43 +427,43 @@ export default function WalletAndKyc({
 
                   {/* Step 1 */}
                   <div className="space-y-1.5">
-                    <label className="text-[11px] text-slate-500 uppercase font-mono font-bold">Step 1: Enter Deposit Amount ($)</label>
+                    <label className="text-[11px] text-lb-text-muted uppercase font-mono font-bold">Step 1: Enter Deposit Amount ($)</label>
                     <input 
                       type="number"
                       min="1"
                       value={depositAmount}
                       onChange={(e) => setDepositAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-xs font-mono text-slate-100 focus:outline-none focus:border-teal-400"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg px-3 py-2.5 text-xs font-mono text-slate-100 focus:outline-none focus:border-teal-400"
                       placeholder="500"
                     />
                   </div>
 
                   {/* Step 2 & 3 */}
-                  <div className="space-y-3 p-4 bg-slate-900 border border-slate-800 rounded-xl">
-                    <p className="text-[11px] text-slate-500 uppercase font-mono font-bold text-center mb-2">Step 2 & 3: Scan UPI QR & Make Payment</p>
+                  <div className="space-y-3 p-4 bg-lb-bg border border-lb-border rounded-xl">
+                    <p className="text-[11px] text-lb-text-muted uppercase font-mono font-bold text-center mb-2">Step 2 & 3: Scan UPI QR & Make Payment</p>
                     <div className="flex flex-col items-center justify-center space-y-3">
-                      <div className="w-36 h-36 bg-white p-3 rounded-xl flex items-center justify-center border-4 border-teal-500">
-                        <div className="w-full h-full bg-slate-900 flex flex-col justify-center items-center text-white p-1 rounded">
-                          <span className="font-extrabold text-[9px] text-teal-400">SCAN TO PAY</span>
+                      <div className="w-36 h-36 bg-lb-text p-3 rounded-xl flex items-center justify-center border-4 border-lb-accent">
+                        <div className="w-full h-full bg-lb-bg flex flex-col justify-center items-center text-lb-text p-1 rounded">
+                          <span className="font-extrabold text-[9px] text-lb-accent">SCAN TO PAY</span>
                           <span className="font-black text-sm tracking-widest text-emerald-400">UPI QR</span>
-                          <span className="text-[7px] text-slate-500">BHIM, PAYTM, G-PAY</span>
+                          <span className="text-[7px] text-lb-text-muted">BHIM, PAYTM, G-PAY</span>
                         </div>
                       </div>
                       <div className="text-center">
-                        <p className="text-[10px] text-slate-400 uppercase font-mono">Merchant VPA</p>
-                        <p className="text-xs text-white font-bold font-mono select-all bg-slate-950 px-2 py-1 rounded border border-slate-800 mt-1">forexfactory.merchants@axl</p>
+                        <p className="text-[10px] text-lb-text-muted uppercase font-mono">Merchant VPA</p>
+                        <p className="text-xs text-lb-text font-bold font-mono select-all bg-lb-panel px-2 py-1 rounded border border-lb-border mt-1">forexfactory.merchants@axl</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Step 4 */}
                   <div className="space-y-1.5">
-                    <label className="text-[11px] text-slate-500 uppercase font-mono font-bold">Step 4: Enter 12-Digit UTR Number</label>
+                    <label className="text-[11px] text-lb-text-muted uppercase font-mono font-bold">Step 4: Enter 12-Digit UTR Number</label>
                     <input 
                       type="text"
                       value={utrNumber}
                       onChange={(e) => setUtrNumber(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-xs font-mono text-slate-100 focus:outline-none focus:border-teal-400"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg px-3 py-2.5 text-xs font-mono text-slate-100 focus:outline-none focus:border-teal-400"
                       placeholder="e.g. 123456789012"
                     />
                   </div>
@@ -473,7 +473,7 @@ export default function WalletAndKyc({
                     id="submit-deposit-action"
                     type="submit"
                     disabled={depositPending || !depositAmount || !utrNumber}
-                    className="w-full py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold transition flex items-center justify-center text-xs uppercase cursor-pointer"
+                    className="w-full py-3.5 rounded-xl bg-lb-accent hover:bg-lb-accent text-lb-bg font-bold transition flex items-center justify-center text-xs uppercase cursor-pointer"
                   >
                     {depositPending ? "Submitting Request..." : "Step 5: Submit Request"}
                   </button>
@@ -483,25 +483,25 @@ export default function WalletAndKyc({
               {walletTab === "WITHDRAW" && (
                 <form onSubmit={handleWithdrawalSubmit} className="space-y-6 text-left">
                   {withdrawError && (
-                    <div className="bg-rose-500/10 border border-rose-500/30 text-rose-500 px-4 py-3 rounded-xl flex items-center text-xs">
+                    <div className="bg-lb-down/10 border border-lb-down/30 text-lb-down px-4 py-3 rounded-xl flex items-center text-xs">
                       <XCircle className="w-4 h-4 mr-2 flex-shrink-0" />
                       <p>{withdrawError}</p>
                     </div>
                   )}
 
                   <div className="space-y-1.5">
-                    <label className="text-[11px] text-slate-500 uppercase font-mono font-bold">Withdraw Amount ($)</label>
+                    <label className="text-[11px] text-lb-text-muted uppercase font-mono font-bold">Withdraw Amount ($)</label>
                     <input 
                       type="number"
                       min="1"
                       value={withdrawAmount}
                       onChange={(e) => setWithdrawAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-xs font-mono text-slate-100 focus:outline-none focus:border-teal-400"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg px-3 py-2.5 text-xs font-mono text-slate-100 focus:outline-none focus:border-teal-400"
                       placeholder="Specify amount"
                     />
-                    <div className="flex justify-between items-center bg-slate-950 p-2 rounded text-xs border border-slate-800 font-mono">
-                      <span className="text-slate-500">Free margin max</span>
-                      <strong className="text-teal-400">${(wallet?.freeMargin ?? 0).toLocaleString()}</strong>
+                    <div className="flex justify-between items-center bg-lb-panel p-2 rounded text-xs border border-lb-border font-mono">
+                      <span className="text-lb-text-muted">Free margin max</span>
+                      <strong className="text-lb-accent">${(wallet?.freeMargin ?? 0).toLocaleString()}</strong>
                     </div>
                   </div>
 
@@ -509,7 +509,7 @@ export default function WalletAndKyc({
                     id="submit-withdraw-action"
                     type="submit"
                     disabled={withdrawPending || !withdrawAmount}
-                    className="w-full py-3.5 bg-rose-500 hover:bg-rose-450 text-white font-bold rounded-xl transition text-xs uppercase cursor-pointer"
+                    className="w-full py-3.5 bg-lb-down hover:bg-rose-450 text-lb-text font-bold rounded-xl transition text-xs uppercase cursor-pointer"
                   >
                     {withdrawPending ? "Encrypting Routing locks..." : "Confirm Withdrawal Settlement"}
                   </button>
@@ -520,18 +520,18 @@ export default function WalletAndKyc({
                 <div className="overflow-x-auto text-left font-mono text-xs">
                   {ledgerLoading ? (
                     <div className="flex flex-col items-center justify-center py-10 space-y-3">
-                      <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-slate-400 font-sans text-[11px]">Loading transactions...</span>
+                      <div className="w-6 h-6 border-2 border-lb-accent border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-lb-text-muted font-sans text-[11px]">Loading transactions...</span>
                     </div>
                   ) : ledgerError ? (
                     <div className="text-center py-10">
-                      <AlertCircle className="w-8 h-8 text-rose-500 mx-auto mb-2 opacity-50" />
+                      <AlertCircle className="w-8 h-8 text-lb-down mx-auto mb-2 opacity-50" />
                       <p className="text-rose-450 font-sans text-xs">{ledgerError}</p>
                     </div>
                   ) : (
                     <table className="w-full">
                       <thead>
-                        <tr className="text-slate-500 border-b border-slate-800 pb-2">
+                        <tr className="text-lb-text-muted border-b border-lb-border pb-2">
                           <th className="pb-2 text-left">UTR Number</th>
                           <th className="pb-2 text-left">Amount</th>
                           <th className="pb-2 text-left">Status</th>
@@ -540,15 +540,15 @@ export default function WalletAndKyc({
                       </thead>
                       <tbody className="divide-y divide-slate-800">
                         {ledgerData.map(t => (
-                          <tr key={t._id} className="hover:bg-slate-950/20">
-                            <td className="py-2.5 font-bold text-slate-300">{t.utr}</td>
-                            <td className="py-2.5 font-bold text-slate-200">
+                          <tr key={t._id} className="hover:bg-lb-panel/20">
+                            <td className="py-2.5 font-bold text-lb-text">{t.utr}</td>
+                            <td className="py-2.5 font-bold text-lb-text">
                               ${(t.amount ?? 0).toLocaleString()}
                             </td>
                             <td className="py-2.5 font-sans">
                               <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase 
                                 ${t.status === 'APPROVED' ? 'bg-emerald-500/15 text-emerald-400' 
-                                : t.status === 'REJECTED' ? 'bg-rose-500/15 text-rose-450' 
+                                : t.status === 'REJECTED' ? 'bg-lb-down/15 text-rose-450' 
                                 : 'bg-amber-500/15 text-amber-500'}`}>
                                 {t.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 mr-1" />}
                                 {t.status === 'REJECTED' && <XCircle className="w-3 h-3 mr-1" />}
@@ -556,7 +556,7 @@ export default function WalletAndKyc({
                                 {t.status}
                               </span>
                             </td>
-                            <td className="py-2.5 text-right text-slate-500">
+                            <td className="py-2.5 text-right text-lb-text-muted">
                               {t.createdAt ? (
                                 new Date(t.createdAt).toLocaleDateString("en-GB", {
                                   day: "2-digit",
@@ -589,18 +589,18 @@ export default function WalletAndKyc({
                 <div className="overflow-x-auto text-left font-mono text-xs">
                   {withdrawHistoryLoading ? (
                     <div className="flex flex-col items-center justify-center py-10 space-y-3">
-                      <div className="w-6 h-6 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-slate-400 font-sans text-[11px]">Loading withdrawal history...</span>
+                      <div className="w-6 h-6 border-2 border-lb-accent border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-lb-text-muted font-sans text-[11px]">Loading withdrawal history...</span>
                     </div>
                   ) : withdrawHistoryError ? (
                     <div className="text-center py-10">
-                      <AlertCircle className="w-8 h-8 text-rose-500 mx-auto mb-2 opacity-50" />
+                      <AlertCircle className="w-8 h-8 text-lb-down mx-auto mb-2 opacity-50" />
                       <p className="text-rose-450 font-sans text-xs">{withdrawHistoryError}</p>
                     </div>
                   ) : (
                     <table className="w-full">
                       <thead>
-                        <tr className="text-slate-500 border-b border-slate-800 pb-2">
+                        <tr className="text-lb-text-muted border-b border-lb-border pb-2">
                           <th className="pb-2 text-left">Amount</th>
                           <th className="pb-2 text-left">Status</th>
                           <th className="pb-2 text-right">Request Date</th>
@@ -608,14 +608,14 @@ export default function WalletAndKyc({
                       </thead>
                       <tbody className="divide-y divide-slate-800">
                         {withdrawHistory.map(t => (
-                          <tr key={t._id} className="hover:bg-slate-950/20">
-                            <td className="py-2.5 font-bold text-slate-200">
+                          <tr key={t._id} className="hover:bg-lb-panel/20">
+                            <td className="py-2.5 font-bold text-lb-text">
                               ${(t.amount ?? 0).toLocaleString()}
                             </td>
                             <td className="py-2.5 font-sans">
                               <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase 
                                 ${t.status === 'APPROVED' ? 'bg-emerald-500/15 text-emerald-400' 
-                                : t.status === 'REJECTED' ? 'bg-rose-500/15 text-rose-450' 
+                                : t.status === 'REJECTED' ? 'bg-lb-down/15 text-rose-450' 
                                 : 'bg-amber-500/15 text-amber-500'}`}>
                                 {t.status === 'APPROVED' && <CheckCircle2 className="w-3 h-3 mr-1" />}
                                 {t.status === 'REJECTED' && <XCircle className="w-3 h-3 mr-1" />}
@@ -623,7 +623,7 @@ export default function WalletAndKyc({
                                 {t.status}
                               </span>
                             </td>
-                            <td className="py-2.5 text-right text-slate-500">
+                            <td className="py-2.5 text-right text-lb-text-muted">
                               {t.createdAt ? (
                                 new Date(t.createdAt).toLocaleDateString("en-GB", {
                                   day: "2-digit",
@@ -657,15 +657,15 @@ export default function WalletAndKyc({
         )}
 
         {activeSegment === "KYC" && (
-          <div className="max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+          <div className="max-w-3xl mx-auto bg-lb-bg border border-lb-border rounded-3xl p-6 md:p-8 shadow-2xl">
             {kycLoading ? (
               <div className="flex flex-col items-center justify-center py-16 space-y-3">
-                <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin"></div>
-                <span className="text-slate-400 font-sans text-xs">Loading KYC Status...</span>
+                <div className="w-8 h-8 border-2 border-lb-accent border-t-transparent rounded-full animate-spin"></div>
+                <span className="text-lb-text-muted font-sans text-xs">Loading KYC Status...</span>
               </div>
             ) : kycError ? (
               <div className="text-center py-16">
-                <AlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-3 opacity-50" />
+                <AlertCircle className="w-12 h-12 text-lb-down mx-auto mb-3 opacity-50" />
                 <p className="text-rose-450 font-sans text-sm font-bold">{kycError}</p>
               </div>
             ) : kycStatus?.status === 'APPROVED' ? (
@@ -674,12 +674,12 @@ export default function WalletAndKyc({
                   <CheckCircle2 className="w-10 h-10" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-xl font-bold text-white">{kycStatus.fullName || 'User'} Portfolio Fully Verified!</h3>
-                  <p className="text-slate-400 text-sm max-w-md mx-auto">Your identity has been fully approved. Withdrawal blockades have been removed completely.</p>
+                  <h3 className="text-xl font-bold text-lb-text">{kycStatus.fullName || 'User'} Portfolio Fully Verified!</h3>
+                  <p className="text-lb-text-muted text-sm max-w-md mx-auto">Your identity has been fully approved. Withdrawal blockades have been removed completely.</p>
                   <p className="text-emerald-400/80 text-[10px] font-mono mt-2 block">Documents uploaded: {kycStatus.documents?.length || 0}</p>
                 </div>
                 {kycStatus.adminNotes && (
-                  <p className="p-3 bg-slate-950 rounded-lg text-xs font-mono max-w-sm mx-auto text-slate-500 border border-slate-850">Admin Note: "{kycStatus.adminNotes}"</p>
+                  <p className="p-3 bg-lb-panel rounded-lg text-xs font-mono max-w-sm mx-auto text-lb-text-muted border border-slate-850">Admin Note: "{kycStatus.adminNotes}"</p>
                 )}
               </div>
             ) : kycStatus?.status === 'PENDING' ? (
@@ -688,30 +688,30 @@ export default function WalletAndKyc({
                   <Clock className="w-10 h-10" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-xl font-semibold text-white">Identity Review Pending validation</h3>
-                  <p className="text-slate-400 text-xs max-w-md mx-auto">Admin compliance desks have received your ID documents. We review files within minutes of submission.</p>
+                  <h3 className="text-xl font-semibold text-lb-text">Identity Review Pending validation</h3>
+                  <p className="text-lb-text-muted text-xs max-w-md mx-auto">Admin compliance desks have received your ID documents. We review files within minutes of submission.</p>
                   <p className="text-amber-500/80 text-[10px] font-mono mt-2 block">Documents uploaded: {kycStatus.documents?.length || 0}</p>
                 </div>
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs text-left text-slate-400 font-mono max-w-md mx-auto">
-                  <p>Document type: <span className="text-white font-bold">{kycStatus.documentType || 'N/A'}</span></p>
-                  <p>Document No: <span className="text-white font-bold">{kycStatus.documentNumber || 'N/A'}</span></p>
-                  <p>Full legal name: <span className="text-white font-bold">{kycStatus.fullName || 'N/A'}</span></p>
+                <div className="bg-lb-panel p-4 rounded-xl border border-lb-border space-y-2 text-xs text-left text-lb-text-muted font-mono max-w-md mx-auto">
+                  <p>Document type: <span className="text-lb-text font-bold">{kycStatus.documentType || 'N/A'}</span></p>
+                  <p>Document No: <span className="text-lb-text font-bold">{kycStatus.documentNumber || 'N/A'}</span></p>
+                  <p>Full legal name: <span className="text-lb-text font-bold">{kycStatus.fullName || 'N/A'}</span></p>
                 </div>
               </div>
             ) : (
               <form onSubmit={handleKycSubmit} className="space-y-6 text-left font-sans">
-                <div className="border-b border-slate-800 pb-3">
-                  <h3 className="text-lg font-bold text-white">KYC Document Upload Wizard</h3>
-                  <p className="text-xs text-slate-400">Complete standard account compliance checks to activate ultimate leverage brackets.</p>
-                  <p className="text-slate-500 text-[10px] font-mono mt-2 block">Status: {kycStatus?.status || 'UNSUBMITTED'}</p>
+                <div className="border-b border-lb-border pb-3">
+                  <h3 className="text-lg font-bold text-lb-text">KYC Document Upload Wizard</h3>
+                  <p className="text-xs text-lb-text-muted">Complete standard account compliance checks to activate ultimate leverage brackets.</p>
+                  <p className="text-lb-text-muted text-[10px] font-mono mt-2 block">Status: {kycStatus?.status || 'UNSUBMITTED'}</p>
                 </div>
 
                 {kycStatus?.status === 'REJECTED' && (
-                  <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-450 rounded-xl text-xs flex items-start">
+                  <div className="p-3.5 bg-lb-down/10 border border-lb-down/20 text-rose-450 rounded-xl text-xs flex items-start">
                     <AlertCircle className="w-4 h-4 mr-2 shrink-0 mt-0.5" />
                     <div>
                       <p className="font-bold">Prior Submission Rejected by Complying desks</p>
-                      <p className="text-slate-400 mt-1">Reason: "{kycStatus.adminNotes || "Details illegible"}"</p>
+                      <p className="text-lb-text-muted mt-1">Reason: "{kycStatus.adminNotes || "Details illegible"}"</p>
                     </div>
                   </div>
                 )}
@@ -722,7 +722,7 @@ export default function WalletAndKyc({
                       key={type}
                       type="button"
                       onClick={() => setKycDocType(type)}
-                      className={`p-3 rounded-xl border text-xs font-bold transition flex items-center justify-center space-x-2 ${kycDocType === type ? 'border-teal-500 bg-teal-500/10 text-white' : 'border-slate-800 bg-slate-950 hover:bg-slate-900 text-slate-400'}`}
+                      className={`p-3 rounded-xl border text-xs font-bold transition flex items-center justify-center space-x-2 ${kycDocType === type ? 'border-lb-accent bg-lb-accent/10 text-lb-text' : 'border-lb-border bg-lb-panel hover:bg-lb-bg text-lb-text-muted'}`}
                     >
                       <FileText className="w-4 h-4" />
                       <span>{type} Card ID</span>
@@ -732,36 +732,36 @@ export default function WalletAndKyc({
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[11px] text-slate-500 uppercase font-mono font-bold">Full Name (Matching ID)</label>
+                    <label className="text-[11px] text-lb-text-muted uppercase font-mono font-bold">Full Name (Matching ID)</label>
                     <input 
                       type="text"
                       value={kycFullName}
                       onChange={(e) => setKycFullName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-teal-500"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg px-3 py-2 text-xs text-lb-text focus:outline-none focus:border-lb-accent"
                       placeholder="e.g. Pradeep Kumar"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[11px] text-slate-500 uppercase font-mono font-bold">Document ID Number</label>
+                    <label className="text-[11px] text-lb-text-muted uppercase font-mono font-bold">Document ID Number</label>
                     <input 
                       type="text"
                       value={kycDocNumber}
                       onChange={(e) => setKycDocNumber(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-teal-500"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg px-3 py-2 text-xs font-mono text-lb-text focus:outline-none focus:border-lb-accent"
                       placeholder={kycDocType === "PAN" ? "PAN-ABCDE1234F" : kycDocType === "AADHAAR" ? "12-Digit UID Code" : "Passport serial code"}
                     />
                   </div>
 
                   <div className="space-y-1.5 col-span-1 md:col-span-2">
-                    <label className="text-[11px] text-slate-500 uppercase font-mono font-bold flex items-center">
+                    <label className="text-[11px] text-lb-text-muted uppercase font-mono font-bold flex items-center">
                       <Calendar className="w-3.5 h-3.5 mr-1" /> Birth Date (DOB)
                     </label>
                     <input 
                       type="date"
                       value={kycDob}
                       onChange={(e) => setKycDob(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-xs font-mono text-white focus:outline-none focus:border-teal-500"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg px-3 py-2.5 text-xs font-mono text-lb-text focus:outline-none focus:border-lb-accent"
                     />
                   </div>
                 </div>
@@ -770,11 +770,11 @@ export default function WalletAndKyc({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Front visual upload */}
                   <div className="space-y-2">
-                    <label className="text-[11px] text-slate-500 uppercase font-mono font-bold">ID Scan FRONT visuals</label>
+                    <label className="text-[11px] text-lb-text-muted uppercase font-mono font-bold">ID Scan FRONT visuals</label>
                     <div 
                       onDragOver={(e) => handleDragOver(e, "FRONT")}
                       onDrop={(e) => handleDrop(e, "FRONT")}
-                      className={`h-36 rounded-xl border-dashed border-2 flex flex-col justify-center items-center p-3 cursor-pointer select-none transition ${dragOverIndex === "FRONT" ? 'border-teal-500 bg-teal-500/5' : 'border-slate-800 bg-slate-950 hover:bg-slate-900/60'}`}
+                      className={`h-36 rounded-xl border-dashed border-2 flex flex-col justify-center items-center p-3 cursor-pointer select-none transition ${dragOverIndex === "FRONT" ? 'border-lb-accent bg-lb-accent/5' : 'border-lb-border bg-lb-panel hover:bg-lb-bg/60'}`}
                     >
                       {kycFrontImage ? (
                         <div className="relative w-full h-full flex justify-center items-center">
@@ -784,7 +784,7 @@ export default function WalletAndKyc({
                             onClick={(e) => {
                               setKycFrontImage("");
                             }}
-                            className="absolute top-1 right-1 bg-slate-950/80 p-1 rounded-full border border-slate-805 hover:text-rose-400"
+                            className="absolute top-1 right-1 bg-lb-panel/80 p-1 rounded-full border border-slate-805 hover:text-lb-down"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -792,7 +792,7 @@ export default function WalletAndKyc({
                       ) : (
                         <div className="text-center space-y-1">
                           <Upload className="w-6 h-6 text-slate-600 mx-auto" />
-                          <p className="text-[10px] text-slate-400">Front Visual Scan</p>
+                          <p className="text-[10px] text-lb-text-muted">Front Visual Scan</p>
                         </div>
                       )}
                     </div>
@@ -800,11 +800,11 @@ export default function WalletAndKyc({
 
                   {/* Back visual upload if needed */}
                   <div className="space-y-2">
-                    <label className="text-[11px] text-slate-500 uppercase font-mono font-bold">ID Scan BACK details</label>
+                    <label className="text-[11px] text-lb-text-muted uppercase font-mono font-bold">ID Scan BACK details</label>
                     <div 
                       onDragOver={(e) => handleDragOver(e, "BACK")}
                       onDrop={(e) => handleDrop(e, "BACK")}
-                      className={`h-36 rounded-xl border-dashed border-2 flex flex-col justify-center items-center p-3 cursor-pointer select-none transition ${dragOverIndex === "BACK" ? 'border-teal-500 bg-teal-500/5' : 'border-slate-800 bg-slate-950 hover:bg-slate-900/60'}`}
+                      className={`h-36 rounded-xl border-dashed border-2 flex flex-col justify-center items-center p-3 cursor-pointer select-none transition ${dragOverIndex === "BACK" ? 'border-lb-accent bg-lb-accent/5' : 'border-lb-border bg-lb-panel hover:bg-lb-bg/60'}`}
                     >
                       {kycBackImage ? (
                         <div className="relative w-full h-full flex justify-center items-center">
@@ -814,7 +814,7 @@ export default function WalletAndKyc({
                             onClick={(e) => {
                               setKycBackImage("");
                             }}
-                            className="absolute top-1 right-1 bg-slate-950/80 p-1 rounded-full border border-slate-805 hover:text-rose-400"
+                            className="absolute top-1 right-1 bg-lb-panel/80 p-1 rounded-full border border-slate-805 hover:text-lb-down"
                           >
                             <Trash2 className="w-3 h-3" />
                           </button>
@@ -822,14 +822,14 @@ export default function WalletAndKyc({
                       ) : (
                         <div className="text-center space-y-1">
                           <Upload className="w-6 h-6 text-slate-600 mx-auto" />
-                          <p className="text-[10px] text-slate-400">Back Visual Scan</p>
+                          <p className="text-[10px] text-lb-text-muted">Back Visual Scan</p>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="bg-amber-500/5 p-3 rounded-lg border border-amber-500/10 text-[10px] text-slate-400 leading-relaxed flex items-start">
+                <div className="bg-amber-500/5 p-3 rounded-lg border border-amber-500/10 text-[10px] text-lb-text-muted leading-relaxed flex items-start">
                   <AlertCircle className="w-3.5 h-3.5 text-amber-500 mr-2 shrink-0 mt-0.5" />
                   <span>Administrative rules: Submitting mock, blank, or low quality photos will trigger automatic rejected rulings. Compliance audits matches DOB and full registered legal names strictly.</span>
                 </div>
@@ -838,7 +838,7 @@ export default function WalletAndKyc({
                   id="submit-kyc-action"
                   type="submit"
                   disabled={kycPendingSubmit || !kycDocNumber || kycStatus?.status === 'PENDING'}
-                  className="w-full py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold rounded-xl transition text-xs uppercase cursor-pointer disabled:opacity-50"
+                  className="w-full py-3 bg-lb-accent hover:bg-lb-accent text-lb-bg font-extrabold rounded-xl transition text-xs uppercase cursor-pointer disabled:opacity-50"
                 >
                   {kycPendingSubmit ? "Securing compliant dossiers..." : "Submit Identity Dossier for verification"}
                 </button>

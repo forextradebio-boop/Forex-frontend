@@ -340,27 +340,27 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
   };
 
   return (
-    <div id="super-admin-crm" className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-8 font-sans">
+    <div id="super-admin-crm" className="min-h-screen bg-lb-panel text-slate-100 p-4 md:p-8 font-sans">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Head Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-900 pb-5">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center border border-orange-500/20">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-orange-500/20">
               <Terminal className="w-5 h-5 animate-pulse" />
             </div>
             <div>
-              <h1 className="text-xl font-black font-sans tracking-tight text-white flex items-center">
+              <h1 className="text-xl font-black font-sans tracking-tight text-lb-text flex items-center">
                 SUPER ADMIN EXCHANGE CONSOLE
-                <span className="ml-2 px-2 py-0.5 bg-orange-500/10 text-orange-400 text-[9px] font-black rounded font-mono border border-orange-500/20">ROOT DEV CONTROL</span>
+                <span className="ml-2 px-2 py-0.5 bg-amber-500/10 text-amber-400 text-[9px] font-black rounded font-mono border border-orange-500/20">ROOT DEV CONTROL</span>
               </h1>
-              <p className="text-xs text-slate-500">Global ledger reviews, KYC audits, position overrides, and ticker leverage configurations.</p>
+              <p className="text-xs text-lb-text-muted">Global ledger reviews, KYC audits, position overrides, and ticker leverage configurations.</p>
             </div>
           </div>
         </div>
 
         {/* Forex Factory CRM Tab Selector Row */}
-        <div className="flex bg-slate-900/60 p-1 rounded-2xl border border-slate-800 overflow-x-auto scrolling-touch">
+        <div className="flex bg-lb-bg/60 p-1 rounded-2xl border border-lb-border overflow-x-auto scrolling-touch">
           {([
             { id: "METRICS", key: "Metrics & Charts" },
             { id: "USERS", key: "User Profiles" },
@@ -374,7 +374,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
             <button 
               key={tab.id}
               onClick={() => setCrmTab(tab.id)}
-              className={`px-4 py-3 rounded-xl text-xs font-bold transition shrink-0 uppercase tracking-wider ${crmTab === tab.id ? 'bg-orange-500 text-slate-950 font-black shadow-lg shadow-orange-500/10' : 'text-slate-400 hover:text-slate-200'}`}
+              className={`px-4 py-3 rounded-xl text-xs font-bold transition shrink-0 uppercase tracking-wider ${crmTab === tab.id ? 'bg-orange-500 text-lb-bg font-black shadow-lg shadow-orange-500/10' : 'text-lb-text-muted hover:text-lb-text'}`}
             >
               {tab.key}
             </button>
@@ -386,54 +386,54 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
           <div className="space-y-8">
             {/* Bento statistics grid */}
             <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-1 shadow-sm">
-                <Users className="w-5 h-5 text-teal-400" />
-                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider pt-2">Total Accounts</p>
-                <p className="text-2xl font-black font-mono text-white">{metrics.totalUsers}</p>
+              <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl space-y-1 shadow-sm">
+                <Users className="w-5 h-5 text-lb-accent" />
+                <p className="text-lb-text-muted text-[10px] uppercase font-bold tracking-wider pt-2">Total Accounts</p>
+                <p className="text-2xl font-black font-mono text-lb-text">{metrics.totalUsers}</p>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-1 shadow-sm font-sans">
+              <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl space-y-1 shadow-sm font-sans">
                 <Activity className="w-5 h-5 text-indigo-400" />
-                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider pt-2">Online Trades</p>
-                <p className="text-2xl font-black font-mono text-white">{metrics.onlineUsers}</p>
+                <p className="text-lb-text-muted text-[10px] uppercase font-bold tracking-wider pt-2">Online Trades</p>
+                <p className="text-2xl font-black font-mono text-lb-text">{metrics.onlineUsers}</p>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-1 shadow-sm">
-                <Award className="w-5 h-5 text-orange-400" />
-                <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider pt-2">Active Traders</p>
-                <p className="text-2xl font-black font-mono text-orange-400">{metrics.activeTraders}</p>
+              <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl space-y-1 shadow-sm">
+                <Award className="w-5 h-5 text-amber-400" />
+                <p className="text-lb-text-muted text-[10px] uppercase font-bold tracking-wider pt-2">Active Traders</p>
+                <p className="text-2xl font-black font-mono text-amber-400">{metrics.activeTraders}</p>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-1 shadow-sm">
+              <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl space-y-1 shadow-sm">
                 <TrendingUp className="w-5 h-5 text-emerald-400" />
-                <p className="text-sm font-mono text-slate-400 mt-2 uppercase tracking-wide">Deposits 24H</p>
+                <p className="text-sm font-mono text-lb-text-muted mt-2 uppercase tracking-wide">Deposits 24H</p>
                 <p className="text-2xl font-black font-mono text-emerald-400">${(metrics?.todayDeposits ?? 0).toLocaleString()}</p>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-1 shadow-sm">
+              <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl space-y-1 shadow-sm">
                 <TrendingDown className="w-5 h-5 text-rose-450" />
-                <p className="text-sm font-mono text-slate-400 mt-2 uppercase tracking-wide">Withdrawals 24H</p>
-                <p className="text-2xl font-black font-mono text-rose-400">${(metrics?.todayWithdrawals ?? 0).toLocaleString()}</p>
+                <p className="text-sm font-mono text-lb-text-muted mt-2 uppercase tracking-wide">Withdrawals 24H</p>
+                <p className="text-2xl font-black font-mono text-lb-down">${(metrics?.todayWithdrawals ?? 0).toLocaleString()}</p>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-1 shadow-sm">
+              <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl space-y-1 shadow-sm">
                 <Sliders className="w-5 h-5 text-pink-400" />
-                <p className="text-xs font-mono text-slate-400 mt-2 uppercase tracking-wide">Trading Volume 24H</p>
-                <p className="text-lg font-black font-mono text-white">${(metrics?.tradingVolume24h ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+                <p className="text-xs font-mono text-lb-text-muted mt-2 uppercase tracking-wide">Trading Volume 24H</p>
+                <p className="text-lg font-black font-mono text-lb-text">${(metrics?.tradingVolume24h ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
               </div>
             </div>
 
             {/* Custom SVG Revenue History visualization Line Graph */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+              <div className="bg-lb-bg border border-lb-border p-6 rounded-2xl">
                 <div className="flex justify-between mb-6">
-                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest flex items-center">
-                    <TrendingUp className="w-4 h-4 mr-1.5 text-teal-400" /> Cumulative Revenue Metrics (24H Cycles)
+                  <h3 className="text-sm font-bold text-lb-text uppercase tracking-widest flex items-center">
+                    <TrendingUp className="w-4 h-4 mr-1.5 text-lb-accent" /> Cumulative Revenue Metrics (24H Cycles)
                   </h3>
-                  <span className="text-xs text-teal-400 font-mono font-bold">+$62,400 Total</span>
+                  <span className="text-xs text-lb-accent font-mono font-bold">+$62,400 Total</span>
                 </div>
                 {/* SVG Graph visual */}
-                <div className="h-60 w-full bg-slate-950 rounded-xl relative p-3 flex flex-col justify-between">
+                <div className="h-60 w-full bg-lb-panel rounded-xl relative p-3 flex flex-col justify-between">
                   <svg className="w-full h-44" viewBox="0 0 500 150" preserveAspectRatio="none">
                     <line x1="0" y1="120" x2="500" y2="120" stroke="#1e293b" strokeDasharray="3" />
                     <line x1="0" y1="60" x2="500" y2="60" stroke="#1e293b" strokeDasharray="3" />
@@ -446,7 +446,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                     {/* Points dot */}
                     <circle cx="490" cy="78" r="4" fill="#14b8a6" />
                   </svg>
-                  <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                  <div className="flex justify-between text-[10px] text-lb-text-muted font-mono">
                     <span>June 5</span>
                     <span>June 7</span>
                     <span>June 9</span>
@@ -455,15 +455,15 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 </div>
               </div>
 
-              <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+              <div className="bg-lb-bg border border-lb-border p-6 rounded-2xl">
                 <div className="flex justify-between mb-6">
-                  <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest flex items-center">
+                  <h3 className="text-sm font-bold text-lb-text uppercase tracking-widest flex items-center">
                     <Sliders className="w-4 h-4 mr-1.5 text-indigo-400" /> Exchange Volume Analytics (USD Millions)
                   </h3>
                   <span className="text-xs text-indigo-450 font-mono font-bold">$8.9M Peak</span>
                 </div>
                 {/* SVG Graph visual */}
-                <div className="h-60 w-full bg-slate-950 rounded-xl relative p-3 flex flex-col justify-between">
+                <div className="h-60 w-full bg-lb-panel rounded-xl relative p-3 flex flex-col justify-between">
                   <svg className="w-full h-44" viewBox="0 0 500 150" preserveAspectRatio="none">
                     <line x1="0" y1="120" x2="500" y2="120" stroke="#1e293b" strokeDasharray="3" />
                     <line x1="0" y1="60" x2="500" y2="60" stroke="#1e293b" strokeDasharray="3" />
@@ -475,7 +475,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                     />
                     <circle cx="490" cy="75" r="4" fill="#6366f1" />
                   </svg>
-                  <div className="flex justify-between text-[10px] text-slate-500 font-mono">
+                  <div className="flex justify-between text-[10px] text-lb-text-muted font-mono">
                     <span>June 5</span>
                     <span>June 7</span>
                     <span>June 9</span>
@@ -490,10 +490,10 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
         {crmTab === "USERS" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left 8 cols: User Lists */}
-            <div className="lg:col-span-8 bg-slate-900 border border-slate-800 p-5 rounded-2xl overflow-x-auto text-left">
+            <div className="lg:col-span-8 bg-lb-bg border border-lb-border p-5 rounded-2xl overflow-x-auto text-left">
               <table className="w-full text-xs font-mono">
                 <thead>
-                  <tr className="text-slate-500 border-b border-slate-800 pb-2">
+                  <tr className="text-lb-text-muted border-b border-lb-border pb-2">
                     <th className="pb-2 text-left">Account ID</th>
                     <th className="pb-2 text-left">Email Address</th>
                     <th className="pb-2 text-left">Total Balance</th>
@@ -505,27 +505,27 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {userProfiles.map(u => (
-                    <tr key={u.profile.id} className="hover:bg-slate-950/20">
-                      <td className="py-2.5 font-bold text-slate-300">{u.profile.id}</td>
-                      <td className="py-2.5 text-slate-200">
+                    <tr key={u.profile.id} className="hover:bg-lb-panel/20">
+                      <td className="py-2.5 font-bold text-lb-text">{u.profile.id}</td>
+                      <td className="py-2.5 text-lb-text">
                         <p className="font-bold">{u.profile.fullName}</p>
-                        <p className="text-[10px] text-slate-500 truncate max-w-[140px]">{u.profile.email}</p>
+                        <p className="text-[10px] text-lb-text-muted truncate max-w-[140px]">{u.profile.email}</p>
                       </td>
-                      <td className="py-2.5 font-bold text-white">${(u.wallet?.balance ?? 0).toLocaleString()}</td>
+                      <td className="py-2.5 font-bold text-lb-text">${(u.wallet?.balance ?? 0).toLocaleString()}</td>
                       <td className="py-2.5">
-                        <span className={`px-2 py-0.5 rounded text-[9px] font-sans font-extrabold ${u.profile.role === 'ADMIN' ? 'bg-orange-500/10 text-orange-400 border border-orange-500/25' : 'bg-slate-950 border border-slate-800 text-slate-400'}`}>
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-sans font-extrabold ${u.profile.role === 'ADMIN' ? 'bg-amber-500/10 text-amber-400 border border-orange-500/25' : 'bg-lb-panel border border-lb-border text-lb-text-muted'}`}>
                           {u.profile.role}
                         </span>
                       </td>
                       <td className="py-2.5">
-                        <span className={`text-[10px] font-sans font-bold uppercase ${u.profile.kycStatus === KYCStatus.APPROVED ? 'text-emerald-400' : 'text-slate-500'}`}>
+                        <span className={`text-[10px] font-sans font-bold uppercase ${u.profile.kycStatus === KYCStatus.APPROVED ? 'text-emerald-400' : 'text-lb-text-muted'}`}>
                           {u.profile.kycStatus}
                         </span>
                       </td>
                       <td className="py-2.5 font-sans">
                         <button 
                           onClick={() => handleToggleUserStatus(u.profile.id, u.profile.status)}
-                          className={`px-2.5 py-1 rounded text-[10px] font-bold border transition ${u.profile.status === 'ACTIVE' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-rose-500/10 hover:text-rose-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-emerald-500/10 hover:text-emerald-400'}`}
+                          className={`px-2.5 py-1 rounded text-[10px] font-bold border transition ${u.profile.status === 'ACTIVE' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-lb-down/10 hover:text-lb-down' : 'bg-lb-down/10 border-lb-down/20 text-lb-down hover:bg-emerald-500/10 hover:text-emerald-400'}`}
                         >
                           {u.profile.status}
                         </button>
@@ -533,7 +533,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                       <td className="py-2.5 text-right">
                         <button 
                           onClick={() => setSelectedUser(u)}
-                          className="px-2 py-1 bg-slate-950 border border-slate-800 rounded text-[11px] font-sans font-bold hover:bg-slate-900 text-slate-300"
+                          className="px-2 py-1 bg-lb-panel border border-lb-border rounded text-[11px] font-sans font-bold hover:bg-lb-bg text-lb-text"
                         >
                           Adjust Balance
                         </button>
@@ -547,19 +547,19 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
             {/* Right 4 cols: Balance modify widget */}
             <div className="lg:col-span-4">
               {selectedUser ? (
-                <div className="bg-slate-900 border border-orange-505 rounded-2xl p-5 space-y-4 shadow-xl border border-orange-500/20">
-                  <div className="flex justify-between items-center bg-slate-950 p-2.5 rounded-lg border border-slate-800 leading-none">
-                    <span className="text-[10px] text-slate-500 uppercase font-mono">Target Email:</span>
-                    <strong className="text-xs text-orange-400">{selectedUser.profile.email}</strong>
+                <div className="bg-lb-bg border border-orange-505 rounded-2xl p-5 space-y-4 shadow-xl border border-orange-500/20">
+                  <div className="flex justify-between items-center bg-lb-panel p-2.5 rounded-lg border border-lb-border leading-none">
+                    <span className="text-[10px] text-lb-text-muted uppercase font-mono">Target Email:</span>
+                    <strong className="text-xs text-amber-400">{selectedUser.profile.email}</strong>
                   </div>
 
                   <div className="space-y-1.5 text-left font-sans">
-                    <label className="text-[11px] text-slate-500 font-mono uppercase font-bold">Adjustment value ($)</label>
+                    <label className="text-[11px] text-lb-text-muted font-mono uppercase font-bold">Adjustment value ($)</label>
                     <input 
                       type="number"
                       value={balanceAdjustAmount}
                       onChange={(e) => setBalanceAdjustAmount(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-200 focus:outline-none"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg px-3 py-2 text-xs font-mono text-lb-text focus:outline-none"
                       placeholder="Specify amount to adjust"
                     />
                   </div>
@@ -567,13 +567,13 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <button 
                       onClick={() => handleAdjustBalance("ADD")}
-                      className="py-2.5 bg-emerald-500 text-slate-950 font-bold rounded-lg text-xs hover:bg-emerald-400 transition"
+                      className="py-2.5 bg-emerald-500 text-lb-bg font-bold rounded-lg text-xs hover:bg-emerald-400 transition"
                     >
                       Credit User (+ $)
                     </button>
                     <button 
                       onClick={() => handleAdjustBalance("SUBTRACT")}
-                      className="py-2.5 bg-rose-500 text-white font-bold rounded-lg text-xs hover:bg-rose-450 transition"
+                      className="py-2.5 bg-lb-down text-lb-text font-bold rounded-lg text-xs hover:bg-rose-450 transition"
                     >
                       Debit User (- $)
                     </button>
@@ -581,13 +581,13 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
 
                   <button 
                     onClick={() => setSelectedUser(null)}
-                    className="w-full py-2 bg-slate-950 text-slate-500 text-xs font-bold rounded-lg hover:text-slate-350 transition border border-slate-850"
+                    className="w-full py-2 bg-lb-panel text-lb-text-muted text-xs font-bold rounded-lg hover:text-slate-350 transition border border-slate-850"
                   >
                     Cancel Action
                   </button>
                 </div>
               ) : (
-                <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs space-y-2">
+                <div className="bg-lb-bg border border-lb-border p-6 rounded-2xl text-center text-lb-text-muted text-xs space-y-2">
                   <Eye className="w-8 h-8 text-slate-700 mx-auto" />
                   <p>Click "Adjust Balance" on any user block to credit/debit active capital accounts instantly.</p>
                 </div>
@@ -599,10 +599,10 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
         {crmTab === "KYC" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left 8: KYC List */}
-            <div className="lg:col-span-8 bg-slate-900 border border-slate-800 p-5 rounded-2xl text-left overflow-x-auto">
+            <div className="lg:col-span-8 bg-lb-bg border border-lb-border p-5 rounded-2xl text-left overflow-x-auto">
               <table className="w-full text-xs font-mono">
                 <thead>
-                  <tr className="text-slate-500 border-b border-slate-800 pb-2">
+                  <tr className="text-lb-text-muted border-b border-lb-border pb-2">
                     <th className="pb-2">Dossier ID</th>
                     <th className="pb-2">User Email</th>
                     <th className="pb-2">Legal Declared Name</th>
@@ -614,17 +614,17 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {kycList.map(k => (
-                    <tr key={k.id} className="hover:bg-slate-950/20">
-                      <td className="py-2.5 font-bold text-slate-300">{k.id}</td>
-                      <td className="py-2.5 text-slate-400">{k.userEmail}</td>
-                      <td className="py-2.5 text-white font-bold">{k.fullName}</td>
+                    <tr key={k.id} className="hover:bg-lb-panel/20">
+                      <td className="py-2.5 font-bold text-lb-text">{k.id}</td>
+                      <td className="py-2.5 text-lb-text-muted">{k.userEmail}</td>
+                      <td className="py-2.5 text-lb-text font-bold">{k.fullName}</td>
                       <td className="py-2.5 text-slate-450">{k.documentType}</td>
-                      <td className="py-2.5 text-slate-400">{k.documentNumber}</td>
-                      <td className="py-2.5 text-slate-500">{new Date(k.submittedAt).toLocaleDateString()}</td>
+                      <td className="py-2.5 text-lb-text-muted">{k.documentNumber}</td>
+                      <td className="py-2.5 text-lb-text-muted">{new Date(k.submittedAt).toLocaleDateString()}</td>
                       <td className="py-2.5 text-right font-sans">
                         <button 
                           onClick={() => setSelectedUser(k)}
-                          className={`px-2.5 py-1 rounded text-[10px] font-sans font-bold border transition ${k.status === KYCStatus.PENDING ? 'bg-amber-500/10 border-amber-500/35 text-amber-500 hover:bg-slate-950' : k.status === KYCStatus.APPROVED ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400' : 'bg-rose-500/10 border-rose-500/25 text-rose-455'}`}
+                          className={`px-2.5 py-1 rounded text-[10px] font-sans font-bold border transition ${k.status === KYCStatus.PENDING ? 'bg-amber-500/10 border-amber-500/35 text-amber-500 hover:bg-lb-panel' : k.status === KYCStatus.APPROVED ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400' : 'bg-lb-down/10 border-lb-down/25 text-rose-455'}`}
                         >
                           {k.status} Review ID
                         </button>
@@ -643,17 +643,17 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
             {/* Right 4: KYC Auditor */}
             <div className="lg:col-span-4">
               {selectedUser && selectedUser.documentNumber ? (
-                <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 text-left border-2 border-orange-500/20 shadow-2xl">
-                  <div className="border-b border-slate-800 pb-3 leading-none">
-                    <h4 className="text-sm font-bold text-white uppercase">{selectedUser.fullName}</h4>
-                    <p className="text-[10px] text-slate-500 font-mono mt-1.5">DOB: {selectedUser.dob}</p>
+                <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl space-y-4 text-left border-2 border-orange-500/20 shadow-2xl">
+                  <div className="border-b border-lb-border pb-3 leading-none">
+                    <h4 className="text-sm font-bold text-lb-text uppercase">{selectedUser.fullName}</h4>
+                    <p className="text-[10px] text-lb-text-muted font-mono mt-1.5">DOB: {selectedUser.dob}</p>
                   </div>
 
                   {/* Visual ID images */}
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1">
-                      <span className="text-[9px] text-slate-500 uppercase font-mono font-bold">Front ID scan</span>
-                      <div className="h-28 bg-slate-950 rounded bg-cover bg-center border border-slate-800 flex items-center justify-center relative overflow-hidden">
+                      <span className="text-[9px] text-lb-text-muted uppercase font-mono font-bold">Front ID scan</span>
+                      <div className="h-28 bg-lb-panel rounded bg-cover bg-center border border-lb-border flex items-center justify-center relative overflow-hidden">
                         {selectedUser.frontImageBase64 ? (
                           <img src={selectedUser.frontImageBase64} alt="ID front" className="max-h-full max-w-full rounded" />
                         ) : (
@@ -663,8 +663,8 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                     </div>
 
                     <div className="space-y-1">
-                      <span className="text-[9px] text-slate-500 uppercase font-mono font-bold">Back ID scan</span>
-                      <div className="h-28 bg-slate-950 rounded bg-cover bg-center border border-slate-800 flex items-center justify-center relative overflow-hidden">
+                      <span className="text-[9px] text-lb-text-muted uppercase font-mono font-bold">Back ID scan</span>
+                      <div className="h-28 bg-lb-panel rounded bg-cover bg-center border border-lb-border flex items-center justify-center relative overflow-hidden">
                         {selectedUser.backImageBase64 ? (
                           <img src={selectedUser.backImageBase64} alt="ID back" className="max-h-full max-w-full rounded" />
                         ) : (
@@ -675,12 +675,12 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                   </div>
 
                   <div className="space-y-1.5 font-sans">
-                    <label className="text-[11px] text-slate-500 font-mono uppercase font-bold">Add audit notes</label>
+                    <label className="text-[11px] text-lb-text-muted font-mono uppercase font-bold">Add audit notes</label>
                     <textarea 
                       rows={2}
                       value={reviewNote}
                       onChange={(e) => setReviewNote(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs text-white"
+                      className="w-full bg-lb-panel border border-slate-850 rounded-lg p-2 text-xs text-lb-text"
                       placeholder="Comment if rejected or approved..."
                     />
                   </div>
@@ -688,13 +688,13 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <button 
                       onClick={() => handleReviewKyc(selectedUser.id, "APPROVED")}
-                      className="py-2.5 bg-emerald-500 text-slate-950 font-extrabold rounded-lg text-xs"
+                      className="py-2.5 bg-emerald-500 text-lb-bg font-extrabold rounded-lg text-xs"
                     >
                       Clear / Approve ID
                     </button>
                     <button 
                       onClick={() => handleReviewKyc(selectedUser.id, "REJECTED")}
-                      className="py-2.5 bg-rose-500 text-white font-bold rounded-lg text-xs"
+                      className="py-2.5 bg-lb-down text-lb-text font-bold rounded-lg text-xs"
                     >
                       Reject Submission
                     </button>
@@ -702,13 +702,13 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                   
                   <button 
                     onClick={() => setSelectedUser(null)}
-                    className="w-full py-1.5 bg-slate-950 text-slate-500 text-xs font-bold rounded hover:text-slate-350"
+                    className="w-full py-1.5 bg-lb-panel text-lb-text-muted text-xs font-bold rounded hover:text-slate-350"
                   >
                     Close dossier review
                   </button>
                 </div>
               ) : (
-                <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs space-y-2">
+                <div className="bg-lb-bg border border-lb-border p-6 rounded-2xl text-center text-lb-text-muted text-xs space-y-2">
                   <FileText className="w-8 h-8 text-slate-700 mx-auto" />
                   <p>Select "Review ID" on the compliant list to view birth dates, ID hashes, and actual image files uploaded.</p>
                 </div>
@@ -719,14 +719,14 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
 
         {crmTab === "PAYMENTS" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            <div className="lg:col-span-8 bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-xl">
+            <div className="lg:col-span-8 bg-lb-bg border border-lb-border p-6 rounded-3xl shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-xl font-black text-slate-100">Payment Destination Settings</h3>
-                  <p className="text-sm text-slate-500 mt-1">Configure UPI and Netbanking details that users will use for deposit verification.</p>
+                  <p className="text-sm text-lb-text-muted mt-1">Configure UPI and Netbanking details that users will use for deposit verification.</p>
                 </div>
                 {paymentSettingsLoading ? (
-                  <span className="text-xs text-slate-400 uppercase tracking-wider">Loading…</span>
+                  <span className="text-xs text-lb-text-muted uppercase tracking-wider">Loading…</span>
                 ) : (
                   <span className="text-xs text-emerald-400 uppercase tracking-wider">Loaded</span>
                 )}
@@ -734,46 +734,46 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
 
               <div className="grid gap-4">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">UPI ID</label>
+                  <label className="text-[10px] uppercase tracking-[0.3em] text-lb-text-muted">UPI ID</label>
                   <input
                     type="text"
                     value={paymentSettingsForm.upiId}
                     onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, upiId: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full bg-lb-panel border border-lb-border rounded-2xl px-4 py-3 text-sm text-lb-text focus:outline-none focus:border-lb-accent"
                     placeholder="demo@upi"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">QR Code URL</label>
+                  <label className="text-[10px] uppercase tracking-[0.3em] text-lb-text-muted">QR Code URL</label>
                   <input
                     type="text"
                     value={paymentSettingsForm.qrCodeUrl}
                     onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, qrCodeUrl: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                    className="w-full bg-lb-panel border border-lb-border rounded-2xl px-4 py-3 text-sm text-lb-text focus:outline-none focus:border-lb-accent"
                     placeholder="https://example.com/qr-code.png"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Bank Name</label>
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-lb-text-muted">Bank Name</label>
                     <input
                       type="text"
                       value={paymentSettingsForm.bankName}
                       onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, bankName: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                      className="w-full bg-lb-panel border border-lb-border rounded-2xl px-4 py-3 text-sm text-lb-text focus:outline-none focus:border-lb-accent"
                       placeholder="Demo Bank"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Account Holder</label>
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-lb-text-muted">Account Holder</label>
                     <input
                       type="text"
                       value={paymentSettingsForm.accountHolder}
                       onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, accountHolder: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                      className="w-full bg-lb-panel border border-lb-border rounded-2xl px-4 py-3 text-sm text-lb-text focus:outline-none focus:border-lb-accent"
                       placeholder="Demo Trading LLC"
                     />
                   </div>
@@ -781,23 +781,23 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">Account Number</label>
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-lb-text-muted">Account Number</label>
                     <input
                       type="text"
                       value={paymentSettingsForm.bankAccount}
                       onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, bankAccount: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                      className="w-full bg-lb-panel border border-lb-border rounded-2xl px-4 py-3 text-sm text-lb-text focus:outline-none focus:border-lb-accent"
                       placeholder="1234567890"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-[0.3em] text-slate-500">IFSC Code</label>
+                    <label className="text-[10px] uppercase tracking-[0.3em] text-lb-text-muted">IFSC Code</label>
                     <input
                       type="text"
                       value={paymentSettingsForm.ifscCode}
                       onChange={(e) => setPaymentSettingsForm({ ...paymentSettingsForm, ifscCode: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500"
+                      className="w-full bg-lb-panel border border-lb-border rounded-2xl px-4 py-3 text-sm text-lb-text focus:outline-none focus:border-lb-accent"
                       placeholder="DEMO0001234"
                     />
                   </div>
@@ -806,28 +806,28 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={handleSavePaymentSettings}
-                    className="w-full rounded-2xl bg-gradient-to-r from-blue-500 via-sky-500 to-teal-400 py-3 text-sm font-black text-slate-950 hover:brightness-110 transition shadow-xl shadow-cyan-500/20"
+                    className="w-full rounded-2xl bg-gradient-to-r from-lb-accent via-lb-accent/80 to-lb-accent py-3 text-sm font-black text-lb-bg hover:brightness-110 transition shadow-xl shadow-lb-accent/20"
                   >
                     Save Payment Settings
                   </button>
-                  <p className="text-xs text-slate-500 leading-relaxed">These values will be shown to users on the premium deposit page when they choose UPI or Netbanking.</p>
+                  <p className="text-xs text-lb-text-muted leading-relaxed">These values will be shown to users on the premium deposit page when they choose UPI or Netbanking.</p>
                 </div>
               </div>
             </div>
 
-            <div className="lg:col-span-4 bg-slate-950 border border-slate-800 p-6 rounded-3xl shadow-xl space-y-4">
-              <h4 className="text-sm font-semibold text-slate-200 uppercase tracking-[0.24em]">Preview for users</h4>
-              <div className="rounded-3xl bg-slate-900 border border-slate-800 p-4 space-y-4">
+            <div className="lg:col-span-4 bg-lb-panel border border-lb-border p-6 rounded-3xl shadow-xl space-y-4">
+              <h4 className="text-sm font-semibold text-lb-text uppercase tracking-[0.24em]">Preview for users</h4>
+              <div className="rounded-3xl bg-lb-bg border border-lb-border p-4 space-y-4">
                 <div className="space-y-2">
-                  <p className="text-[10px] uppercase tracking-[0.28em] text-slate-500">UPI</p>
-                  <p className="text-white font-bold">{paymentSettingsForm.upiId || 'Not configured'}</p>
-                  <p className="text-slate-400 text-sm">Displayed in the deposit portal under UPI transfer.</p>
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-lb-text-muted">UPI</p>
+                  <p className="text-lb-text font-bold">{paymentSettingsForm.upiId || 'Not configured'}</p>
+                  <p className="text-lb-text-muted text-sm">Displayed in the deposit portal under UPI transfer.</p>
                 </div>
                 <div className="space-y-2">
-                  <p className="text-[10px] uppercase tracking-[0.28em] text-slate-500">Bank details</p>
-                  <p className="text-white font-bold">{paymentSettingsForm.accountHolder || 'Not configured'}</p>
-                  <p className="text-slate-400 text-sm">{paymentSettingsForm.bankName || 'Not configured'}</p>
-                  <p className="text-sm text-slate-300">{paymentSettingsForm.bankAccount || 'Not configured'} · IFSC {paymentSettingsForm.ifscCode || 'Not configured'}</p>
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-lb-text-muted">Bank details</p>
+                  <p className="text-lb-text font-bold">{paymentSettingsForm.accountHolder || 'Not configured'}</p>
+                  <p className="text-lb-text-muted text-sm">{paymentSettingsForm.bankName || 'Not configured'}</p>
+                  <p className="text-sm text-lb-text">{paymentSettingsForm.bankAccount || 'Not configured'} · IFSC {paymentSettingsForm.ifscCode || 'Not configured'}</p>
                 </div>
               </div>
             </div>
@@ -837,10 +837,10 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
         {crmTab === "TRANSACTIONS" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left 8: Transactions list queue */}
-            <div className="lg:col-span-8 bg-slate-900 border border-slate-800 p-5 rounded-2xl overflow-x-auto text-left">
+            <div className="lg:col-span-8 bg-lb-bg border border-lb-border p-5 rounded-2xl overflow-x-auto text-left">
               <table className="w-full text-xs font-mono">
                 <thead>
-                  <tr className="text-slate-500 border-b border-slate-800 pb-2">
+                  <tr className="text-lb-text-muted border-b border-lb-border pb-2">
                     <th className="pb-2">ID</th>
                     <th className="pb-2">User Email</th>
                     <th className="pb-2">Type</th>
@@ -853,20 +853,20 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 </thead>
                 <tbody className="divide-y divide-slate-800">
                   {transactionsList.map(t => (
-                    <tr key={t.id} className="hover:bg-slate-950/20">
+                    <tr key={t.id} className="hover:bg-lb-panel/20">
                       <td className="py-2.5 font-bold text-slate-350">{t.id}</td>
-                      <td className="py-2.5 text-slate-400">
-                        <p className="font-bold text-white leading-none">{t.userName}</p>
-                        <p className="text-[9px] text-slate-500 mt-1 truncate max-w-[140px]">{t.userEmail}</p>
+                      <td className="py-2.5 text-lb-text-muted">
+                        <p className="font-bold text-lb-text leading-none">{t.userName}</p>
+                        <p className="text-[9px] text-lb-text-muted mt-1 truncate max-w-[140px]">{t.userEmail}</p>
                       </td>
                       <td className="py-2.5">
-                        <span className={`px-2 py-0.5 rounded text-[9px] font-sans font-extrabold ${t.type === 'DEPOSIT' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-455'}`}>
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-sans font-extrabold ${t.type === 'DEPOSIT' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-lb-down/10 text-rose-455'}`}>
                           {t.type === TransactionType.DEPOSIT ? 'Deposit' : 'Withdrawal'}
                         </span>
                       </td>
-                      <td className="py-2.5 font-black text-white">${(t.amount ?? 0).toLocaleString()}</td>
-                      <td className="py-2.5 text-slate-400 font-sans">{t.method}</td>
-                      <td className="py-2.5 text-slate-300 font-mono max-w-[180px] truncate">{t.utrNumber || t.details}</td>
+                      <td className="py-2.5 font-black text-lb-text">${(t.amount ?? 0).toLocaleString()}</td>
+                      <td className="py-2.5 text-lb-text-muted font-sans">{t.method}</td>
+                      <td className="py-2.5 text-lb-text font-mono max-w-[180px] truncate">{t.utrNumber || t.details}</td>
                       <td className="py-2.5">
                         <span className={`px-1.5 py-0.2 rounded text-[10px] font-sans font-bold ${t.status === TransactionStatus.APPROVED ? 'text-emerald-400' : t.status === TransactionStatus.REJECTED ? 'text-rose-450' : 'text-amber-500'}`}>
                           {t.status}
@@ -876,7 +876,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                         {t.status === TransactionStatus.PENDING ? (
                           <button 
                             onClick={() => setSelectedUser(t)}
-                            className="px-2 py-1 bg-orange-500 hover:bg-orange-400 text-slate-950 font-bold text-[10px] rounded transition"
+                            className="px-2 py-1 bg-orange-500 hover:bg-orange-400 text-lb-bg font-bold text-[10px] rounded transition"
                           >
                             Review Ledger
                           </button>
@@ -898,35 +898,35 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
             {/* Right 4: Receipt Auditor */}
             <div className="lg:col-span-4">
               {selectedUser && selectedUser.amount && !selectedUser.documentNumber ? (
-                <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-4 text-left border-l-4 border-orange-500 shadow-2xl">
-                  <div className="border-b border-slate-800 pb-3 font-sans">
-                    <h4 className="text-sm font-bold text-slate-200">Processing: {selectedUser.type} Account request</h4>
-                    <p className="text-xs text-orange-400 font-mono mt-1 font-bold">Sum requested: ${selectedUser.amount}</p>
+                <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl space-y-4 text-left border-l-4 border-orange-500 shadow-2xl">
+                  <div className="border-b border-lb-border pb-3 font-sans">
+                    <h4 className="text-sm font-bold text-lb-text">Processing: {selectedUser.type} Account request</h4>
+                    <p className="text-xs text-amber-400 font-mono mt-1 font-bold">Sum requested: ${selectedUser.amount}</p>
                   </div>
 
-                  <div className="space-y-1 font-mono text-[11px] bg-slate-950 p-2.5 rounded border border-slate-800">
-                    <p className="text-slate-500">Routing Channel: <span className="text-white">{selectedUser.method}</span></p>
-                    {selectedUser.utrNumber && <p className="text-slate-500">UTR Receipt No: <span className="text-emerald-400 font-bold">{selectedUser.utrNumber}</span></p>}
-                    <p className="text-slate-500">Client details: <span className="text-slate-300">{selectedUser.details}</span></p>
+                  <div className="space-y-1 font-mono text-[11px] bg-lb-panel p-2.5 rounded border border-lb-border">
+                    <p className="text-lb-text-muted">Routing Channel: <span className="text-lb-text">{selectedUser.method}</span></p>
+                    {selectedUser.utrNumber && <p className="text-lb-text-muted">UTR Receipt No: <span className="text-emerald-400 font-bold">{selectedUser.utrNumber}</span></p>}
+                    <p className="text-lb-text-muted">Client details: <span className="text-lb-text">{selectedUser.details}</span></p>
                   </div>
 
                   {/* Receipt screenshot preview */}
                   {selectedUser.screenshotBase64 && (
                     <div className="space-y-1">
-                      <span className="text-[9px] text-slate-500 uppercase font-mono font-bold">Screenshot receipt proof:</span>
-                      <div className="h-44 bg-slate-950 rounded border border-slate-800 flex items-center justify-center overflow-hidden">
+                      <span className="text-[9px] text-lb-text-muted uppercase font-mono font-bold">Screenshot receipt proof:</span>
+                      <div className="h-44 bg-lb-panel rounded border border-lb-border flex items-center justify-center overflow-hidden">
                         <img src={selectedUser.screenshotBase64} alt="Screenshot receipt" className="max-h-full max-w-full rounded" />
                       </div>
                     </div>
                   )}
 
                   <div className="space-y-1.5 font-sans">
-                    <label className="text-[11px] text-slate-500 font-mono uppercase font-bold">Auditor response comments</label>
+                    <label className="text-[11px] text-lb-text-muted font-mono uppercase font-bold">Auditor response comments</label>
                     <textarea 
                       rows={2}
                       value={reviewNote}
                       onChange={(e) => setReviewNote(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-850 rounded-lg p-2 text-xs text-white"
+                      className="w-full bg-lb-panel border border-slate-850 rounded-lg p-2 text-xs text-lb-text"
                       placeholder="Comment for UTR approved / failed audits..."
                     />
                   </div>
@@ -934,13 +934,13 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <button 
                       onClick={() => handleReviewTransaction(selectedUser.id, "APPROVED")}
-                      className="py-2.5 bg-emerald-500 text-slate-950 font-bold rounded-lg text-xs"
+                      className="py-2.5 bg-emerald-500 text-lb-bg font-bold rounded-lg text-xs"
                     >
                       Verify / Approve Credit
                     </button>
                     <button 
                       onClick={() => handleReviewTransaction(selectedUser.id, "REJECTED")}
-                      className="py-2.5 bg-rose-500 text-white font-bold rounded-lg text-xs"
+                      className="py-2.5 bg-lb-down text-lb-text font-bold rounded-lg text-xs"
                     >
                       Reject Request
                     </button>
@@ -948,13 +948,13 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
 
                   <button 
                     onClick={() => setSelectedUser(null)}
-                    className="w-full py-1.5 bg-slate-950 text-slate-500 text-xs font-bold rounded hover:text-slate-300"
+                    className="w-full py-1.5 bg-lb-panel text-lb-text-muted text-xs font-bold rounded hover:text-lb-text"
                   >
                     Cancel ledger inspection
                   </button>
                 </div>
               ) : (
-                <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center text-slate-500 text-xs space-y-2">
+                <div className="bg-lb-bg border border-lb-border p-6 rounded-2xl text-center text-lb-text-muted text-xs space-y-2">
                   <Eye className="w-8 h-8 text-slate-700 mx-auto" />
                   <p>Click "Review Ledger" to bring up destination routes, receipt photos, UTR codes and verify credits.</p>
                 </div>
@@ -964,12 +964,12 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
         )}
 
         {crmTab === "TRADES" && (
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl text-left overflow-x-auto space-y-4">
+          <div className="bg-lb-bg border border-lb-border p-5 rounded-2xl text-left overflow-x-auto space-y-4">
             <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest">Global Positions Active & History Log</h3>
             
             <table className="w-full text-xs font-mono">
               <thead>
-                <tr className="text-slate-500 border-b border-slate-800 pb-2">
+                <tr className="text-lb-text-muted border-b border-lb-border pb-2">
                   <th className="pb-2">Trade / Position ID</th>
                   <th className="pb-2">User Email Profile</th>
                   <th className="pb-2">Symbol</th>
@@ -983,23 +983,23 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
               </thead>
               <tbody className="divide-y divide-slate-800">
                 {globalTrades.active.map(p => (
-                  <tr key={p.id} className="hover:bg-slate-950/20">
-                    <td className="py-2.5 font-bold text-slate-300">{p.id}</td>
-                    <td className="py-2.5 text-slate-400">{p.userEmail}</td>
-                    <td className="py-2.5 text-white font-extrabold">{p.symbol}</td>
+                  <tr key={p.id} className="hover:bg-lb-panel/20">
+                    <td className="py-2.5 font-bold text-lb-text">{p.id}</td>
+                    <td className="py-2.5 text-lb-text-muted">{p.userEmail}</td>
+                    <td className="py-2.5 text-lb-text font-extrabold">{p.symbol}</td>
                     <td className="py-2.5">
-                      <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${p.side === 'BUY' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-450'}`}>{p.side}</span>
+                      <span className={`px-1.5 py-0.2 rounded text-[10px] font-bold ${p.side === 'BUY' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-lb-down/10 text-rose-450'}`}>{p.side}</span>
                     </td>
-                    <td className="py-2.5 text-slate-200">{p.size} lots</td>
-                    <td className="py-2.5 text-slate-300">${p.entryPrice}</td>
-                    <td className="py-2.5 text-slate-300">${p.currentPrice}</td>
-                    <td className={`py-2.5 font-bold ${p.pnl >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                    <td className="py-2.5 text-lb-text">{p.size} lots</td>
+                    <td className="py-2.5 text-lb-text">${p.entryPrice}</td>
+                    <td className="py-2.5 text-lb-text">${p.currentPrice}</td>
+                    <td className={`py-2.5 font-bold ${p.pnl >= 0 ? "text-emerald-400" : "text-lb-down"}`}>
                       {p.pnl >= 0 ? "+" : ""}{(p.pnl ?? 0).toLocaleString()}
                     </td>
                     <td className="py-2.5 text-right font-sans">
                       <button 
                         onClick={() => handleForceClosePosition(p.id)}
-                        className="px-2.5 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/25 text-[10px] font-bold"
+                        className="px-2.5 py-1 rounded bg-lb-down/10 hover:bg-lb-down/20 text-lb-down border border-lb-down/25 text-[10px] font-bold"
                       >
                         Force Close Rate
                       </button>
@@ -1019,12 +1019,12 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
         {crmTab === "MARKETS" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left 7 cols: Symbols Listing */}
-            <div className="lg:col-span-7 bg-slate-900 border border-slate-800 p-5 rounded-2xl text-left overflow-x-auto space-y-4">
+            <div className="lg:col-span-7 bg-lb-bg border border-lb-border p-5 rounded-2xl text-left overflow-x-auto space-y-4">
               <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest font-sans">Exchange Market Symbols Listings</h3>
               
               <table className="w-full text-xs font-mono">
                 <thead>
-                  <tr className="text-slate-500 border-b border-slate-800 pb-2">
+                  <tr className="text-lb-text-muted border-b border-lb-border pb-2">
                     <th className="pb-2">Token / Code</th>
                     <th className="pb-2">Category</th>
                     <th className="pb-2">Spot Quote ($)</th>
@@ -1037,17 +1037,17 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                   {activeSymbols.map(s => (
                     <tr key={s.symbol}>
                       <td className="py-2.5">
-                        <p className="font-extrabold text-white leading-none">{s.symbol}</p>
-                        <p className="text-[9px] text-slate-500 mt-1 truncate max-w-[120px]">{s.name}</p>
+                        <p className="font-extrabold text-lb-text leading-none">{s.symbol}</p>
+                        <p className="text-[9px] text-lb-text-muted mt-1 truncate max-w-[120px]">{s.name}</p>
                       </td>
-                      <td className="py-2.5 text-slate-400 font-sans">{s.category}</td>
-                      <td className="py-2.5 font-bold text-slate-200">${s.price.toLocaleString()}</td>
-                      <td className="py-2.5 text-slate-400">{s.spread}</td>
-                      <td className="py-2.5 text-teal-400 font-bold">1:{s.leverageLimit}</td>
+                      <td className="py-2.5 text-lb-text-muted font-sans">{s.category}</td>
+                      <td className="py-2.5 font-bold text-lb-text">${s.price.toLocaleString()}</td>
+                      <td className="py-2.5 text-lb-text-muted">{s.spread}</td>
+                      <td className="py-2.5 text-lb-accent font-bold">1:{s.leverageLimit}</td>
                       <td className="py-2.5 text-right font-sans">
                         <button 
                           onClick={() => handleToggleSymbolState(s.symbol)}
-                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${s.isActive ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-rose-500/10 hover:text-rose-400' : 'bg-rose-500/10 border-rose-500/20 text-rose-450 hover:bg-emerald-500/10 hover:text-emerald-400'}`}
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold border transition ${s.isActive ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-lb-down/10 hover:text-lb-down' : 'bg-lb-down/10 border-lb-down/20 text-rose-450 hover:bg-emerald-500/10 hover:text-emerald-400'}`}
                         >
                           {s.isActive ? 'Active Spot' : 'HALTED'}
                         </button>
@@ -1059,30 +1059,30 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
             </div>
 
             {/* Right 5: Create Form */}
-            <div className="lg:col-span-5 bg-slate-900 border border-slate-800 p-5 rounded-2xl text-left">
-              <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest pb-3 border-b border-slate-800 font-sans">List New Asset Symbol</h3>
+            <div className="lg:col-span-5 bg-lb-bg border border-lb-border p-5 rounded-2xl text-left">
+              <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest pb-3 border-b border-lb-border font-sans">List New Asset Symbol</h3>
               
               <form onSubmit={handleAddSymbol} className="space-y-4 pt-4 text-xs font-sans">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Symbol Identifier Code</label>
+                    <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Symbol Identifier Code</label>
                     <input 
                       type="text"
                       value={newSymCode}
                       onChange={(e) => setNewSymCode(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 font-mono text-white"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 font-mono text-lb-text"
                       placeholder="e.g. RELIANCE"
                       required
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Asset Label Name</label>
+                    <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Asset Label Name</label>
                     <input 
                       type="text"
                       value={newSymName}
                       onChange={(e) => setNewSymName(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 text-lb-text"
                       placeholder="e.g. Reliance Industries"
                     />
                   </div>
@@ -1090,24 +1090,24 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Initial Spot Quote ($)</label>
+                    <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Initial Spot Quote ($)</label>
                     <input 
                       type="number"
                       step="0.0001"
                       value={newSymPrice}
                       onChange={(e) => setNewSymPrice(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 font-mono text-white"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 font-mono text-lb-text"
                       placeholder="125.50"
                       required
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Standard Category</label>
+                    <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Standard Category</label>
                     <select 
                       value={newSymCategory}
                       onChange={(e) => setNewSymCategory(e.target.value as AssetCategory)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 text-lb-text"
                     >
                       {Object.keys(AssetCategory).map(cat => (
                         <option key={cat} value={cat}>{cat}</option>
@@ -1118,24 +1118,24 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Leverage Bracket Maximum</label>
+                    <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Leverage Bracket Maximum</label>
                     <input 
                       type="number"
                       value={newSymLeverage}
                       onChange={(e) => setNewSymLeverage(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 font-mono text-white"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 font-mono text-lb-text"
                       placeholder="100"
                     />
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Mated Spread (Pips)</label>
+                    <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Mated Spread (Pips)</label>
                     <input 
                       type="number"
                       step="0.01"
                       value={newSymSpread}
                       onChange={(e) => setNewSymSpread(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 font-mono text-white"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 font-mono text-lb-text"
                       placeholder="e.g. 5"
                     />
                   </div>
@@ -1144,7 +1144,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 <button 
                   id="submit-new-symbol"
                   type="submit"
-                  className="w-full py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold rounded-lg transition text-xs uppercase cursor-pointer"
+                  className="w-full py-3 bg-lb-accent hover:bg-lb-accent text-lb-bg font-extrabold rounded-lg transition text-xs uppercase cursor-pointer"
                 >
                   Publish and List Token
                 </button>
@@ -1156,40 +1156,40 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
         {crmTab === "NEWS" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Left 6: Write Press */}
-            <div className="lg:col-span-6 bg-slate-900 border border-slate-800 p-5 rounded-2xl text-left font-sans">
-              <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest pb-3 border-b border-slate-800">Publish Financial Breaking News</h3>
+            <div className="lg:col-span-6 bg-lb-bg border border-lb-border p-5 rounded-2xl text-left font-sans">
+              <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest pb-3 border-b border-lb-border">Publish Financial Breaking News</h3>
               
               <form onSubmit={handleCreateNews} className="space-y-4 pt-4 text-xs">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">News Head Headline</label>
+                  <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">News Head Headline</label>
                   <input 
                     type="text"
                     value={newsTitle}
                     onChange={(e) => setNewsTitle(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-white font-bold"
+                    className="w-full bg-lb-panel border border-lb-border rounded-lg p-2.5 text-lb-text font-bold"
                     placeholder="e.g. S&P 500 registers record liquidity sweeps..."
                     required
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Brief summary</label>
+                  <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Brief summary</label>
                   <input 
                     type="text"
                     value={newsSummary}
                     onChange={(e) => setNewsSummary(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white"
+                    className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 text-lb-text"
                     placeholder="Brief 1-sentence synopsis."
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Target sector</label>
+                    <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Target sector</label>
                     <select 
                       value={newsCat}
                       onChange={(e) => setNewsCat(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white"
+                      className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 text-lb-text"
                     >
                       <option value="crypto">Cryptos sector</option>
                       <option value="forex">Forex Spot</option>
@@ -1200,14 +1200,14 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-500 uppercase font-mono font-bold flex items-center">
+                  <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold flex items-center">
                     <FileText className="w-3.5 h-3.5 mr-1" /> Article Body copy
                   </label>
                   <textarea 
                     rows={4}
                     value={newsContent}
                     onChange={(e) => setNewsContent(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200"
+                    className="w-full bg-lb-panel border border-lb-border rounded-lg p-2.5 text-lb-text"
                     placeholder="Provide professional insights..."
                     required
                   />
@@ -1216,7 +1216,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 <button 
                   id="submit-news-article"
                   type="submit"
-                  className="w-full py-3 bg-teal-500 hover:bg-teal-405 text-slate-950 font-bold rounded-lg uppercase"
+                  className="w-full py-3 bg-lb-accent hover:bg-teal-405 text-lb-bg font-bold rounded-lg uppercase"
                 >
                   Publish Breaking Story
                 </button>
@@ -1224,28 +1224,28 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
             </div>
 
             {/* Right 6: Push dispatcher */}
-            <div className="lg:col-span-6 bg-slate-900 border border-slate-800 p-5 rounded-2xl text-left font-sans">
-              <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest pb-3 border-b border-slate-800">Dispatch Push notification banners</h3>
+            <div className="lg:col-span-6 bg-lb-bg border border-lb-border p-5 rounded-2xl text-left font-sans">
+              <h3 className="text-sm font-bold text-slate-350 uppercase tracking-widest pb-3 border-b border-lb-border">Dispatch Push notification banners</h3>
               
               <form onSubmit={handleDispatchNotification} className="space-y-4 pt-4 text-xs">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Notification Title Header</label>
+                  <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Notification Title Header</label>
                   <input 
                     type="text"
                     value={notifTitle}
                     onChange={(e) => setNotifTitle(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-bold"
+                    className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 text-lb-text font-bold"
                     placeholder="e.g. Critical margin policy adjustment..."
                     required
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-500 uppercase font-mono font-bold">Target Account Segment</label>
+                  <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold">Target Account Segment</label>
                   <select 
                     value={notifUser}
                     onChange={(e) => setNotifUser(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-white font-mono"
+                    className="w-full bg-lb-panel border border-lb-border rounded-lg p-2 text-lb-text font-mono"
                   >
                     <option value="ALL">Broad Broadcast (All Active displays)</option>
                     <option value="USER_GUEST">Pradeep / Guest Trader profile specific</option>
@@ -1253,14 +1253,14 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] text-slate-500 uppercase font-mono font-bold flex items-center">
-                    <BellRing className="w-3.5 h-3.5 text-teal-400 mr-1" /> Alert Body Info
+                  <label className="text-[10px] text-lb-text-muted uppercase font-mono font-bold flex items-center">
+                    <BellRing className="w-3.5 h-3.5 text-lb-accent mr-1" /> Alert Body Info
                   </label>
                   <textarea 
                     rows={3}
                     value={notifContent}
                     onChange={(e) => setNotifContent(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-slate-200"
+                    className="w-full bg-lb-panel border border-lb-border rounded-lg p-2.5 text-lb-text"
                     placeholder="Compliance message..."
                     required
                   />
@@ -1269,7 +1269,7 @@ export default function AdminCRM({ userId, onRefreshAllData }: AdminCRMProps) {
                 <button 
                   id="submit-push-banner"
                   type="submit"
-                  className="w-full py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold rounded-lg uppercase"
+                  className="w-full py-3 bg-lb-accent hover:bg-lb-accent text-lb-bg font-bold rounded-lg uppercase"
                 >
                   Broadcast Push Alert
                 </button>

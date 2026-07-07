@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Activity, BookOpen, Mail, Book, Calendar, Users, TrendingUp, HelpCircle, Info, ChevronRight, X, LogOut, Download, Upload } from 'lucide-react';
+import { User, Activity, BookOpen, Mail, Book, Calendar, Users, TrendingUp, HelpCircle, Info, ChevronRight, X, LogOut, Download, Upload, RefreshCw } from 'lucide-react';
 
 export type WalletSubTab = 'dashboard' | 'deposit' | 'withdraw' | 'transactions';
 
@@ -11,6 +11,7 @@ interface SidebarProps {
   onNavigateProfile?: () => void;
   onNavigateNews: () => void;
   onNavigateCalendar?: () => void;
+  onNavigateAbout?: () => void;
   userProfile?: {
     id: string;
     username: string;
@@ -19,7 +20,7 @@ interface SidebarProps {
   onLogout?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted, onNavigateWallet, onNavigateProfile, onNavigateNews, onNavigateCalendar, userProfile, onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted, onNavigateWallet, onNavigateProfile, onNavigateNews, onNavigateCalendar, onNavigateAbout, userProfile, onLogout }) => {
   if (!isOpen) return null;
 
   const isAuthenticated = !!userProfile;
@@ -30,24 +31,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
       
       {/* Drawer */}
-      <div className="relative w-4/5 max-w-[320px] bg-black text-white h-full flex flex-col shadow-2xl animate-in slide-in-from-left">
+      <div className="relative w-4/5 max-w-[320px] bg-black text-lb-text h-full flex flex-col shadow-2xl animate-in slide-in-from-left">
         
         {/* Header Section */}
-        <div className="p-6 pb-8 border-b border-white/10 flex flex-col gap-4 bg-[#0a0a0a]">
-          <div className="flex items-start justify-between">
+        <div className="p-6 pb-8 border-b border-lb-border flex flex-col gap-4 bg-lb-panel shadow-lg relative overflow-hidden">
+          {/* Subtle background glow */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-lb-accent/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div className="flex items-start justify-between relative z-10">
             <div className="flex gap-4 items-center">
-              <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center relative shadow-lg">
-                <User className="text-white w-6 h-6" />
-                {isAuthenticated && <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-black"></div>}
+              <div className="w-12 h-12 rounded-full bg-lb-accent/10 border border-lb-accent/30 flex items-center justify-center relative shadow-[0_0_15px_rgba(20,184,166,0.2)]">
+                <User className="text-lb-accent w-6 h-6" />
+                {isAuthenticated && <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-lb-accent rounded-full border-2 border-lb-panel shadow-[0_0_10px_rgba(20,184,166,0.8)] animate-pulse"></div>}
               </div>
               <div className="flex flex-col">
                 {isAuthenticated ? (
                   <>
-                    <span className="text-[13px] font-semibold text-white/70 uppercase tracking-wider">Account</span>
-                    <span className="text-[15px] font-bold text-white">{userProfile.username}</span>
+                    <span className="text-[12px] font-bold text-lb-text-muted uppercase tracking-widest">Account</span>
+                    <span className="text-[16px] font-black text-lb-text">{userProfile.username}</span>
                   </>
                 ) : (
-                  <span className="text-[15px] font-medium leading-tight text-white/90">Login to existing<br/>account or open demo</span>
+                  <span className="text-[15px] font-bold leading-tight text-lb-text/90">Login to existing<br/>account or open demo</span>
                 )}
               </div>
             </div>
@@ -55,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
           {isAuthenticated ? (
             <button 
               onClick={() => { onClose(); onLogout?.(); }}
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full w-max text-sm mt-2 transition-colors shadow-lg shadow-red-600/20 flex items-center gap-2"
+              className="relative z-10 bg-lb-down/10 border border-lb-down/30 hover:bg-lb-down hover:text-white text-lb-down font-bold py-2 px-6 rounded-xl w-max text-sm mt-2 transition-all duration-300 shadow-[0_0_15px_rgba(244,63,94,0.1)] hover:shadow-[0_0_20px_rgba(244,63,94,0.4)] flex items-center gap-2 hover:scale-105 active:scale-95"
             >
               <LogOut size={16} />
               Logout
@@ -63,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
           ) : (
             <button 
               onClick={() => { onClose(); onGetStarted(); }}
-              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-full w-max text-sm mt-2 transition-colors shadow-lg shadow-blue-500/20"
+              className="relative z-10 bg-lb-accent hover:bg-lb-accent/80 text-lb-bg font-black py-2.5 px-8 rounded-xl w-max text-sm mt-2 transition-all duration-300 shadow-[0_0_20px_rgba(20,184,166,0.3)] hover:shadow-[0_0_25px_rgba(20,184,166,0.5)] hover:scale-105 active:scale-95"
             >
               Get started
             </button>
@@ -74,17 +78,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
         <div className="flex-1 overflow-y-auto py-4">
           <div className="flex flex-col px-2 gap-0.5">
             <MenuItem icon={<Activity size={20} />} label="Trade" onClick={() => console.log('Trade clicked')} />
-            <MenuItem icon={<BookOpen size={20} />} label="News" onClick={() => { onClose(); onNavigateNews(); }} />
-            {/* <MenuItem icon={<Mail size={20} />} label="Mailbox" badge="8" onClick={() => console.log('Mailbox clicked')} /> */}
-            {/* <MenuItem icon={<Book size={20} />} label="Journal" onClick={() => console.log('Journal clicked')} /> */}
+            <MenuItem icon={<BookOpen size={20} />} label="News" onClick={() => { onClose(); onNavigateNews?.(); }} />
             <MenuItem icon={<Download size={20} />} label="Deposit" onClick={() => { onClose(); onNavigateWallet?.('deposit'); }} />
             <MenuItem icon={<Upload size={20} />} label="Withdraw" onClick={() => { onClose(); onNavigateWallet?.('withdraw'); }} />
+            <MenuItem icon={<RefreshCw size={20} />} label="Currency Converter" onClick={() => { onClose(); onNavigateWallet?.('dashboard'); }} />
             <MenuItem icon={<User size={20} />} label="Profile" onClick={() => { onClose(); onNavigateProfile?.(); }} />
             <MenuItem icon={<Calendar size={20} />} label="Economic calendar" isAds onClick={() => { onClose(); onNavigateCalendar?.(); }} />
-            {/* <MenuItem icon={<Users size={20} />} label="Traders Community" onClick={() => console.log('Traders Community clicked')} /> */}
-            {/* <MenuItem icon={<TrendingUp size={20} />} label="MQL5 Algo Trading" onClick={() => console.log('MQL5 Algo Trading clicked')} /> */}
-            {/* <MenuItem icon={<HelpCircle size={20} />} label="User guide" onClick={() => console.log('User guide clicked')} /> */}
-            <MenuItem icon={<Info size={20} />} label="About" onClick={() => console.log('About clicked')} />
+            <MenuItem icon={<Info size={20} />} label="About" onClick={() => { onClose(); onNavigateAbout?.(); }} />
           </div>
         </div>
 
@@ -97,17 +97,20 @@ const MenuItem = ({ icon, label, badge, isAds, onClick }: { icon: React.ReactNod
   <button 
     type="button"
     onClick={onClick}
-    className="flex items-center justify-between px-4 py-3 hover:bg-white/10 active:bg-white/20 rounded-lg transition-all text-left w-full group cursor-pointer duration-200"
+    className="flex items-center justify-between px-4 py-3.5 hover:bg-lb-accent/10 active:bg-lb-accent/20 rounded-xl transition-all duration-300 text-left w-full group cursor-pointer hover:shadow-[0_0_15px_rgba(20,184,166,0.05)] hover:scale-[1.02] active:scale-95 border border-transparent hover:border-lb-accent/20 relative overflow-hidden"
   >
-    <div className="flex items-center gap-3">
-      <div className="text-white/60 group-hover:text-white/80 transition-colors">
+    {/* Left accent bar on hover */}
+    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-0 bg-lb-accent rounded-r-full transition-all duration-300 group-hover:h-1/2"></div>
+    
+    <div className="flex items-center gap-4">
+      <div className="text-lb-text-muted group-hover:text-lb-accent transition-colors duration-300">
         {icon}
       </div>
-      <span className="text-[14px] font-medium text-white/80 group-hover:text-white transition-colors">{label}</span>
+      <span className="text-[14px] font-bold text-lb-text/80 group-hover:text-lb-text group-hover:tracking-wide transition-all duration-300">{label}</span>
     </div>
-    <div className="flex gap-1.5 items-center">
-      {isAds && <span className="text-[9px] font-bold text-orange-400 px-1.5 py-0.5 rounded-full border border-orange-500/30 bg-orange-500/10">Premium</span>}
-      {badge && <span className="bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full">{badge}</span>}
+    <div className="flex gap-2 items-center">
+      {isAds && <span className="text-[9px] font-black text-amber-400 px-2 py-0.5 rounded-full border border-amber-500/30 bg-amber-500/10 uppercase tracking-widest shadow-[0_0_10px_rgba(251,191,36,0.2)]">Premium</span>}
+      {badge && <span className="bg-lb-accent text-lb-bg text-[10px] font-black w-5 h-5 flex items-center justify-center rounded-full shadow-[0_0_10px_rgba(20,184,166,0.4)]">{badge}</span>}
     </div>
   </button>
 );
