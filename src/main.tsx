@@ -6,6 +6,7 @@ import './index.css';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './theme';
 import { SocketProvider } from './contexts/SocketContext';
+import { MarketProvider } from './contexts/MarketContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -21,9 +22,11 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
         <AuthProvider>
-          <SocketProvider>
-            <App />
-          </SocketProvider>
+          <MarketProvider>
+            <SocketProvider>
+              <App />
+            </SocketProvider>
+          </MarketProvider>
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

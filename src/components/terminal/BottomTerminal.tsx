@@ -63,12 +63,14 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
             <tr>
               <th className="px-4 py-2 font-semibold">Symbol</th>
               <th className="px-4 py-2 font-semibold">Ticket</th>
+              <th className="px-4 py-2 font-semibold">Time</th>
               <th className="px-4 py-2 font-semibold">Type</th>
               <th className="px-4 py-2 font-semibold text-right">Volume</th>
-              <th className="px-4 py-2 font-semibold text-right">Open Price</th>
+              <th className="px-4 py-2 font-semibold text-right">Price</th>
               <th className="px-4 py-2 font-semibold text-right">S / L</th>
               <th className="px-4 py-2 font-semibold text-right">T / P</th>
-              <th className="px-4 py-2 font-semibold text-right">Current Price</th>
+              <th className="px-4 py-2 font-semibold text-right">Price</th>
+              <th className="px-4 py-2 font-semibold text-right">Swap</th>
               <th className="px-4 py-2 font-semibold text-right">Profit</th>
               {activeTab === 'open' && <th className="px-4 py-2 font-semibold text-center w-20">Action</th>}
             </tr>
@@ -81,12 +83,14 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
                   {p.symbol}
                 </td>
                 <td className="px-4 py-2 text-lb-text-muted text-[11px]">#{p.id.slice(-6)}</td>
-                <td className={`px-4 py-2 font-bold ${p.side === 'BUY' ? 'text-lb-accent' : 'text-lb-down'}`}>{p.side}</td>
+                <td className="px-4 py-2 text-lb-text-muted text-[11px]">{new Date(p.timestamp || Date.now()).toLocaleString().replace(',', '')}</td>
+                <td className={`px-4 py-2 font-bold ${p.side === 'BUY' ? 'text-lb-accent' : 'text-lb-down'}`}>{p.side?.toLowerCase()}</td>
                 <td className="px-4 py-2 text-right">{p.size.toFixed(2)}</td>
                 <td className="px-4 py-2 text-right">{formatPrice(p.entryPrice)}</td>
-                <td className="px-4 py-2 text-right">{formatPrice(p.slPrice)}</td>
-                <td className="px-4 py-2 text-right">{formatPrice(p.tpPrice)}</td>
+                <td className="px-4 py-2 text-right">{formatPrice(p.slPrice) !== '-' ? formatPrice(p.slPrice) : '0.00000'}</td>
+                <td className="px-4 py-2 text-right">{formatPrice(p.tpPrice) !== '-' ? formatPrice(p.tpPrice) : '0.00000'}</td>
                 <td className="px-4 py-2 text-right">{formatPrice(p.currentPrice || p.entryPrice)}</td>
+                <td className="px-4 py-2 text-right">0.00</td>
                 <td className={`px-4 py-2 text-right font-bold ${p.pnl && p.pnl >= 0 ? 'text-lb-accent' : 'text-lb-down'}`}>
                   {toCurrency(p.pnl || 0)}
                 </td>
@@ -95,7 +99,7 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
                     onClick={() => onClosePosition(p.id)} 
                     className="w-full py-1 rounded bg-lb-bg hover:bg-lb-down/10 text-lb-text-muted hover:text-lb-down border border-transparent hover:border-lb-down/30 transition-colors font-sans text-[10px] font-bold"
                   >
-                    Close
+                    x
                   </button>
                 </td>
               </tr>
@@ -120,12 +124,14 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
                     {item.symbol}
                   </td>
                   <td className="px-4 py-2 text-lb-text-muted text-[11px]">#{item.id?.slice(-6) || '---'}</td>
-                  <td className={`px-4 py-2 font-bold ${item.side === 'BUY' ? 'text-lb-accent' : 'text-lb-down'}`}>{item.side}</td>
+                  <td className="px-4 py-2 text-lb-text-muted text-[11px]">{new Date(item.timestamp || item.entryDate || Date.now()).toLocaleString().replace(',', '')}</td>
+                  <td className={`px-4 py-2 font-bold ${item.side === 'BUY' ? 'text-lb-accent' : 'text-lb-down'}`}>{item.side?.toLowerCase()}</td>
                   <td className="px-4 py-2 text-right">{item.size?.toFixed(2)}</td>
                   <td className="px-4 py-2 text-right">{formatPrice(item.entryPrice)}</td>
-                  <td className="px-4 py-2 text-right">-</td>
-                  <td className="px-4 py-2 text-right">-</td>
+                  <td className="px-4 py-2 text-right">{formatPrice(item.slPrice) !== '-' ? formatPrice(item.slPrice) : '0.00000'}</td>
+                  <td className="px-4 py-2 text-right">{formatPrice(item.tpPrice) !== '-' ? formatPrice(item.tpPrice) : '0.00000'}</td>
                   <td className="px-4 py-2 text-right">{formatPrice(item.closePrice)}</td>
+                  <td className="px-4 py-2 text-right">0.00</td>
                   <td className={`px-4 py-2 text-right font-bold ${item.pnl && item.pnl >= 0 ? 'text-lb-accent' : 'text-lb-down'}`}>
                     {toCurrency(item.pnl || 0)}
                   </td>

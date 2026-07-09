@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronDown } from 'lucide-react';
+import { useMarket } from '../../contexts/MarketContext';
 
 interface MobileOrderScreenProps {
   symbol: string;
@@ -14,6 +15,12 @@ interface MobileOrderScreenProps {
   setOrderTP: (v: string) => void;
   isPlacingOrder: boolean;
   executeOrder: (side: 'BUY' | 'SELL') => void;
+  oneClickEnabled: boolean;
+  setOneClickEnabled: (enabled: boolean) => void;
+  walletBalance?: number;
+  liveEquity?: number;
+  liveFreeMargin?: number;
+  liveMargin?: number;
 }
 
 export const MobileOrderScreen: React.FC<MobileOrderScreenProps> = ({
@@ -28,8 +35,31 @@ export const MobileOrderScreen: React.FC<MobileOrderScreenProps> = ({
   orderTP,
   setOrderTP,
   isPlacingOrder,
-  executeOrder
+  executeOrder,
+  oneClickEnabled,
+  setOneClickEnabled,
+  walletBalance = 0,
+  liveEquity = 0,
+  liveFreeMargin = 0,
+  liveMargin = 0
 }) => {
+  const { marketEnabled } = useMarket();
+
+  // Highlight flash state for bid/ask changes
+  const [bidColor, setBidColor] = useState('text-lb-down');
+  const [askColor, setAskColor] = useState('text-lb-accent');
+  
+  useEffect(() => {
+    setBidColor('text-red-400');
+    const timer = setTimeout(() => setBidColor('text-lb-down'), 150);
+    return () => clearTimeout(timer);
+  }, [liveBid]);
+
+  useEffect(() => {
+    setAskColor('text-teal-400');
+    const timer = setTimeout(() => setAskColor('text-lb-accent'), 150);
+    return () => clearTimeout(timer);
+  }, [liveAsk]);
 
   const normalizeSymbol = (symbolValue: string) => symbolValue.replace(/m$/i, '').toUpperCase();
 
@@ -73,131 +103,179 @@ export const MobileOrderScreen: React.FC<MobileOrderScreenProps> = ({
     setOrderVolume(next.toFixed(2));
   };
 
+  const stepSL = (amount: number) => {
+    const current = orderSL ? parseFloat(orderSL) : liveBid;
+    const step = liveBid > 10 ? 0.01 : 0.0001;
+    const adjust = liveBid > 10 ? amount * 100 : amount; 
+    setOrderSL((current + adjust * step).toFixed(step === 0.01 ? 2 : 5));
+  };
+
+  const stepTP = (amount: number) => {
+    const current = orderTP ? parseFloat(orderTP) : liveAsk;
+    const step = liveAsk > 10 ? 0.01 : 0.0001;
+    const adjust = liveAsk > 10 ? amount * 100 : amount;
+    setOrderTP((current + adjust * step).toFixed(step === 0.01 ? 2 : 5));
+  };
+
+  const renderPriceLarge = (price: number, colorClass: string) => {
+    if (!price) return <span className={`text-4xl font-mono ${colorClass}`}>-</span>;
+    const pStr = price.toFixed(5);
+    const main = pStr.slice(0, -2);
+    const pip = pStr.slice(-2, -1);
+    const pipette = pStr.slice(-1);
+    
+    return (
+      <span className={`flex items-baseline font-mono tracking-tighter ${colorClass}`}>
+        <span className="text-3xl font-light">{main}</span>
+        <span className="text-[44px] font-bold leading-none">{pip}</span>
+        <span className="text-xl font-medium mb-4 ml-[1px]">{pipette}</span>
+      </span>
+    );
+  };
+
   return (
-    <div className="fixed inset-0 bg-lb-bg z-50 flex flex-col font-sans overflow-hidden">
+    <div className="fixed inset-0 bg-lb-bg z-50 flex flex-col font-sans overflow-hidden animate-slide-up">
       {/* Header */}
-      <div className="flex items-center px-4 py-3 border-b border-lb-border bg-lb-panel relative shrink-0">
+      <div className="flex items-center px-4 py-3 bg-lb-panel relative shrink-0 shadow-md z-10 border-b border-lb-border">
         <button onClick={onClose} className="w-10 h-10 bg-lb-bg rounded-full flex items-center justify-center text-lb-text hover:bg-lb-panel-hover active:scale-95 transition-all">
           <ChevronLeft className="w-6 h-6" />
         </button>
-        <div className="flex-1 flex flex-col items-center justify-center">
-          <div className="flex items-center gap-1 font-bold text-lg text-lb-text">
-            {displaySymbol} <ChevronDown className="w-4 h-4 text-lb-text-muted" />
+        <div className="flex-1 flex flex-col items-center justify-center -ml-10">
+          <div className="flex items-center gap-1 font-bold text-[19px] text-lb-text tracking-tight">
+            {displaySymbol}
           </div>
-          <span className="text-[11px] text-lb-text-muted">{displaySubtitle}</span>
+          <span className="text-[12px] text-lb-text-muted">{displaySubtitle}</span>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        {/* Execution Type */}
-        <div className="px-4 py-4 flex justify-between items-center border-b border-lb-border bg-lb-panel mt-2">
-          <span className="font-semibold text-[17px] text-lb-text">Market Execution</span>
+      <div className="flex-1 overflow-y-auto pb-6">
+        
+        {/* Execution Type Selector */}
+        <div className="mx-4 mt-4 px-4 py-3.5 flex justify-between items-center bg-lb-panel rounded-xl border border-lb-border shadow-sm active:bg-lb-panel-hover cursor-pointer">
+          <span className="font-semibold text-[16px] text-lb-text">Market Execution</span>
           <ChevronDown className="w-5 h-5 text-lb-text-muted" />
         </div>
 
-        {/* Volume Selector */}
-        <div className="flex justify-between items-center px-6 py-5 border-b border-lb-border bg-lb-panel">
-          <button onClick={() => adjustVolume(-0.5)} className="text-lb-accent font-bold text-[17px] active:scale-95 transition-transform">-0.5</button>
-          <button onClick={() => adjustVolume(-0.1)} className="text-lb-accent font-bold text-[17px] active:scale-95 transition-transform">-0.1</button>
+        {/* Volume Selector - MT5 Style */}
+        <div className="mx-4 mt-3 flex justify-between items-center bg-lb-panel rounded-xl border border-lb-border p-2 shadow-sm">
+          <div className="flex gap-1">
+            <button onClick={() => adjustVolume(-0.1)} className="px-2 py-2 text-lb-accent font-bold text-[15px] active:scale-95 transition-transform bg-lb-bg rounded-lg w-12 text-center">-0.1</button>
+            <button onClick={() => adjustVolume(-0.01)} className="px-2 py-2 text-lb-accent font-bold text-[15px] active:scale-95 transition-transform bg-lb-bg rounded-lg w-12 text-center">-0.01</button>
+          </div>
           <input 
             type="number" 
             value={orderVolume} 
             onChange={e => setOrderVolume(e.target.value)}
-            className="w-20 text-center font-bold text-xl outline-none bg-transparent text-lb-text"
+            className="w-20 text-center font-bold text-[22px] outline-none bg-transparent text-lb-text font-mono"
+            step="0.01"
+            min="0.01"
           />
-          <button onClick={() => adjustVolume(0.1)} className="text-lb-accent font-bold text-[17px] active:scale-95 transition-transform">+0.1</button>
-          <button onClick={() => adjustVolume(0.5)} className="text-lb-accent font-bold text-[17px] active:scale-95 transition-transform">+0.5</button>
+          <div className="flex gap-1">
+            <button onClick={() => adjustVolume(0.01)} className="px-2 py-2 text-lb-accent font-bold text-[15px] active:scale-95 transition-transform bg-lb-bg rounded-lg w-12 text-center">+0.01</button>
+            <button onClick={() => adjustVolume(0.1)} className="px-2 py-2 text-lb-accent font-bold text-[15px] active:scale-95 transition-transform bg-lb-bg rounded-lg w-12 text-center">+0.1</button>
+          </div>
+        </div>
+
+        {/* Big Prices (Bid / Ask) */}
+        <div className="flex items-center justify-between px-6 py-6 mt-2">
+          <div className="flex flex-col items-center flex-1">
+            <span className="text-[12px] text-lb-text-muted mb-1 font-semibold tracking-wider">BID</span>
+            {renderPriceLarge(liveBid, bidColor)}
+          </div>
+          <div className="flex flex-col items-center flex-1">
+            <span className="text-[12px] text-lb-text-muted mb-1 font-semibold tracking-wider">ASK</span>
+            {renderPriceLarge(liveAsk, askColor)}
+          </div>
         </div>
 
         {/* Stop Loss / Take Profit */}
-        <div className="flex flex-col border-b border-lb-border bg-lb-panel mt-2">
-          <div className="flex items-center justify-between px-4 py-4 border-b border-lb-border">
-            <span className="text-lb-text-muted font-medium text-[15px] w-28">Stop Loss</span>
-            <button onClick={() => {
-              const step = liveBid > 10 ? 0.01 : 0.0001;
-              const current = orderSL ? parseFloat(orderSL) : liveBid;
-              setOrderSL((current - step).toFixed(step === 0.01 ? 2 : 5));
-            }} className="text-lb-accent font-bold text-2xl w-8 h-8 flex items-center justify-center active:bg-lb-accent/10 active:scale-95 rounded-full transition-all">-</button>
-            <input 
-              type="number" 
-              placeholder="not set" 
-              value={orderSL}
-              onChange={e => setOrderSL(e.target.value)}
-              className="flex-1 text-center text-lb-text font-medium text-[16px] outline-none bg-transparent placeholder-lb-text-muted/50 focus:text-lb-accent transition-colors"
-            />
-            <button onClick={() => {
-              const step = liveBid > 10 ? 0.01 : 0.0001;
-              const current = orderSL ? parseFloat(orderSL) : liveBid;
-              setOrderSL((current + step).toFixed(step === 0.01 ? 2 : 5));
-            }} className="text-lb-accent font-bold text-2xl w-8 h-8 flex items-center justify-center active:bg-lb-accent/10 active:scale-95 rounded-full transition-all">+</button>
+        <div className="mx-4 mt-2 flex gap-3">
+          {/* Stop Loss Block */}
+          <div className="flex-1 bg-lb-panel rounded-xl border border-lb-border p-3 flex flex-col shadow-sm">
+            <span className="text-lb-text-muted font-bold text-[12px] uppercase tracking-wider text-center mb-2">Stop Loss</span>
+            <div className="flex items-center justify-between bg-lb-bg rounded-lg p-1">
+              <button onClick={() => stepSL(-1)} className="w-8 h-8 flex items-center justify-center text-lb-down font-bold text-xl active:bg-lb-panel rounded-md transition-colors">-</button>
+              <input 
+                type="number" 
+                placeholder="Not set" 
+                value={orderSL}
+                onChange={e => setOrderSL(e.target.value)}
+                className="w-full text-center text-lb-text font-bold text-[16px] outline-none bg-transparent placeholder-lb-text-muted/40 font-mono"
+              />
+              <button onClick={() => stepSL(1)} className="w-8 h-8 flex items-center justify-center text-lb-down font-bold text-xl active:bg-lb-panel rounded-md transition-colors">+</button>
+            </div>
           </div>
-          <div className="flex items-center justify-between px-4 py-4">
-            <span className="text-lb-text-muted font-medium text-[15px] w-28">Take Profit</span>
-            <button onClick={() => {
-              const step = liveAsk > 10 ? 0.01 : 0.0001;
-              const current = orderTP ? parseFloat(orderTP) : liveAsk;
-              setOrderTP((current - step).toFixed(step === 0.01 ? 2 : 5));
-            }} className="text-lb-accent font-bold text-2xl w-8 h-8 flex items-center justify-center active:bg-lb-accent/10 active:scale-95 rounded-full transition-all">-</button>
-            <input 
-              type="number" 
-              placeholder="not set" 
-              value={orderTP}
-              onChange={e => setOrderTP(e.target.value)}
-              className="flex-1 text-center text-lb-text font-medium text-[16px] outline-none bg-transparent placeholder-lb-text-muted/50 focus:text-lb-accent transition-colors"
-            />
-            <button onClick={() => {
-              const step = liveAsk > 10 ? 0.01 : 0.0001;
-              const current = orderTP ? parseFloat(orderTP) : liveAsk;
-              setOrderTP((current + step).toFixed(step === 0.01 ? 2 : 5));
-            }} className="text-lb-accent font-bold text-2xl w-8 h-8 flex items-center justify-center active:bg-lb-accent/10 active:scale-95 rounded-full transition-all">+</button>
+          
+          {/* Take Profit Block */}
+          <div className="flex-1 bg-lb-panel rounded-xl border border-lb-border p-3 flex flex-col shadow-sm">
+            <span className="text-lb-text-muted font-bold text-[12px] uppercase tracking-wider text-center mb-2">Take Profit</span>
+            <div className="flex items-center justify-between bg-lb-bg rounded-lg p-1">
+              <button onClick={() => stepTP(-1)} className="w-8 h-8 flex items-center justify-center text-lb-accent font-bold text-xl active:bg-lb-panel rounded-md transition-colors">-</button>
+              <input 
+                type="number" 
+                placeholder="Not set" 
+                value={orderTP}
+                onChange={e => setOrderTP(e.target.value)}
+                className="w-full text-center text-lb-text font-bold text-[16px] outline-none bg-transparent placeholder-lb-text-muted/40 font-mono"
+              />
+              <button onClick={() => stepTP(1)} className="w-8 h-8 flex items-center justify-center text-lb-accent font-bold text-xl active:bg-lb-panel rounded-md transition-colors">+</button>
+            </div>
           </div>
         </div>
 
-        {/* Fill Policy */}
-        <div className="flex justify-between items-center px-4 py-4 border-b border-lb-border bg-lb-panel mt-2">
-          <span className="text-lb-text-muted font-medium text-[15px]">Fill Policy</span>
-          <span className="text-lb-text-muted font-medium text-[15px]">Fill or Kill</span>
-        </div>
-
-        {/* Prices */}
-        <div className="flex items-center justify-between px-10 py-6">
-          <div className="flex flex-col items-center">
-            <span className="text-4xl font-light text-lb-down font-mono tracking-tighter">
-              {liveBid.toFixed(5).slice(0, -2)}<span className="text-[42px] font-medium">{liveBid.toFixed(5).slice(-2)}</span>
-            </span>
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-4xl font-light text-lb-accent font-mono tracking-tighter">
-              {liveAsk.toFixed(5).slice(0, -2)}<span className="text-[42px] font-medium">{liveAsk.toFixed(5).slice(-2)}</span>
-            </span>
-          </div>
+        {/* Fill Policy / Deviation */}
+        <div className="mx-4 mt-4 mb-2 flex justify-between px-2 text-[12px] text-lb-text-muted font-medium">
+          <span>Deviation: <span className="text-lb-text">0</span></span>
+          <span>Fill Policy: <span className="text-lb-text">Fill or Kill</span></span>
         </div>
 
         {/* Execution Buttons */}
-        <div className="flex px-4 gap-4 mb-4">
+        <div className="flex px-4 gap-3 mt-4 relative">
+          {!marketEnabled && (
+            <div className="absolute inset-0 z-10 mx-4 flex items-center justify-center bg-lb-bg/80 backdrop-blur-sm rounded-xl border border-lb-border cursor-not-allowed">
+              <span className="text-[15px] font-bold text-lb-text-muted uppercase tracking-widest">Market is Closed</span>
+            </div>
+          )}
           <button 
             onClick={() => executeOrder('SELL')}
-            disabled={isPlacingOrder}
-            className="flex-1 bg-lb-down/10 text-lb-down border border-lb-down/30 hover:border-lb-down py-4 rounded-xl font-bold text-[17px] active:scale-95 hover:shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all duration-300 disabled:opacity-50"
+            disabled={isPlacingOrder || !marketEnabled}
+            className="flex-1 bg-[#d93043] text-white py-4 rounded-xl font-bold text-[17px] active:scale-95 shadow-[0_4px_10px_rgba(217,48,67,0.3)] transition-transform disabled:opacity-50 flex flex-col items-center justify-center leading-tight"
           >
-            Sell by Market
+            <span>SELL</span>
+            <span className="text-[11px] font-normal opacity-80 uppercase tracking-widest mt-0.5">by Market</span>
           </button>
           <button 
             onClick={() => executeOrder('BUY')}
-            disabled={isPlacingOrder}
-            className="flex-1 bg-lb-accent/10 text-lb-accent border border-lb-accent/30 hover:border-lb-accent py-4 rounded-xl font-bold text-[17px] active:scale-95 hover:shadow-[0_0_15px_rgba(20,184,166,0.3)] transition-all duration-300 disabled:opacity-50"
+            disabled={isPlacingOrder || !marketEnabled}
+            className="flex-1 bg-[#007aff] text-white py-4 rounded-xl font-bold text-[17px] active:scale-95 shadow-[0_4px_10px_rgba(0,122,255,0.3)] transition-transform disabled:opacity-50 flex flex-col items-center justify-center leading-tight"
           >
-            Buy by Market
+            <span>BUY</span>
+            <span className="text-[11px] font-normal opacity-80 uppercase tracking-widest mt-0.5">by Market</span>
           </button>
         </div>
 
-        {/* Disclaimer */}
-        <div className="px-6 pb-8 text-center mt-2">
-          <p className="text-[12px] text-lb-text-muted leading-snug">
-            Attention! The trade will be executed at market conditions, difference with requested price may be significant!
-          </p>
+        {/* Account Details Footer */}
+        <div className="mx-4 mt-6 bg-lb-panel rounded-xl border border-lb-border p-4 shadow-sm flex flex-col gap-2">
+          <div className="flex justify-between text-[13px]">
+            <span className="text-lb-text-muted font-medium">Balance:</span>
+            <span className="text-lb-text font-bold font-mono">{walletBalance.toFixed(2)} USD</span>
+          </div>
+          <div className="flex justify-between text-[13px]">
+            <span className="text-lb-text-muted font-medium">Equity:</span>
+            <span className="text-lb-text font-bold font-mono">{liveEquity.toFixed(2)} USD</span>
+          </div>
+          <div className="flex justify-between text-[13px]">
+            <span className="text-lb-text-muted font-medium">Margin:</span>
+            <span className="text-lb-text font-bold font-mono">{liveMargin.toFixed(2)} USD</span>
+          </div>
+          <div className="flex justify-between text-[13px]">
+            <span className="text-lb-text-muted font-medium">Free Margin:</span>
+            <span className="text-lb-text font-bold font-mono">{liveFreeMargin.toFixed(2)} USD</span>
+          </div>
         </div>
+
       </div>
     </div>
   );
 };
+

@@ -7,6 +7,7 @@ import * as walletService from "./services/wallet";
 import * as tradingService from "./services/trading";
 import * as transactionService from "./services/transaction";
 import { UserWallet, Position } from "./types";
+import { useMarket } from "./contexts/MarketContext";
 
 // Lazy load the massive dashboard to optimize initial bundle size
 const ProTradingDashboard = lazy(() => import("./components/ProTradingDashboard"));
@@ -14,6 +15,7 @@ const ProTradingDashboard = lazy(() => import("./components/ProTradingDashboard"
 export default function App() {
   const { user: userProfile, loading: authLoading } = useAuth();
   const { socket } = useSocket();
+  const { marketEnabled } = useMarket();
 
   // Live updates states
   const [walletMetrics, setWalletMetrics] = useState<UserWallet>({ balance: 0, equity: 0, margin: 0, freeMargin: 0, pnl: 0 });
@@ -25,8 +27,12 @@ export default function App() {
     if (!socket) return;
 
     const handlePnl = (positions: any[]) => {
-      setActivePositions(
-        positions.map((p: any) => ({
+      setActivePositions(prev => {
+        if (prev.length > 0 && positions.length < prev.length) {
+          // A position was closed, fetch history in the background
+          setTimeout(fetchClientPortfolioStats, 500);
+        }
+        return positions.map((p: any) => ({
           id: p._id,
           symbol: p.symbol,
           side: p.type,
@@ -35,9 +41,10 @@ export default function App() {
           currentPrice: p.currentPrice,
           pnl: p.pnl,
           slPrice: p.sl,
-          tpPrice: p.tp
-        }))
-      );
+          tpPrice: p.tp,
+          timestamp: p.createdAt
+        }));
+      });
     };
 
     const handleWallet = (wallet: any) => {
@@ -77,7 +84,8 @@ export default function App() {
           currentPrice: p.currentPrice,
           pnl: p.pnl,
           slPrice: p.sl,
-          tpPrice: p.tp
+          tpPrice: p.tp,
+          timestamp: p.createdAt
         })));
       }
 
@@ -110,6 +118,10 @@ export default function App() {
 
   // Handle Order entry placements
   const handlePlaceOrder = React.useCallback(async (orderPayload: any) => {
+    if (!marketEnabled) {
+      alert("Market is closed.");
+      return;
+    }
     try {
       if (orderPayload.type === 'MARKET') {
         const res = await tradingService.createPosition({
@@ -133,8 +145,8 @@ export default function App() {
     try {
       await tradingService.closePosition(posId);
       await fetchClientPortfolioStats();
-    } catch (err) {
-      alert("Error liquidating.");
+    } catch (err: any) {
+      alert(`Error liquidating: ${err.response?.data?.error || err.message}`);
     }
   }, []);
 

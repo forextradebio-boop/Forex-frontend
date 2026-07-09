@@ -8,10 +8,11 @@ import { UserWallet, Position } from '../types';
 
 import { TerminalHeader } from './terminal/TerminalHeader';
 import { MarketWatch } from './terminal/MarketWatch';
-import { TradingChart } from './terminal/TradingChart';
+import { TradingViewChart } from './TradingViewChart';
 import { OneClickTrading } from './terminal/OneClickTrading';
 import { BottomTerminal } from './terminal/BottomTerminal';
 import { MobileNavigation, MobileTab } from './terminal/MobileNavigation';
+import { SymbolActionSheet } from './terminal/SymbolActionSheet';
 import ProfileScreen from './ProfileScreen';
 import { MobileOrderScreen } from './terminal/MobileOrderScreen';
 import { Sidebar, WalletSubTab } from './terminal/Sidebar';
@@ -48,21 +49,30 @@ const ProTradingDashboard = ({
 }: ProTradingDashboardProps) => {
   const { isConnected } = useSocket();
   const { symbols } = useMarketStream();
+  const { isDarkMode } = useTheme();
 
   // Dashboard State
   const [selectedSymbol, setSelectedSymbol] = useState<string>('EURUSD');
   const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('chart');
+  const [actionSheetSymbol, setActionSheetSymbol] = useState<any | null>(null);
   
   // Order State
   const [orderVolume, setOrderVolume] = useState<string>('0.10');
   const [orderSL, setOrderSL] = useState<string>('');
   const [orderTP, setOrderTP] = useState<string>('');
   const [isPlacingOrder, setIsPlacingOrder] = useState<boolean>(false);
+  const [oneClickEnabled, setOneClickEnabled] = useState<boolean>(() => {
+    return localStorage.getItem('forex_one_click') !== 'false';
+  });
+  const [pendingOrder, setPendingOrder] = useState<{side: 'BUY'|'SELL'} | null>(null);
+
+  useEffect(() => {
+    localStorage.setItem('forex_one_click', String(oneClickEnabled));
+  }, [oneClickEnabled]);
   const [historyFilter, setHistoryFilter] = useState<'TODAY' | 'WEEK' | 'MONTH' | 'YEAR' | 'ALL'>('ALL');
   const [showHistoryMenu, setShowHistoryMenu] = useState(false);
   const [historySubTab, setHistorySubTab] = useState<'POSITIONS' | 'ORDERS' | 'DEALS'>('POSITIONS');
   const [historySortDesc, setHistorySortDesc] = useState(true);
-  const [quoteMenuSymbol, setQuoteMenuSymbol] = useState<string | null>(null);
   const [positionMenuId, setPositionMenuId] = useState<string | null>(null);
   const [closeConfirmationPositionId, setCloseConfirmationPositionId] = useState<string | null>(null);
   const [expandedPositionId, setExpandedPositionId] = useState<string | null>(null);
@@ -114,21 +124,9 @@ const ProTradingDashboard = ({
   const liveBid = currentSymbolData?.bid || currentSymbolData?.price || 0;
   const liveAsk = currentSymbolData?.ask || currentSymbolData?.price || 0;
 
-  // Financials
-  const liveEquity = useMemo(() => {
-    const activePnl = positions.reduce((sum, p) => sum + (p.pnl || 0), 0);
-    return wallet.balance + activePnl;
-  }, [wallet.balance, positions]);
-
-  const liveMargin = useMemo(() => {
-    return positions.reduce((sum, p) => {
-      const pPrice = p.currentPrice || p.entryPrice;
-      const nominal = (p.size || 0) * pPrice;
-      return sum + (nominal / 100); // Assuming 1:100 leverage for display
-    }, 0);
-  }, [positions]);
-
-  const liveFreeMargin = liveEquity - liveMargin;
+  const liveEquity = wallet.equity ?? wallet.balance;
+  const liveMargin = wallet.usedMargin ?? 0;
+  const liveFreeMargin = wallet.freeMargin ?? wallet.balance;
 
   const parseHistoryDate = (value: any, fallback?: any) => {
     const date = new Date(value ?? fallback ?? Date.now());
@@ -138,8 +136,7 @@ const ProTradingDashboard = ({
     return date;
   };
 
-  // Execution
-  const executeOrder = useCallback(async (side: 'BUY' | 'SELL') => {
+  const executeOrderBackend = useCallback(async (side: 'BUY' | 'SELL') => {
     if (isPlacingOrder) return;
     setIsPlacingOrder(true);
     try {
@@ -154,7 +151,6 @@ const ProTradingDashboard = ({
       });
       setOrderSL('');
       setOrderTP('');
-      // Switch to trade tab on mobile if order succeeds
       if (window.innerWidth < 768) {
         setActiveMobileTab('trade');
       }
@@ -162,8 +158,24 @@ const ProTradingDashboard = ({
       console.error(err);
     } finally {
       setIsPlacingOrder(false);
+      setPendingOrder(null);
     }
   }, [selectedSymbol, isPlacingOrder, orderVolume, orderSL, orderTP, liveAsk, liveBid, onPlaceOrder]);
+
+  const executeOrder = useCallback((side: 'BUY' | 'SELL') => {
+    const vol = parseFloat(orderVolume);
+    if (isNaN(vol) || vol <= 0) {
+      alert('Invalid Volume');
+      return;
+    }
+    
+    if (oneClickEnabled) {
+      executeOrderBackend(side);
+    } else {
+      setPendingOrder({ side });
+    }
+  }, [orderVolume, oneClickEnabled, executeOrderBackend]);
+
 
   return (
     <div className="h-[100dvh] w-full flex flex-col font-sans overflow-hidden bg-lb-bg text-lb-text">
@@ -280,13 +292,17 @@ const ProTradingDashboard = ({
         
         {/* DESKTOP LEFT: Market Watch */}
         <div className="hidden md:flex shrink-0">
-          <MarketWatch selectedSymbol={selectedSymbol} onSelectSymbol={setSelectedSymbol} />
+          <MarketWatch 
+            selectedSymbol={selectedSymbol} 
+            onSelectSymbol={setSelectedSymbol} 
+            onLongPressSymbol={setActionSheetSymbol}
+          />
         </div>
 
         {/* MOBILE: Conditional Rendering based on Tabs */}
         {/* DESKTOP CENTER: Chart + OCT */}
         <main className={`flex-1 flex flex-col relative min-w-0 ${activeMobileTab !== 'chart' ? 'hidden md:flex' : 'flex'}`}>
-          <TradingChart symbol={selectedSymbol} />
+          <TradingViewChart symbol={selectedSymbol} theme={isDarkMode ? 'Dark' : 'Light'} />
           
           {/* Desktop Overlay OCT */}
           <div className="hidden md:block absolute top-4 right-4 shadow-2xl rounded-xl z-10">
@@ -297,16 +313,21 @@ const ProTradingDashboard = ({
               orderSL={orderSL} setOrderSL={setOrderSL}
               orderTP={orderTP} setOrderTP={setOrderTP}
               isPlacingOrder={isPlacingOrder} executeOrder={executeOrder}
+              oneClickEnabled={oneClickEnabled} setOneClickEnabled={setOneClickEnabled}
             />
           </div>
         </main>
 
         {/* MOBILE PANELS */}
         <div className={`flex-1 flex flex-col bg-lb-bg overflow-hidden ${activeMobileTab !== 'quotes' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
-           <MarketWatch selectedSymbol={selectedSymbol} onSelectSymbol={(sym) => {
-             setSelectedSymbol(sym);
-             setQuoteMenuSymbol(sym);
-           }} />
+           <MarketWatch 
+             selectedSymbol={selectedSymbol} 
+             onSelectSymbol={(sym) => {
+               setSelectedSymbol(sym);
+               setActiveMobileTab('chart');
+             }} 
+             onLongPressSymbol={setActionSheetSymbol}
+           />
         </div>
 
         <div className={`flex-1 flex flex-col bg-lb-bg overflow-y-auto ${activeMobileTab !== 'trade' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
@@ -321,7 +342,7 @@ const ProTradingDashboard = ({
                <div className="flex justify-between"><span className="text-lb-text-muted">Equity:</span><span className="font-mono text-lb-text">{liveEquity.toFixed(2)} USD</span></div>
                <div className="flex justify-between"><span className="text-lb-text-muted">Margin:</span><span className="font-mono text-lb-text">{liveMargin.toFixed(2)} USD</span></div>
                <div className="flex justify-between"><span className="text-lb-text-muted">Free Margin:</span><span className="font-mono text-lb-text">{liveFreeMargin.toFixed(2)} USD</span></div>
-               <div className="flex justify-between"><span className="text-lb-text-muted">Margin Level (%):</span><span className="font-mono text-lb-text">{liveMargin > 0 ? ((liveEquity / liveMargin) * 100).toFixed(2) : '0.00'}</span></div>
+               <div className="flex justify-between"><span className="text-lb-text-muted">Margin Level (%):</span><span className="font-mono text-lb-text">{wallet.marginLevel ? wallet.marginLevel.toFixed(2) : (liveMargin > 0 ? ((liveEquity / liveMargin) * 100).toFixed(2) : 'Unlimited')}</span></div>
              </div>
            </div>
            
@@ -530,20 +551,7 @@ const ProTradingDashboard = ({
         <MobileNavigation activeTab={activeMobileTab} setActiveTab={setActiveMobileTab} />
       </div>
 
-      {/* MOBILE POPUP MENU */}
-      {quoteMenuSymbol && (
-        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/40 animate-in fade-in">
-          <div className="bg-lb-panel rounded-t-3xl p-4 pb-8 flex flex-col gap-3 relative shadow-2xl animate-in slide-in-from-bottom-4">
-             <div className="w-12 h-1.5 bg-lb-border rounded-full mx-auto mb-2" />
-             <div className="font-bold text-center text-lg mb-2 text-lb-text">{quoteMenuSymbol}: Forex</div>
-             <button onClick={() => { setQuoteMenuSymbol(null); setActiveMobileTab('new_order'); }} className="py-3.5 bg-lb-bg rounded-xl font-bold text-lb-text active:bg-lb-panel-hover transition-colors text-center text-lg">Trade</button>
-             <button onClick={() => { setQuoteMenuSymbol(null); setActiveMobileTab('chart'); }} className="py-3.5 bg-lb-bg rounded-xl font-bold text-lb-text active:bg-lb-panel-hover transition-colors text-center text-lg">Chart</button>
-             <button onClick={() => setQuoteMenuSymbol(null)} className="py-3.5 mt-1 bg-lb-down/10 text-lb-down rounded-xl font-bold active:bg-lb-down/20 transition-colors text-center text-lg">Cancel</button>
-          </div>
-        </div>
-      )}
-
-      {/* MOBILE ORDER SCREEN */}
+      {/* MOBILE POPUP MENU FOR POSITIONS */}
       {/* POSITION MENU */}
       {positionMenuId && (
         <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-end bg-black/60 animate-in fade-in" onClick={() => { setPositionMenuId(null); setExpandedPositionId(null); }}>
@@ -645,18 +653,80 @@ const ProTradingDashboard = ({
         </div>
       )}
 
-      {activeMobileTab === 'new_order' && (
-        <div className="md:hidden fixed inset-0 z-[60]">
+            {activeMobileTab === 'new_order' && (
+        <div className="md:hidden">
           <MobileOrderScreen 
             symbol={selectedSymbol}
-            onClose={() => setActiveMobileTab('quotes')}
-            liveBid={liveBid}
-            liveAsk={liveAsk}
+            onClose={() => setActiveMobileTab('chart')}
+            liveBid={liveBid} liveAsk={liveAsk}
             orderVolume={orderVolume} setOrderVolume={setOrderVolume}
             orderSL={orderSL} setOrderSL={setOrderSL}
             orderTP={orderTP} setOrderTP={setOrderTP}
             isPlacingOrder={isPlacingOrder} executeOrder={executeOrder}
+            oneClickEnabled={oneClickEnabled} setOneClickEnabled={setOneClickEnabled}
+            walletBalance={wallet.balance}
+            liveEquity={liveEquity}
+            liveFreeMargin={liveFreeMargin}
+            liveMargin={liveMargin}
           />
+        </div>
+      )}
+
+      {/* ACTION SHEET */}
+      <SymbolActionSheet
+        visible={!!actionSheetSymbol}
+        symbol={actionSheetSymbol}
+        isFavorite={(() => {
+          try {
+            const favs = JSON.parse(localStorage.getItem('forex_favorites') || '[]');
+            return actionSheetSymbol ? favs.includes(actionSheetSymbol.symbol.replace('/', '')) : false;
+          } catch(e) { return false; }
+        })()}
+        onClose={() => setActionSheetSymbol(null)}
+        onOpenChart={(sym) => {
+          setSelectedSymbol(sym.symbol.replace('/', ''));
+          setActiveMobileTab('chart');
+        }}
+        onNewOrder={(sym) => {
+          setSelectedSymbol(sym.symbol.replace('/', ''));
+          setActiveMobileTab('new_order');
+        }}
+        onFavoriteToggle={(sym) => {
+          const raw = sym.symbol.replace('/', '');
+          try {
+            const favs = JSON.parse(localStorage.getItem('forex_favorites') || '[]');
+            const newFavs = favs.includes(raw) ? favs.filter((s: string) => s !== raw) : [...favs, raw];
+            localStorage.setItem('forex_favorites', JSON.stringify(newFavs));
+            window.dispatchEvent(new Event('favoritesUpdated'));
+          } catch(e) {}
+        }}
+      />
+
+      {/* ORDER CONFIRMATION MODAL */}
+      {pendingOrder && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 px-4">
+          <div className="w-full max-w-sm bg-lb-panel rounded-2xl shadow-2xl p-6 border border-lb-border flex flex-col items-center">
+            <h3 className="text-xl font-bold mb-2">Confirm Order</h3>
+            <p className="text-sm text-lb-text-muted text-center mb-6">
+              You are about to place a <span className={`font-bold ${pendingOrder.side === 'BUY' ? 'text-lb-accent' : 'text-lb-down'}`}>{pendingOrder.side}</span> order for <span className="font-bold text-lb-text">{orderVolume} {selectedSymbol}</span>.
+            </p>
+            
+            <div className="flex w-full gap-3">
+              <button 
+                onClick={() => setPendingOrder(null)}
+                className="flex-1 py-3 rounded-xl bg-lb-bg text-lb-text font-bold active:scale-95 transition-transform"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => executeOrderBackend(pendingOrder.side)}
+                disabled={isPlacingOrder}
+                className={`flex-1 py-3 rounded-xl font-bold active:scale-95 transition-transform text-white disabled:opacity-50 ${pendingOrder.side === 'BUY' ? 'bg-lb-accent text-black' : 'bg-lb-down text-white'}`}
+              >
+                {isPlacingOrder ? 'Confirming...' : 'Confirm'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
       </>

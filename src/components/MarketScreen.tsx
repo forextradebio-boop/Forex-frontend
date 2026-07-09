@@ -11,14 +11,7 @@ import {
   Layers,
   ArrowRight
 } from 'lucide-react';
-import { 
-  useTickers, 
-  useForex, 
-  useCrypto, 
-  useMetals, 
-  useTopGainers, 
-  useTopLosers 
-} from '../hooks/useMarket';
+import { useMarketStream } from '../hooks/useMarketStream';
 import { MarketTicker } from '../types';
 
 type MarketTab = 'OVERVIEW' | 'FOREX' | 'CRYPTO' | 'METALS';
@@ -28,12 +21,18 @@ export default function MarketScreen() {
   const [searchQuery, setSearchQuery] = useState('');
 
   // Primary Data Hooks
-  const { data: tickers, isLoading: isTickersLoading, isError: isTickersError, refetch: refetchTickers, isFetching: isTickersFetching } = useTickers();
-  const { data: topGainers, isLoading: isGainersLoading } = useTopGainers();
-  const { data: topLosers, isLoading: isLosersLoading } = useTopLosers();
+  const { symbols: tickers } = useMarketStream();
+  
+  const topGainers = React.useMemo(() => {
+    return [...tickers].sort((a, b) => (b.changePercent || 0) - (a.changePercent || 0)).slice(0, 5);
+  }, [tickers]);
+
+  const topLosers = React.useMemo(() => {
+    return [...tickers].sort((a, b) => (a.changePercent || 0) - (b.changePercent || 0)).slice(0, 5);
+  }, [tickers]);
 
   const handleRefresh = () => {
-    refetchTickers();
+    // No-op for socket stream
   };
 
   const getFilteredData = (): MarketTicker[] => {
@@ -51,8 +50,8 @@ export default function MarketScreen() {
 
   const filteredTickers = getFilteredData();
 
-  const isGlobalLoading = isTickersLoading;
-  const isGlobalError = isTickersError;
+  const isGlobalLoading = tickers.length === 0;
+  const isGlobalError = false;
 
   return (
     <div className="flex flex-col h-full bg-black font-sans text-lb-text">
@@ -97,7 +96,7 @@ export default function MarketScreen() {
           </div>
           <button 
             onClick={handleRefresh}
-            className={`p-2 rounded bg-lb-bg border border-lb-border text-lb-text-muted hover:text-lb-text transition-colors ${isTickersFetching ? 'animate-spin text-emerald-400' : ''}`}
+            className={`p-2 rounded bg-lb-bg border border-lb-border text-lb-text-muted hover:text-lb-text transition-colors`}
             title="Pull to Refresh"
           >
             <RefreshCw className="w-4 h-4" />
@@ -146,14 +145,14 @@ export default function MarketScreen() {
                     <TrendingUp className="w-4 h-4 text-emerald-500 mr-2" />
                     Top Gainers
                   </h3>
-                  {isGainersLoading ? (
+                  {tickers.length === 0 ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map(i => <div key={i} className="h-10 bg-lb-bg rounded animate-pulse"></div>)}
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {topGainers?.map(ticker => (
-                        <TickerMiniCard key={`gainer-${ticker.symbol}`} ticker={ticker} />
+                      {topGainers.map(ticker => (
+                        <TickerMiniCard key={`gainer-${ticker.symbol}`} ticker={ticker as any} />
                       ))}
                     </div>
                   )}
@@ -165,14 +164,14 @@ export default function MarketScreen() {
                     <TrendingDown className="w-4 h-4 text-lb-down mr-2" />
                     Top Losers
                   </h3>
-                  {isLosersLoading ? (
+                  {tickers.length === 0 ? (
                     <div className="space-y-2">
                       {[1, 2, 3].map(i => <div key={i} className="h-10 bg-lb-bg rounded animate-pulse"></div>)}
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {topLosers?.map(ticker => (
-                        <TickerMiniCard key={`loser-${ticker.symbol}`} ticker={ticker} />
+                      {topLosers.map(ticker => (
+                        <TickerMiniCard key={`loser-${ticker.symbol}`} ticker={ticker as any} />
                       ))}
                     </div>
                   )}
@@ -193,13 +192,14 @@ export default function MarketScreen() {
                       <th className="p-4 font-semibold tracking-wider text-right">Bid</th>
                       <th className="p-4 font-semibold tracking-wider text-right">Ask</th>
                       <th className="p-4 font-semibold tracking-wider text-right">Spread</th>
+                      <th className="p-4 font-semibold tracking-wider text-right">Status</th>
                       <th className="p-4 font-semibold tracking-wider text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/50">
                     {filteredTickers.length > 0 ? (
                       filteredTickers.map(ticker => (
-                        <TickerTableRow key={ticker.symbol} ticker={ticker} />
+                        <TickerTableRow key={ticker.symbol} ticker={ticker as any} />
                       ))
                     ) : (
                       <tr>
@@ -238,9 +238,9 @@ function TickerMiniCard({ ticker }: { ticker: MarketTicker }) {
         </div>
       </div>
       <div className="text-right">
-        <div className="font-mono text-sm text-lb-text">{ticker.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}</div>
+        <div className="font-mono text-sm text-lb-text">{(ticker.price || ticker.bid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}</div>
         <div className={`font-mono text-xs flex items-center justify-end mt-0.5 ${isUp ? 'text-emerald-400' : 'text-lb-down'}`}>
-          {isUp ? '+' : ''}{ticker.changePercent.toFixed(2)}%
+          {isUp ? '+' : ''}{(ticker.changePercent || 0).toFixed(2)}%
         </div>
       </div>
     </div>
@@ -262,23 +262,28 @@ function TickerTableRow({ ticker }: { ticker: MarketTicker }) {
       </td>
       <td className="p-4 text-right">
         <span className={`font-bold ${isUp ? 'text-emerald-400' : 'text-lb-down'}`}>
-          {ticker.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}
+          {(ticker.price || ticker.bid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}
         </span>
       </td>
       <td className="p-4 text-right">
         <div className={`flex flex-col items-end ${isUp ? 'text-emerald-400' : 'text-lb-down'}`}>
-          <span className="font-bold">{isUp ? '+' : ''}{ticker.changePercent.toFixed(2)}%</span>
-          <span className="text-[10px] opacity-80">{isUp ? '+' : ''}{ticker.change.toFixed(4)}</span>
+          <span className="font-bold">{isUp ? '+' : ''}{(ticker.changePercent || 0).toFixed(2)}%</span>
+          <span className="text-[10px] opacity-80">{isUp ? '+' : ''}{(ticker.change || 0).toFixed(4)}</span>
         </div>
       </td>
       <td className="p-4 text-right text-lb-text">
-        {ticker.bid.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}
+        {(ticker.bid || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}
       </td>
       <td className="p-4 text-right text-lb-text">
-        {ticker.ask.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}
+        {(ticker.ask || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 5 })}
       </td>
       <td className="p-4 text-right text-lb-text-muted">
-        {ticker.spread.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 5 })}
+        {(ticker.spread || ((ticker.ask || 0) - (ticker.bid || 0))).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 5 })}
+      </td>
+      <td className="p-4 text-right text-lb-text-muted">
+        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${ticker.marketStatus === 'OPEN' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-lb-text-muted/20 text-lb-text-muted'}`}>
+          {ticker.marketStatus || 'OPEN'}
+        </span>
       </td>
       <td className="p-4 text-center">
         <button className="bg-zinc-800 hover:bg-emerald-500 hover:text-black text-lb-text-muted p-2 rounded transition-colors group-hover:opacity-100 opacity-0 focus:opacity-100">

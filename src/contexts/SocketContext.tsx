@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { SOCKET_URL } from '../api/config';
 import { useAuth } from './AuthContext';
+import { useMarket } from './MarketContext';
 
 interface SocketContextValue {
   socket: Socket | null;
@@ -25,9 +26,14 @@ const socketInstance = io(SOCKET_URL, {
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isConnected, setIsConnected] = useState(socketInstance.connected);
   const { user } = useAuth();
+  const { marketEnabled } = useMarket();
+  const mounted = useRef(false);
 
   useEffect(() => {
-    socketInstance.connect();
+    mounted.current = true;
+    if (marketEnabled) {
+      socketInstance.connect();
+    }
 
     const onConnect = () => {
       setIsConnected(true);
@@ -44,18 +50,33 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     socketInstance.on('disconnect', onDisconnect);
 
     return () => {
+      mounted.current = false;
       socketInstance.off('connect', onConnect);
       socketInstance.off('disconnect', onDisconnect);
-      // We don't disconnect the singleton on unmount to keep it alive across fast refreshes
     };
-  }, []);
+  }, []); // Only bind events once
+
+  // Handle connection toggling when market status changes
+  useEffect(() => {
+    if (!mounted.current) return;
+    
+    if (marketEnabled) {
+      if (!socketInstance.connected) {
+        socketInstance.connect();
+      }
+    } else {
+      if (socketInstance.connected) {
+        socketInstance.disconnect();
+      }
+    }
+  }, [marketEnabled]);
 
   // Handle re-subscribing if user logs in after socket is already connected
   useEffect(() => {
-    if (isConnected && user?.id) {
+    if (isConnected && user?.id && marketEnabled) {
       socketInstance.emit('subscribe', user.id);
     }
-  }, [user?.id, isConnected]);
+  }, [user?.id, isConnected, marketEnabled]);
 
   return (
     <SocketContext.Provider value={{ socket: socketInstance, isConnected }}>

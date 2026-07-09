@@ -1,5 +1,6 @@
 import React from 'react';
-import { User, Activity, BookOpen, Mail, Book, Calendar, Users, TrendingUp, HelpCircle, Info, ChevronRight, X, LogOut, Download, Upload, RefreshCw } from 'lucide-react';
+import { User, Activity, BookOpen, Mail, Book, Calendar, Users, TrendingUp, HelpCircle, Info, ChevronRight, X, LogOut, Download, Upload, RefreshCw, Power } from 'lucide-react';
+import { useMarket } from '../../contexts/MarketContext';
 
 export type WalletSubTab = 'dashboard' | 'deposit' | 'withdraw' | 'transactions';
 
@@ -21,6 +22,8 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted, onNavigateWallet, onNavigateProfile, onNavigateNews, onNavigateCalendar, onNavigateAbout, userProfile, onLogout }) => {
+  const { marketEnabled, toggleMarket } = useMarket();
+
   if (!isOpen) return null;
 
   const isAuthenticated = !!userProfile;
@@ -77,6 +80,22 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
         {/* Menu Items */}
         <div className="flex-1 overflow-y-auto py-4">
           <div className="flex flex-col px-2 gap-0.5">
+            {/* Market Status Toggle */}
+            <div className="flex items-center justify-between px-4 py-3.5 hover:bg-lb-accent/10 active:bg-lb-accent/20 rounded-xl transition-all duration-300 w-full group mb-2 border border-lb-border/50 bg-lb-bg/50">
+              <div className="flex items-center gap-4">
+                <div className={`transition-colors duration-300 ${marketEnabled ? 'text-lb-accent' : 'text-lb-down'}`}>
+                  <Power size={20} />
+                </div>
+                <span className="text-[14px] font-bold text-lb-text/80 group-hover:text-lb-text transition-all duration-300">Market Status</span>
+              </div>
+              <button 
+                onClick={toggleMarket}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-300 ease-in-out focus:outline-none ${marketEnabled ? 'bg-lb-accent' : 'bg-lb-border'}`}
+              >
+                <div className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ease-in-out ${marketEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+            </div>
+
             <MenuItem icon={<Activity size={20} />} label="Trade" onClick={() => console.log('Trade clicked')} />
             <MenuItem icon={<BookOpen size={20} />} label="News" onClick={() => { onClose(); onNavigateNews?.(); }} />
             <MenuItem icon={<Download size={20} />} label="Deposit" onClick={() => { onClose(); onNavigateWallet?.('deposit'); }} />

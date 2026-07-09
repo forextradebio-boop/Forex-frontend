@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useSocket } from '../contexts/SocketContext';
+import { useMarket } from '../contexts/MarketContext';
 import * as marketService from '../services/market';
 import { SymbolData } from '../types';
 
 export function useMarketStream(initialSymbols: SymbolData[] = []) {
   const { socket } = useSocket();
+  const { marketEnabled } = useMarket();
   const [symbols, setSymbols] = useState<SymbolData[]>(initialSymbols);
 
   useEffect(() => {
     const fetchWatchList = async () => {
+      if (!marketEnabled) return;
       try {
         const syms = await marketService.getWatch();
         if (syms?.length) {
@@ -19,10 +22,10 @@ export function useMarketStream(initialSymbols: SymbolData[] = []) {
       }
     };
     fetchWatchList();
-  }, []);
+  }, [marketEnabled]);
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !marketEnabled) return;
 
     const handleMarketUpdate = (data: SymbolData[]) => {
       if (data?.length) {
@@ -42,7 +45,7 @@ export function useMarketStream(initialSymbols: SymbolData[] = []) {
       socket.off('market:update', handleMarketUpdate);
       socket.off('prices', handleMarketUpdate);
     };
-  }, [socket]);
+  }, [socket, marketEnabled]);
 
   return { symbols, setSymbols };
 }
