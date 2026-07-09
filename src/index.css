@@ -5,15 +5,15 @@
   --font-sans: "Inter", "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   
-  --color-lb-bg: #090C09;
-  --color-lb-panel: #111512;
-  --color-lb-panel-hover: #191E1A;
-  --color-lb-border: #1C231E;
-  --color-lb-accent: #C6F953;
-  --color-lb-text: #FFFFFF;
-  --color-lb-text-muted: #8A958D;
-  --color-lb-up: #C6F953;
-  --color-lb-down: #FF4D4D;
+  --color-lb-bg: var(--theme-lb-bg);
+  --color-lb-panel: var(--theme-lb-panel);
+  --color-lb-panel-hover: var(--theme-lb-panel-hover);
+  --color-lb-border: var(--theme-lb-border);
+  --color-lb-accent: var(--theme-lb-accent);
+  --color-lb-text: var(--theme-lb-text);
+  --color-lb-text-muted: var(--theme-lb-text-muted);
+  --color-lb-up: var(--theme-lb-up);
+  --color-lb-down: var(--theme-lb-down);
 }
 
 html, body, #root {
@@ -56,11 +56,11 @@ html, body, #root {
 }
 
 @keyframes flashGreen {
-  0% { background-color: rgba(198, 249, 83, 0.2); }
+  0% { background-color: color-mix(in srgb, var(--theme-lb-up) 25%, transparent); }
   100% { background-color: transparent; }
 }
 @keyframes flashRed {
-  0% { background-color: rgba(255, 77, 77, 0.2); }
+  0% { background-color: color-mix(in srgb, var(--theme-lb-down) 25%, transparent); }
   100% { background-color: transparent; }
 }
 .flash-up { animation: flashGreen 0.5s ease-out; }

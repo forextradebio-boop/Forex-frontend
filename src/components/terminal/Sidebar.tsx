@@ -1,6 +1,7 @@
 import React from 'react';
-import { User, Activity, BookOpen, Mail, Book, Calendar, Users, TrendingUp, HelpCircle, Info, ChevronRight, X, LogOut, Download, Upload, RefreshCw, Power } from 'lucide-react';
+import { User, Activity, BookOpen, Mail, Book, Calendar, Users, TrendingUp, HelpCircle, Info, ChevronRight, X, LogOut, Download, Upload, RefreshCw, Power, Sun, Moon, Settings, Bell, Globe } from 'lucide-react';
 import { useMarket } from '../../contexts/MarketContext';
+import { useTheme } from '../../theme';
 
 export type WalletSubTab = 'dashboard' | 'deposit' | 'withdraw' | 'transactions';
 
@@ -23,6 +24,7 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted, onNavigateWallet, onNavigateProfile, onNavigateNews, onNavigateCalendar, onNavigateAbout, userProfile, onLogout }) => {
   const { marketEnabled, toggleMarket } = useMarket();
+  const { themeMode, setThemeMode } = useTheme();
 
   if (!isOpen) return null;
 
@@ -34,7 +36,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
       <div className="fixed inset-0 bg-black/60" onClick={onClose} />
       
       {/* Drawer */}
-      <div className="relative w-4/5 max-w-[320px] bg-black text-lb-text h-full flex flex-col shadow-2xl animate-in slide-in-from-left">
+      <div className="relative w-4/5 max-w-[320px] bg-lb-bg text-lb-text h-full flex flex-col shadow-2xl animate-in slide-in-from-left">
         
         {/* Header Section */}
         <div className="p-6 pb-8 border-b border-lb-border flex flex-col gap-4 bg-lb-panel shadow-lg relative overflow-hidden">
@@ -103,6 +105,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
             <MenuItem icon={<RefreshCw size={20} />} label="Currency Converter" onClick={() => { onClose(); onNavigateWallet?.('dashboard'); }} />
             <MenuItem icon={<User size={20} />} label="Profile" onClick={() => { onClose(); onNavigateProfile?.(); }} />
             <MenuItem icon={<Calendar size={20} />} label="Economic calendar" isAds onClick={() => { onClose(); onNavigateCalendar?.(); }} />
+            
+            {/* Theme Toggle */}
+            <div className="flex items-center justify-between px-4 py-3.5 hover:bg-lb-accent/10 active:bg-lb-accent/20 rounded-xl transition-all duration-300 w-full group my-1 border border-lb-border/50 bg-lb-bg/50">
+              <div className="flex items-center gap-4">
+                <div className="text-lb-accent transition-colors duration-300">
+                  {themeMode === 'white' ? <Sun size={20} /> : <Moon size={20} />}
+                </div>
+                <span className="text-[14px] font-bold text-lb-text/80 group-hover:text-lb-text transition-all duration-300">
+                  {themeMode === 'white' ? 'Light Theme' : 'Dark Theme'}
+                </span>
+              </div>
+              <button 
+                onClick={() => setThemeMode(themeMode === 'white' ? 'navy' : 'white')}
+                className={`relative w-12 h-6 rounded-full transition-colors duration-300 ease-in-out focus:outline-none ${themeMode === 'navy' ? 'bg-lb-accent' : 'bg-lb-border'}`}
+              >
+                <div className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ease-in-out ${themeMode === 'navy' ? 'translate-x-6' : 'translate-x-0'}`} />
+              </button>
+            </div>
+
+            <MenuItem icon={<Globe size={20} />} label="Language" onClick={() => {}} />
+            <MenuItem icon={<Bell size={20} />} label="Notifications" badge="3" onClick={() => {}} />
+            <MenuItem icon={<Settings size={20} />} label="Settings" onClick={() => {}} />
             <MenuItem icon={<Info size={20} />} label="About" onClick={() => { onClose(); onNavigateAbout?.(); }} />
           </div>
         </div>

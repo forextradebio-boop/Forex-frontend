@@ -7,9 +7,10 @@ import { useMarket } from '../../contexts/MarketContext';
 export interface ChartContainerProps {
   symbol: string;
   theme?: 'Light' | 'Dark';
+  intervalValue?: string;
 }
 
-const TIMEFRAMES = [
+export const TIMEFRAMES = [
   { label: '1m', value: '1m', seconds: 60 },
   { label: '5m', value: '5m', seconds: 300 },
   { label: '15m', value: '15m', seconds: 900 },
@@ -23,13 +24,14 @@ const TIMEFRAMES = [
 
 export const TradingViewChart: React.FC<ChartContainerProps> = ({
   symbol = 'EURUSD',
-  theme = 'Dark'
+  theme = 'Dark',
+  intervalValue = '15m'
 }) => {
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [interval, setInterval] = useState(TIMEFRAMES[0]);
+  const interval = TIMEFRAMES.find(t => t.value === intervalValue) || TIMEFRAMES[2];
   const { socket } = useSocket();
   const { marketEnabled } = useMarket();
 
@@ -38,19 +40,60 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
     const chartOptions = {
       layout: {
-        background: { type: 'solid' as const, color: theme === 'Dark' ? '#0b0e14' : '#ffffff' },
-        textColor: theme === 'Dark' ? '#A3A3A3' : '#333333',
+        background: { type: 'solid' as const, color: theme === 'Dark' ? '#000000' : '#ffffff' },
+        textColor: theme === 'Dark' ? '#BDBDBD' : '#64748B',
+        fontSize: 11,
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif",
       },
       grid: {
-        vertLines: { color: theme === 'Dark' ? '#1f2937' : '#e5e7eb' },
-        horzLines: { color: theme === 'Dark' ? '#1f2937' : '#e5e7eb' },
+        vertLines: { color: theme === 'Dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)', style: 1 }, // Thin dotted/dashed MT5 grid
+        horzLines: { color: theme === 'Dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)', style: 1 },
       },
       crosshair: {
-        mode: 0,
+        mode: 1, // Magnet mode
+        vertLine: {
+          color: theme === 'Dark' ? '#758696' : '#9598a1',
+          width: 1,
+          style: 3, // dashed
+          labelBackgroundColor: theme === 'Dark' ? '#363a45' : '#131722',
+        },
+        horzLine: {
+          color: theme === 'Dark' ? '#758696' : '#9598a1',
+          width: 1,
+          style: 3,
+          labelBackgroundColor: theme === 'Dark' ? '#363a45' : '#131722',
+        },
+      },
+      rightPriceScale: {
+        autoScale: true,
+        alignLabels: true,
+        borderVisible: true,
+        borderColor: theme === 'Dark' ? '#2b2b43' : '#e0e3eb',
+        scaleMargins: {
+          top: 0.1,
+          bottom: 0.1,
+        },
       },
       timeScale: {
         timeVisible: true,
         secondsVisible: false,
+        borderVisible: true,
+        borderColor: theme === 'Dark' ? '#2b2b43' : '#e0e3eb',
+        fixLeftEdge: false,
+        rightOffset: 15,
+        barSpacing: 12, // Increased for wider candles
+        minBarSpacing: 5,
+      },
+      handleScroll: {
+        mouseWheel: true,
+        pressedMouseMove: true,
+        horzTouchDrag: true,
+        vertTouchDrag: true,
+      },
+      handleScale: {
+        axisPressedMouseMove: true,
+        mouseWheel: true,
+        pinch: true,
       },
       autoSize: true,
     };
@@ -59,11 +102,14 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
     chartRef.current = chart;
 
     const candlestickSeries = chart.addSeries(CandlestickSeries, {
-      upColor: '#10b981',
-      downColor: '#f43f5e',
-      borderVisible: false,
-      wickUpColor: '#10b981',
-      wickDownColor: '#f43f5e',
+      upColor: theme === 'Dark' ? '#26A69A' : '#10B981',
+      downColor: theme === 'Dark' ? '#EF5350' : '#EF4444',
+      borderVisible: true,
+      borderUpColor: theme === 'Dark' ? '#26A69A' : '#10B981',
+      borderDownColor: theme === 'Dark' ? '#EF5350' : '#EF4444',
+      wickUpColor: theme === 'Dark' ? '#26A69A' : '#10B981',
+      wickDownColor: theme === 'Dark' ? '#EF5350' : '#EF4444',
+      wickVisible: true,
     });
     seriesRef.current = candlestickSeries;
 
@@ -92,6 +138,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           
           if (uniqueData.length > 0) {
             candlestickSeries.setData(uniqueData);
+            chart.timeScale().fitContent();
           }
         }
       } catch (error) {
@@ -103,19 +150,16 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
     loadData();
 
-    const handleResize = () => {
-      if (chartContainerRef.current && chartRef.current) {
-        chartRef.current.applyOptions({
-          width: chartContainerRef.current.clientWidth,
-          height: chartContainerRef.current.clientHeight,
-        });
-      }
-    };
+    const resizeObserver = new ResizeObserver(entries => {
+      if (entries.length === 0 || entries[0].target !== chartContainerRef.current) return;
+      const newRect = entries[0].contentRect;
+      chart.applyOptions({ width: newRect.width, height: newRect.height });
+    });
 
-    window.addEventListener('resize', handleResize);
+    resizeObserver.observe(chartContainerRef.current);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
       if (chartRef.current) {
         chartRef.current.remove();
         chartRef.current = null;
@@ -163,19 +207,37 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
     };
   }, [socket, symbol, interval]);
 
+  const getSubtitle = (sym: string) => {
+    if (sym.includes('XAU')) return 'Gold vs US Dollar';
+    if (sym.includes('XAG')) return 'Silver vs US Dollar';
+    if (sym.includes('BTC')) return 'Bitcoin vs US Dollar';
+    if (sym.includes('EURUSD')) return 'Euro vs US Dollar';
+    if (sym.includes('GBPUSD')) return 'British Pound vs US Dollar';
+    if (sym.includes('USDJPY')) return 'US Dollar vs Japanese Yen';
+    if (sym.includes('USDCAD')) return 'US Dollar vs Canadian Dollar';
+    return 'Forex Pair';
+  };
   return (
-    <div className="relative w-full h-full flex flex-col">
-      {/* Timeframe Controls Overlay */}
-      <div className="absolute top-0 left-0 right-0 z-20 flex gap-1 p-2 bg-gradient-to-b from-lb-bg/80 to-transparent pointer-events-none">
-        <div className="flex gap-1 overflow-x-auto no-scrollbar pointer-events-auto">
+    <div className="relative w-full h-full flex flex-col bg-black">
+      {/* MT5 Mobile Top-Left Info Text */}
+      <div className="absolute top-1 left-2 z-10 pointer-events-none flex flex-col">
+        <div className="flex items-center gap-1">
+          <span className="text-[12px] font-bold text-[#2962FF]">{symbol}m</span>
+          <span className="text-[10px] font-bold text-gray-300">▼ {interval.value.toUpperCase()}</span>
+        </div>
+        <span className="text-[10px] font-medium text-white">{getSubtitle(symbol)}</span>
+      </div>
+
+      {/* Hidden Timeframe Controls for Desktop / Or moved elsewhere */}
+      <div className="hidden md:flex absolute top-0 right-16 z-20 gap-1 p-2 pointer-events-none">
+        <div className="flex gap-1 overflow-x-auto no-scrollbar pointer-events-auto backdrop-blur-sm bg-lb-bg/40 p-1 rounded border border-lb-border/50">
           {TIMEFRAMES.map((tf) => (
             <button
               key={tf.value}
-              onClick={() => setInterval(tf)}
-              className={`px-2 py-1 rounded text-[11px] font-bold transition-colors ${
+              className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all duration-300 ${
                 interval.value === tf.value
-                  ? 'bg-lb-accent text-black shadow-sm'
-                  : 'bg-lb-panel/80 text-lb-text-muted hover:text-lb-text hover:bg-lb-panel border border-lb-border/50'
+                  ? 'bg-lb-up/20 text-lb-up'
+                  : 'bg-transparent text-lb-text-muted hover:text-lb-text'
               }`}
             >
               {tf.label}
@@ -183,7 +245,6 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           ))}
         </div>
       </div>
-      
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-lb-bg/50 backdrop-blur-sm">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lb-accent"></div>

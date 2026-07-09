@@ -8,7 +8,7 @@ import { UserWallet, Position } from '../types';
 
 import { TerminalHeader } from './terminal/TerminalHeader';
 import { MarketWatch } from './terminal/MarketWatch';
-import { TradingViewChart } from './TradingViewChart';
+import { TradingViewChart, TIMEFRAMES } from './TradingViewChart';
 import { OneClickTrading } from './terminal/OneClickTrading';
 import { BottomTerminal } from './terminal/BottomTerminal';
 import { MobileNavigation, MobileTab } from './terminal/MobileNavigation';
@@ -49,12 +49,14 @@ const ProTradingDashboard = ({
 }: ProTradingDashboardProps) => {
   const { isConnected } = useSocket();
   const { symbols } = useMarketStream();
-  const { isDarkMode } = useTheme();
+  const { themeMode, setThemeMode } = useTheme();
 
   // Dashboard State
   const [selectedSymbol, setSelectedSymbol] = useState<string>('EURUSD');
+  const [chartInterval, setChartInterval] = useState<string>('15m');
   const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('chart');
   const [actionSheetSymbol, setActionSheetSymbol] = useState<any | null>(null);
+  const [showTimeframeMenu, setShowTimeframeMenu] = useState(false);
   
   // Order State
   const [orderVolume, setOrderVolume] = useState<string>('0.10');
@@ -77,7 +79,6 @@ const ProTradingDashboard = ({
   const [closeConfirmationPositionId, setCloseConfirmationPositionId] = useState<string | null>(null);
   const [expandedPositionId, setExpandedPositionId] = useState<string | null>(null);
   const [isClosingPosition, setIsClosingPosition] = useState(false);
-  const { themeMode, setThemeMode } = useTheme();
   const { login: setAuthState, user: authUser, logout: handleLogout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [authFlowState, setAuthFlowState] = useState<'NONE' | 'REGISTER' | 'KYC' | 'LOGIN'>(authUser ? 'NONE' : 'LOGIN');
@@ -264,24 +265,47 @@ const ProTradingDashboard = ({
       </div>
 
       {/* MOBILE TOP BAR (For Chart/Quotes) */}
-      <div className={`md:hidden shrink-0 bg-lb-panel border-b border-lb-border items-center justify-between px-4 shadow-sm relative ${activeMobileTab === 'trade' || activeMobileTab === 'new_order' ? 'hidden' : 'flex h-12'}`}>
-         <button onClick={() => setIsSidebarOpen(true)} className="w-9 h-9 flex items-center justify-center text-lb-text active:bg-lb-panel-hover rounded-full -ml-2">
-           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-         </button>
-         <span className="font-bold text-lb-text tracking-wide capitalize absolute left-1/2 -translate-x-1/2">
-           {activeMobileTab === 'quotes' && 'Quotes'}
-           {activeMobileTab === 'chart' && selectedSymbol}
-           {activeMobileTab === 'history' && 'History'}
-           {activeMobileTab === 'profile' && 'Profile'}
-         </span>
-         <div className="w-9 h-9 flex items-center justify-center">
+      <div className={`md:hidden shrink-0 bg-lb-panel border-b border-lb-border items-center justify-between px-3 shadow-sm relative z-30 ${activeMobileTab === 'trade' || activeMobileTab === 'new_order' ? 'hidden' : 'flex h-12'}`}>
+         <div className="flex items-center gap-4">
+           <button onClick={() => setIsSidebarOpen(true)} className="w-8 h-8 flex items-center justify-center text-lb-text active:bg-lb-panel-hover rounded-full">
+             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+           </button>
+           {activeMobileTab === 'chart' && (
+             <div className="flex items-center gap-4 text-lb-text">
+               <button className="flex items-center justify-center p-1"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg></button>
+               <button className="flex items-center justify-center p-1 text-lb-text font-serif italic font-bold">f</button>
+               <div className="relative">
+                 <button onClick={() => setShowTimeframeMenu(!showTimeframeMenu)} className="flex items-center gap-0.5 p-1 font-bold">
+                   M{chartInterval.replace('m', '')} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                 </button>
+                 {showTimeframeMenu && (
+                   <div className="absolute top-10 left-0 bg-lb-panel shadow-xl border border-lb-border rounded-xl w-32 py-1 z-50 text-sm font-semibold text-lb-text">
+                     {TIMEFRAMES.map(tf => (
+                       <div key={tf.value} className={`px-4 py-2 hover:bg-lb-panel-hover cursor-pointer ${chartInterval === tf.value ? 'text-lb-accent' : ''}`} onClick={() => { setChartInterval(tf.value); setShowTimeframeMenu(false); }}>
+                         {tf.label}
+                       </div>
+                     ))}
+                   </div>
+                 )}
+               </div>
+             </div>
+           )}
+         </div>
+         {activeMobileTab !== 'chart' && (
+           <span className="font-bold text-lb-text tracking-wide capitalize absolute left-1/2 -translate-x-1/2">
+             {activeMobileTab === 'quotes' && 'Quotes'}
+             {activeMobileTab === 'history' && 'History'}
+             {activeMobileTab === 'profile' && 'Profile'}
+           </span>
+         )}
+         <div className="flex items-center">
            {activeMobileTab === 'chart' && (
              <button 
                onClick={() => setActiveMobileTab('new_order')} 
-               className="text-lb-accent bg-lb-accent/10 hover:bg-lb-accent/20 p-2 rounded-full transition-all active:scale-95 shadow-[0_0_10px_rgba(20,184,166,0.15)]"
+               className="text-lb-accent bg-transparent p-2 rounded-full transition-all active:scale-95"
                title="New Order"
              >
-               <FilePlus className="w-4 h-4" strokeWidth={2.5} />
+               <FilePlus className="w-5 h-5" strokeWidth={2} />
              </button>
            )}
          </div>
@@ -302,7 +326,7 @@ const ProTradingDashboard = ({
         {/* MOBILE: Conditional Rendering based on Tabs */}
         {/* DESKTOP CENTER: Chart + OCT */}
         <main className={`flex-1 flex flex-col relative min-w-0 ${activeMobileTab !== 'chart' ? 'hidden md:flex' : 'flex'}`}>
-          <TradingViewChart symbol={selectedSymbol} theme={isDarkMode ? 'Dark' : 'Light'} />
+          <TradingViewChart symbol={selectedSymbol} theme={themeMode === 'navy' ? 'Dark' : 'Light'} intervalValue={chartInterval} />
           
           {/* Desktop Overlay OCT */}
           <div className="hidden md:block absolute top-4 right-4 shadow-2xl rounded-xl z-10">

@@ -205,19 +205,19 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
 
                   {/* Middle Row: Bid / Ask / Change */}
                   <div className="flex justify-between items-baseline px-1">
-                    <span className={`text-[11px] font-bold ${isPositive ? 'text-lb-accent' : 'text-lb-down'}`}>
+                    <span className={`text-[11px] font-bold ${isPositive ? 'text-lb-up' : 'text-lb-down'}`}>
                       {isPositive ? '+' : ''}{(sym.changePercent || 0).toFixed(2)}%
                     </span>
                     <div className="flex gap-4 items-baseline">
                       <div className="flex flex-col items-end">
                         <span className="text-[9px] text-lb-text-muted">Bid</span>
-                        <span className={`text-[15px] ${isPositive ? 'text-lb-accent' : 'text-lb-down'}`}>
+                        <span className={`text-[15px] ${isPositive ? 'text-lb-up' : 'text-lb-down'}`}>
                           <PriceFlashCell price={sym.bid || sym.price || 0} />
                         </span>
                       </div>
                       <div className="flex flex-col items-end">
                         <span className="text-[9px] text-lb-text-muted">Ask</span>
-                        <span className={`text-[15px] ${isPositive ? 'text-lb-accent' : 'text-lb-down'}`}>
+                        <span className={`text-[15px] ${isPositive ? 'text-lb-up' : 'text-lb-down'}`}>
                           <PriceFlashCell price={sym.ask || sym.price || 0} isAsk={true} />
                         </span>
                       </div>
