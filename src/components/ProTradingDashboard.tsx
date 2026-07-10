@@ -178,6 +178,32 @@ const ProTradingDashboard = ({
   }, [orderVolume, oneClickEnabled, executeOrderBackend]);
 
 
+  // Filtered History for Mobile List & Footer
+  const filteredHistory = useMemo(() => {
+    return closedHistory.filter(item => {
+      if (historyFilter === 'ALL') return true;
+      const itemDate = parseHistoryDate(item.timestamp ?? item.entryDate);
+      const now = new Date();
+      if (historyFilter === 'TODAY') return itemDate.toDateString() === now.toDateString();
+      if (historyFilter === 'WEEK') return now.getTime() - itemDate.getTime() < 7 * 24 * 60 * 60 * 1000;
+      if (historyFilter === 'MONTH') return now.getTime() - itemDate.getTime() < 30 * 24 * 60 * 60 * 1000;
+      if (historyFilter === 'YEAR') return now.getTime() - itemDate.getTime() < 365 * 24 * 60 * 60 * 1000;
+      return true;
+    });
+  }, [closedHistory, historyFilter]);
+
+  // Calculate footer totals using the filtered list (simulating MT5 period totals)
+  const historyProfit = filteredHistory.filter(h => h.historyType === 'trade').reduce((s, h) => s + (Number(h.pnl) || 0), 0);
+  const historyWithdrawal = filteredHistory.filter(h => ((h.type === 'WITHDRAWAL' || h.type === 'WITHDRAW') && h.status === 'APPROVED') || (h.type === 'ADMIN_ADJUSTMENT' && h.amount < 0)).reduce((s, h) => s + Math.abs(Number(h.amount) || 0), 0);
+  let historyDeposit = filteredHistory.filter(h => (h.type === 'DEPOSIT' && h.status === 'APPROVED') || (h.type === 'ADMIN_ADJUSTMENT' && h.amount > 0)).reduce((s, h) => s + (Number(h.amount) || 0), 0);
+  
+  // Backwards compatibility for testing: If filter is ALL, but no deposit is recorded and they have a wallet balance.
+  if (historyFilter === 'ALL' && historyDeposit === 0 && (wallet.balance || 0) > 0) {
+    historyDeposit = (wallet.balance || 0) - historyProfit + historyWithdrawal;
+  }
+  
+  const historyBalance = historyDeposit + historyProfit - historyWithdrawal;
+
   return (
     <div className="h-[100dvh] w-full flex flex-col font-sans overflow-hidden bg-lb-bg text-lb-text">
       <Sidebar 
@@ -468,96 +494,90 @@ const ProTradingDashboard = ({
                </div>
              ) : (
                <div className="flex flex-col gap-2 p-4">
-                 {closedHistory
-                   .filter(item => {
-                     if (historyFilter === 'ALL') return true;
-                     const itemDate = parseHistoryDate(item.timestamp ?? item.entryDate);
-                     const now = new Date();
-                     if (historyFilter === 'TODAY') return itemDate.toDateString() === now.toDateString();
-                     if (historyFilter === 'WEEK') return now.getTime() - itemDate.getTime() < 7 * 24 * 60 * 60 * 1000;
-                     if (historyFilter === 'MONTH') return now.getTime() - itemDate.getTime() < 30 * 24 * 60 * 60 * 1000;
-                     if (historyFilter === 'YEAR') return now.getTime() - itemDate.getTime() < 365 * 24 * 60 * 60 * 1000;
-                     return true;
-                   })
+                 {filteredHistory
                    .sort((a, b) => {
                      const diff = parseHistoryDate(b.timestamp ?? b.entryDate).getTime() - parseHistoryDate(a.timestamp ?? a.entryDate).getTime();
                      return historySortDesc ? diff : -diff;
                    })
                    .map((item, idx) => {
                      const historyDate = parseHistoryDate(item.timestamp ?? item.entryDate);
-                     return (
-                       <div key={idx} className="px-4 py-3 rounded-2xl border border-lb-border flex justify-between items-start bg-lb-panel">
-                         {item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL' ? (
-                           <>
-                             <div className="flex flex-col gap-0.5">
-                               <span className="font-semibold text-[15px] text-lb-text">{item.type === 'DEPOSIT' ? 'Balance' : 'Withdrawal'}</span>
-                               <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">{item.id || `D-trial-USD-${historyDate.getTime().toString().slice(-10)}`}</span>
-                             </div>
-                             <div className="flex flex-col items-end gap-0.5">
-                               <span className={`font-semibold text-[15px] tracking-tight ${item.type === 'DEPOSIT' ? 'text-lb-accent' : 'text-lb-down'}`}>{item.amount.toFixed(2)}</span>
-                               <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">
-                                 {historyDate.toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
-                               </span>
-                             </div>
-                           </>
-                         ) : (
-                           <>
-                             <div className="flex flex-col gap-0.5">
-                               <div className="flex items-baseline gap-1">
-                                 <span className="font-semibold text-lb-text text-[15px]">{item.symbol}</span>
-                                 <span className={`text-[12px] px-1.5 py-0.5 rounded ${item.side === 'BUY' ? 'bg-lb-accent/10 text-lb-accent' : 'bg-lb-down/10 text-lb-down'}`}>{item.side?.toLowerCase()} {item.size?.toFixed(2) || '0.10'}</span>
-                               </div>
-                               <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">{formatPrice(item.entryPrice)} → {formatPrice(item.closePrice)}</span>
-                             </div>
-                             <div className="flex flex-col items-end gap-0.5">
-                               <span className={`font-semibold text-[15px] tracking-tight ${item.pnl && item.pnl >= 0 ? 'text-lb-accent' : 'text-lb-down'}`}>
-                                 {item.pnl?.toFixed(2) || '0.00'}
-                               </span>
-                               <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">
-                                 {historyDate.toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
-                               </span>
-                             </div>
-                           </>
-                         )}
-                       </div>
-                     );
-                   })}
+                     return <div key={idx} className="px-4 py-3 rounded-2xl border border-lb-border flex justify-between items-start bg-lb-panel">
+                          {item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL' || item.type === 'WITHDRAW' || item.type === 'ADMIN_ADJUSTMENT' ? (
+                            <>
+                              <div className="flex flex-col gap-0.5">
+                                <span className="font-semibold text-[15px] text-lb-text">
+                                  {item.type === 'ADMIN_ADJUSTMENT' ? (item.amount > 0 ? 'Admin Credit' : 'Admin Debit') : (item.type === 'DEPOSIT' ? 'Deposit' : 'Withdrawal')}
+                                </span>
+                                <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">{item.id || `TX-${historyDate.getTime().toString().slice(-10)}`}</span>
+                                {item.status && (
+                                  <div className="flex items-center gap-1.5 mt-0.5">
+                                    <div className={`w-1.5 h-1.5 rounded-full ${item.status === 'APPROVED' ? 'bg-lb-accent' : item.status === 'REJECTED' ? 'bg-lb-down' : 'bg-amber-500 animate-pulse'}`}></div>
+                                    <span className="text-[10px] font-bold text-lb-text-muted uppercase tracking-wider">{item.status}</span>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="flex flex-col items-end gap-0.5">
+                                <span className={`font-semibold text-[15px] tracking-tight ${item.amount >= 0 && (item.type === 'DEPOSIT' || item.type === 'ADMIN_ADJUSTMENT') ? 'text-lb-accent' : 'text-lb-down'}`}>
+                                  {item.amount > 0 && (item.type === 'DEPOSIT' || item.type === 'ADMIN_ADJUSTMENT') ? '+' : ''}{item.type === 'WITHDRAWAL' || item.type === 'WITHDRAW' ? '-' : ''}{Math.abs(item.amount).toFixed(2)}
+                                </span>
+                                <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">
+                                  {historyDate.toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex flex-col gap-0.5">
+                                <div className="flex items-baseline gap-1">
+                                  <span className="font-semibold text-lb-text text-[15px]">{item.symbol}</span>
+                                  <span className={`text-[12px] px-1.5 py-0.5 rounded ${item.side === 'BUY' ? 'bg-lb-accent/10 text-lb-accent' : 'bg-lb-down/10 text-lb-down'}`}>{item.side?.toLowerCase()} {item.size?.toFixed(2) || '0.10'}</span>
+                                </div>
+                                <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">{formatPrice(item.entryPrice)} → {formatPrice(item.closePrice)}</span>
+                              </div>
+                              <div className="flex flex-col items-end gap-0.5">
+                                <span className={`font-semibold text-[15px] tracking-tight ${item.pnl && item.pnl >= 0 ? 'text-lb-accent' : 'text-lb-down'}`}>
+                                  {item.pnl?.toFixed(2) || '0.00'}
+                                </span>
+                                <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">
+                                  {historyDate.toISOString().replace('T', ' ').slice(0, 19).replace(/-/g, '.')}
+                                </span>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                    })}
                </div>
              )}
 
-             {/* History Summary Footer */}
-             <div className="mx-4 mt-2 px-4 py-4 rounded-2xl bg-lb-panel border border-lb-border flex flex-col gap-2 text-[14px]">
-               <div className="flex justify-between">
-                 <span className="text-lb-text-muted">Deposit</span>
-                 <span className="font-bold text-lb-text font-mono">
-                   {closedHistory.filter(h => h.type === 'DEPOSIT').reduce((s, h) => s + h.amount, 0).toFixed(2)}
-                 </span>
+             {/* History Summary Footer (only show if not ORDERS) */}
+             {historySubTab !== 'ORDERS' && (
+               <div className="border-t border-lb-border bg-lb-panel/50 p-4 shrink-0">
+                 <div className="flex justify-between mb-1">
+                   <span className="text-lb-text-muted">Profit</span>
+                   <span className={`font-bold font-mono ${historyProfit >= 0 ? 'text-lb-accent' : 'text-lb-down'}`}>
+                     {historyProfit.toFixed(2)}
+                   </span>
+                 </div>
+                 <div className="flex justify-between">
+                   <span className="text-lb-text-muted">Deposit</span>
+                   <span className="font-bold text-lb-text font-mono">
+                     {historyDeposit.toFixed(2)}
+                   </span>
+                 </div>
+                 <div className="flex justify-between">
+                   <span className="text-lb-text-muted">Withdrawal</span>
+                   <span className="font-bold text-lb-text font-mono">
+                     {historyWithdrawal.toFixed(2)}
+                   </span>
+                 </div>
+                 <div className="flex justify-between border-t border-lb-border pt-2 mt-1">
+                   <span className="text-lb-text-muted">Balance</span>
+                   <span className="font-bold text-lb-text font-mono">
+                     {historyBalance.toFixed(2)}
+                   </span>
+                 </div>
                </div>
-               <div className="flex justify-between">
-                 <span className="text-lb-text-muted">Profit</span>
-                 <span className="font-bold text-lb-text font-mono">
-                   {closedHistory.filter(h => h.type !== 'DEPOSIT' && h.type !== 'WITHDRAWAL').reduce((s, h) => s + (h.pnl || 0), 0).toFixed(2)}
-                 </span>
-               </div>
-               <div className="flex justify-between">
-                 <span className="text-lb-text-muted">Swap</span>
-                 <span className="font-bold text-lb-text font-mono">0.00</span>
-               </div>
-               <div className="flex justify-between">
-                 <span className="text-lb-text-muted">Commission</span>
-                 <span className="font-bold text-lb-text font-mono">0.00</span>
-               </div>
-               <div className="flex justify-between border-t border-lb-border pt-2 mt-1">
-                 <span className="text-lb-text-muted">Balance</span>
-                 <span className="font-bold text-lb-text font-mono">
-                   {(
-                     closedHistory.filter(h => h.type === 'DEPOSIT').reduce((s, h) => s + h.amount, 0) + 
-                     closedHistory.filter(h => h.type !== 'DEPOSIT' && h.type !== 'WITHDRAWAL').reduce((s, h) => s + (h.pnl || 0), 0) - 
-                     closedHistory.filter(h => h.type === 'WITHDRAWAL').reduce((s, h) => s + h.amount, 0)
-                   ).toFixed(2)}
-                 </span>
-               </div>
-             </div>
+             )}
           </div>
         </div>
 

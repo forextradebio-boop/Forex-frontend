@@ -16,7 +16,12 @@ export default function TransactionHistoryScreen() {
     );
   }
 
-  const filteredData = transactions?.filter(t => filter === 'ALL' || t.type === filter) || [];
+  const filteredData = transactions?.filter(t => {
+    if (filter === 'ALL') return true;
+    if (filter === 'DEPOSIT') return t.type === 'DEPOSIT' || (t.type === 'ADMIN_ADJUSTMENT' && t.amount > 0);
+    if (filter === 'WITHDRAW') return t.type === 'WITHDRAW' || t.type === 'WITHDRAWAL' || (t.type === 'ADMIN_ADJUSTMENT' && t.amount < 0);
+    return t.type === filter;
+  }) || [];
 
   return (
     <div className="bg-lb-panel border border-lb-border rounded-3xl p-6 shadow-2xl">
@@ -53,8 +58,8 @@ export default function TransactionHistoryScreen() {
       ) : (
         <div className="space-y-3 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
           {filteredData.map(tx => {
-            const isDeposit = tx.type === 'DEPOSIT';
-            const isWithdraw = tx.type === 'WITHDRAW';
+            const isDeposit = tx.type === 'DEPOSIT' || (tx.type === 'ADMIN_ADJUSTMENT' && tx.amount > 0);
+            const isWithdraw = tx.type === 'WITHDRAW' || tx.type === 'WITHDRAWAL' || (tx.type === 'ADMIN_ADJUSTMENT' && tx.amount < 0);
             const Icon = isDeposit ? ArrowDownLeft : isWithdraw ? ArrowUpRight : ArrowRightLeft;
             const iconColor = isDeposit ? 'text-lb-accent' : isWithdraw ? 'text-lb-down' : 'text-lb-accent';
             const bgClass = isDeposit ? 'bg-lb-accent/10 border-lb-accent/20' : isWithdraw ? 'bg-lb-down/10 border-lb-down/20' : 'bg-lb-accent/10 border-lb-accent/20';
@@ -69,7 +74,7 @@ export default function TransactionHistoryScreen() {
                     <Icon className={`w-5 h-5 ${iconColor}`} />
                   </div>
                   <div>
-                    <h4 className="text-lb-text font-bold text-sm tracking-wide">{tx.type}</h4>
+                    <h4 className="text-lb-text font-bold text-sm tracking-wide">{tx.type === 'ADMIN_ADJUSTMENT' ? 'ADMIN CREDIT' : tx.type}</h4>
                     <div className="text-[10px] text-lb-text-muted font-mono mt-0.5">{dateStr} • {timeStr}</div>
                   </div>
                 </div>

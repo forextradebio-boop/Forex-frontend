@@ -51,12 +51,18 @@ export default function App() {
       setWalletMetrics(wallet);
     };
 
+    const handleTransaction = () => {
+      fetchClientPortfolioStats();
+    };
+
     socket.on("pnl", handlePnl);
     socket.on("wallet", handleWallet);
+    socket.on("transaction", handleTransaction);
 
     return () => {
       socket.off("pnl", handlePnl);
       socket.off("wallet", handleWallet);
+      socket.off("transaction", handleTransaction);
     };
   }, [socket]);
 

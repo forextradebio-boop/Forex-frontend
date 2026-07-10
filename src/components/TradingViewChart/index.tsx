@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { createChart, IChartApi, ISeriesApi, CandlestickData, Time, CandlestickSeries } from 'lightweight-charts';
+import { createChart, IChartApi, ISeriesApi, CandlestickData, Time, CandlestickSeries, ColorType } from 'lightweight-charts';
 import api from '../../api/axios';
 import { useSocket } from '../../contexts/SocketContext';
 import { useMarket } from '../../contexts/MarketContext';
@@ -38,9 +38,9 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
-    const chartOptions = {
+    const chartOptions: any = {
       layout: {
-        background: { type: 'solid' as const, color: theme === 'Dark' ? '#000000' : '#ffffff' },
+        background: { type: ColorType.Solid, color: theme === 'Dark' ? '#000000' : '#ffffff' },
         textColor: theme === 'Dark' ? '#BDBDBD' : '#64748B',
         fontSize: 11,
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif",
@@ -135,7 +135,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
               uniqueData.push(d);
             }
           }
-          
+
           if (uniqueData.length > 0) {
             candlestickSeries.setData(uniqueData);
             chart.timeScale().fitContent();
@@ -170,17 +170,17 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
   // Live updates
   useEffect(() => {
     if (!socket || !seriesRef.current) return;
-    
+
     const handleMarketUpdate = (updates: any[]) => {
       updates.forEach((update) => {
         if (update.symbol.replace('/', '') === symbol) {
           const tradePrice = update.price || update.bid;
           const timestamp = update.timestamp || Date.now();
           const tickTime = Math.floor(timestamp / 1000);
-          
+
           // Snap to current interval candle
           const candleTime = (tickTime - (tickTime % interval.seconds)) as Time;
-          
+
           const bar = {
             time: candleTime,
             open: update.open || tradePrice,
@@ -188,7 +188,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
             low: update.low || tradePrice,
             close: tradePrice,
           };
-          
+
           try {
             seriesRef.current?.update(bar);
           } catch (e) {
@@ -234,11 +234,10 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           {TIMEFRAMES.map((tf) => (
             <button
               key={tf.value}
-              className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all duration-300 ${
-                interval.value === tf.value
+              className={`px-2 py-0.5 rounded text-[11px] font-bold transition-all duration-300 ${interval.value === tf.value
                   ? 'bg-lb-up/20 text-lb-up'
                   : 'bg-transparent text-lb-text-muted hover:text-lb-text'
-              }`}
+                }`}
             >
               {tf.label}
             </button>
@@ -254,7 +253,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-lb-bg/60 backdrop-blur-sm">
           <div className="bg-lb-panel/90 border border-lb-border px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-lb-down/10 flex items-center justify-center border border-lb-down/30">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-lb-down" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-lb-down" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg>
             </div>
             <h2 className="text-xl font-black text-lb-text tracking-wide">Market is currently closed.</h2>
             <p className="text-sm text-lb-text-muted font-medium text-center">Live price updates and trading are disabled.</p>

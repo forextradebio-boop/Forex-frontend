@@ -37,8 +37,9 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
     
     return sorted.map(item => {
       if (item.historyType === 'transaction') {
-        if (item.type === 'DEPOSIT') currentBalance += item.amount;
-        else if (item.type === 'WITHDRAWAL' || item.type === 'WITHDRAW') currentBalance -= item.amount;
+        if (item.type === 'DEPOSIT' && item.status === 'APPROVED') currentBalance += item.amount;
+        else if ((item.type === 'WITHDRAWAL' || item.type === 'WITHDRAW') && item.status === 'APPROVED') currentBalance -= Math.abs(item.amount);
+        else if (item.type === 'ADMIN_ADJUSTMENT') currentBalance += item.amount;
       } else {
         currentBalance += (item.pnl || 0) + (item.swap || 0) + (item.commission || 0);
       }
