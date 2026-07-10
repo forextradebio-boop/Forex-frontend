@@ -358,7 +358,9 @@ const ProTradingDashboard = ({
            {/* Top Header replacement for Trade Tab */}
            <div className="p-4 pt-6 flex flex-col bg-lb-panel mx-4 mt-4 rounded-2xl shadow-lg border border-lb-border">
              <div className="flex justify-center items-start w-full">
-               <span className="text-3xl font-bold text-lb-accent tracking-tight">{(liveEquity - wallet.balance).toFixed(2)} USD</span>
+               <span className={`text-3xl font-bold tracking-tight ${(liveEquity - wallet.balance) >= 0 ? 'text-lb-accent' : 'text-lb-down'}`}>
+                 {(liveEquity - wallet.balance).toFixed(2)} USD
+               </span>
              </div>
              
              <div className="flex flex-col gap-1.5 text-[13px] mt-6 px-1">

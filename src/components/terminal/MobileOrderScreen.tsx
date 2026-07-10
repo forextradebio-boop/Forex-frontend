@@ -137,7 +137,7 @@ export const MobileOrderScreen: React.FC<MobileOrderScreenProps> = ({
     <div className="fixed inset-0 bg-lb-bg z-50 flex flex-col font-sans overflow-hidden animate-slide-up">
       {/* Header */}
       <div className="flex items-center px-4 py-3 bg-lb-panel relative shrink-0 shadow-md z-10 border-b border-lb-border">
-        <button onClick={onClose} className="w-10 h-10 bg-lb-bg rounded-full flex items-center justify-center text-lb-text hover:bg-lb-panel-hover active:scale-95 transition-all">
+        <button onClick={onClose} className="w-10 h-10 relative z-20 bg-lb-bg rounded-full flex items-center justify-center text-lb-text hover:bg-lb-panel-hover active:scale-95 transition-all">
           <ChevronLeft className="w-6 h-6" />
         </button>
         <div className="flex-1 flex flex-col items-center justify-center -ml-10">
