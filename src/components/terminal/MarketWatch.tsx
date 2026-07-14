@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Search, Star } from 'lucide-react';
 import { useMarketStream } from '../../hooks/useMarketStream';
 import { MarketTicker } from '../../types';
+import { CrudeOilChart } from './CrudeOilChart';
 
 interface MarketWatchProps {
   selectedSymbol: string;
@@ -64,9 +65,14 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
     });
   };
 
-  const categories = ['Favorites', 'Forex', 'Metals', 'Crypto', 'Indices', 'Commodities'];
+  const categories = ['Favorites', 'Forex', 'Metals', 'Crypto', 'Crude Oil'];
 
   const filteredSymbols = useMemo(() => {
+    // Skip filtering for Crude Oil - it has its own custom view
+    if (activeCategory === 'Crude Oil') {
+      return [];
+    }
+
     let filtered = symbols;
     
     // Apply Category Filter
@@ -102,21 +108,26 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
             </button>
           ))}
         </div>
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-lb-text-muted" />
-          <input
-            type="text"
-            placeholder="Search symbols..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-8 pr-2 py-1.5 text-xs bg-lb-bg border border-lb-border rounded-lg outline-none focus:border-lb-accent transition-all text-lb-text placeholder:text-lb-text-muted"
-          />
-        </div>
+        {activeCategory !== 'Crude Oil' && (
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-lb-text-muted" />
+            <input
+              type="text"
+              placeholder="Search symbols..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-8 pr-2 py-1.5 text-xs bg-lb-bg border border-lb-border rounded-lg outline-none focus:border-lb-accent transition-all text-lb-text placeholder:text-lb-text-muted"
+            />
+          </div>
+        )}
       </div>
       
       {/* Table Body - Advanced View MT5 Style */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        {filteredSymbols.length === 0 ? (
+        {/* Crude Oil Special View */}
+        {activeCategory === 'Crude Oil' ? (
+          <CrudeOilChart />
+        ) : filteredSymbols.length === 0 ? (
           <div className="p-4 text-center text-xs text-lb-text-muted">
             {activeCategory === 'Favorites' ? 'No favorites added yet.' : 'No symbols found.'}
           </div>

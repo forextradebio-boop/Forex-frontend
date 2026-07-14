@@ -124,10 +124,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
               </button>
             </div>
 
-            <MenuItem icon={<Globe size={20} />} label="Language" onClick={() => {}} />
+            {/* <MenuItem icon={<Globe size={20} />} label="Language" onClick={() => {}} />
             <MenuItem icon={<Bell size={20} />} label="Notifications" badge="3" onClick={() => {}} />
             <MenuItem icon={<Settings size={20} />} label="Settings" onClick={() => {}} />
-            <MenuItem icon={<Info size={20} />} label="About" onClick={() => { onClose(); onNavigateAbout?.(); }} />
+            <MenuItem icon={<Info size={20} />} label="About" onClick={() => { onClose(); onNavigateAbout?.(); }} /> */}
           </div>
         </div>
 

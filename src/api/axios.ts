@@ -11,12 +11,14 @@ api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (!config.headers) (config.headers = {} as any);
   if (token) {
-    (config.headers as any).Authorization = `Bearer ${token}`;
+      (config.headers as any).Authorization = `Bearer ${token}`;
   }
   return config;
 }, (error) => {
   return Promise.reject(error);
-});
+});  
+
+
 
 api.interceptors.response.use(
   (response) => response,

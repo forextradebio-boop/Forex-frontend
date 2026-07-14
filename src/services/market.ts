@@ -67,3 +67,49 @@ export const getChart = async (symbol: string) => {
   const res = await api.get(`/market/chart/${symbol}`);
   return res.data;
 };
+
+export const getCrudeOil = async () => {
+  try {
+    const res = await api.get('/api/market/crude-oil');
+    return res.data;
+  } catch (error) {
+    console.error('Error fetching crude oil data:', error);
+    throw error;
+  }
+};
+
+export const getCrudeOilChart = async (symbol: string = 'CL=F', interval: string = '1d', range: string = 'ytd') => {
+  try {
+    const res = await api.get(`/api/market/crude-oil-chart`, {
+      params: { symbol, interval, range }
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Error fetching crude oil chart:', error);
+    throw error;
+  }
+};
+
+export const placeOrder = async (orderData: {
+  symbol: string;
+  type: 'BUY' | 'SELL';
+  volume: number;
+  openPrice?: number;
+  sl?: number;
+  tp?: number;
+}) => {
+  try {
+    const res = await api.post('/api/trading/positions', {
+      symbol: orderData.symbol,
+      type: orderData.type,
+      volume: orderData.volume,
+      openPrice: orderData.openPrice,
+      sl: orderData.sl,
+      tp: orderData.tp
+    });
+    return res.data;
+  } catch (error) {
+    console.error('Error placing order:', error);
+    throw error;
+  }
+};
