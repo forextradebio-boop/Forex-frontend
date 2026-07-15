@@ -160,6 +160,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           if (uniqueData.length > 0) {
             candlestickSeries.setData(uniqueData);
             chart.timeScale().fitContent();
+            chart.timeScale().scrollToEnd();
           }
         }
       } catch (error) {
@@ -224,6 +225,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
           try {
             seriesRef.current?.update(updatedBar);
+            chartRef.current?.timeScale().scrollToEnd();
           } catch {
             // Ignore stale or out-of-order updates.
           }
@@ -246,6 +248,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
         try {
           seriesRef.current?.update(nextBar);
+          chartRef.current?.timeScale().scrollToEnd();
         } catch {
           // Ignore stale or out-of-order updates.
         }
@@ -314,7 +317,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           </div>
         </div>
       )}
-      <div ref={chartContainerRef} className="w-full h-full" />
+      <div ref={chartContainerRef} className="w-full h-full min-h-[320px]" />
     </div>
   );
 };
