@@ -58,7 +58,13 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
     historyRef.current = [];
 
+    const containerRect = chartContainerRef.current.getBoundingClientRect();
+    const chartWidth = Math.max(Math.round(containerRect.width || 320), 320);
+    const chartHeight = Math.max(Math.round(containerRect.height || 320), 320);
+
     const chartOptions: any = {
+      width: chartWidth,
+      height: chartHeight,
       layout: {
         background: { type: ColorType.Solid, color: theme === 'Dark' ? '#000000' : '#ffffff' },
         textColor: theme === 'Dark' ? '#BDBDBD' : '#64748B',
@@ -115,7 +121,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
         mouseWheel: true,
         pinch: true,
       },
-      autoSize: true,
+      autoSize: false,
     };
 
     const chart = createChart(chartContainerRef.current, chartOptions);
@@ -160,7 +166,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           if (uniqueData.length > 0) {
             candlestickSeries.setData(uniqueData);
             chart.timeScale().fitContent();
-            chart.timeScale().scrollToEnd();
+            chart.timeScale().scrollToRealTime();
           }
         }
       } catch (error) {
@@ -175,10 +181,13 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
     const resizeObserver = new ResizeObserver(entries => {
       if (entries.length === 0 || entries[0].target !== chartContainerRef.current) return;
       const newRect = entries[0].contentRect;
-      chart.applyOptions({ width: newRect.width, height: newRect.height });
+      chart.applyOptions({ width: Math.max(Math.round(newRect.width), 320), height: Math.max(Math.round(newRect.height), 320) });
     });
 
     resizeObserver.observe(chartContainerRef.current);
+    requestAnimationFrame(() => {
+      chart.applyOptions({ width: chartWidth, height: chartHeight });
+    });
 
     return () => {
       resizeObserver.disconnect();
@@ -225,7 +234,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
           try {
             seriesRef.current?.update(updatedBar);
-            chartRef.current?.timeScale().scrollToEnd();
+            chartRef.current?.timeScale().scrollToRealTime();
           } catch {
             // Ignore stale or out-of-order updates.
           }
@@ -248,7 +257,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
         try {
           seriesRef.current?.update(nextBar);
-          chartRef.current?.timeScale().scrollToEnd();
+          chartRef.current?.timeScale().scrollToRealTime();
         } catch {
           // Ignore stale or out-of-order updates.
         }
@@ -317,7 +326,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           </div>
         </div>
       )}
-      <div ref={chartContainerRef} className="w-full h-full min-h-[320px]" />
+      <div ref={chartContainerRef} className="w-full h-full min-h-[320px] overflow-hidden" />
     </div>
   );
 };
