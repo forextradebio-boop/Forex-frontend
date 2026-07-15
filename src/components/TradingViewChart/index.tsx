@@ -22,6 +22,23 @@ export const TIMEFRAMES = [
   { label: '1M', value: '1mo', seconds: 2592000 },
 ];
 
+const normalizeSymbol = (value: string = '') => value.replace('/', '').toUpperCase();
+const toUnixTime = (value: unknown): Time => {
+  if (typeof value === 'number') {
+    const normalized = value > 9999999999 ? Math.floor(value / 1000) : value;
+    return normalized as Time;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Date.parse(value);
+    if (!Number.isNaN(parsed)) {
+      return Math.floor(parsed / 1000) as Time;
+    }
+  }
+
+  return Math.floor(Date.now() / 1000) as Time;
+};
+
 export const TradingViewChart: React.FC<ChartContainerProps> = ({
   symbol = 'EURUSD',
   theme = 'Dark',
@@ -30,6 +47,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
+  const historyRef = useRef<CandlestickData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const interval = TIMEFRAMES.find(t => t.value === intervalValue) || TIMEFRAMES[2];
   const { socket } = useSocket();
@@ -37,6 +55,8 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
+
+    historyRef.current = [];
 
     const chartOptions: any = {
       layout: {
@@ -46,15 +66,15 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
         fontFamily: "-apple-system, BlinkMacSystemFont, 'Trebuchet MS', Roboto, Ubuntu, sans-serif",
       },
       grid: {
-        vertLines: { color: theme === 'Dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)', style: 1 }, // Thin dotted/dashed MT5 grid
+        vertLines: { color: theme === 'Dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)', style: 1 },
         horzLines: { color: theme === 'Dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)', style: 1 },
       },
       crosshair: {
-        mode: 1, // Magnet mode
+        mode: 1,
         vertLine: {
           color: theme === 'Dark' ? '#758696' : '#9598a1',
           width: 1,
-          style: 3, // dashed
+          style: 3,
           labelBackgroundColor: theme === 'Dark' ? '#363a45' : '#131722',
         },
         horzLine: {
@@ -81,7 +101,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
         borderColor: theme === 'Dark' ? '#2b2b43' : '#e0e3eb',
         fixLeftEdge: false,
         rightOffset: 15,
-        barSpacing: 12, // Increased for wider candles
+        barSpacing: 12,
         minBarSpacing: 5,
       },
       handleScroll: {
@@ -119,22 +139,23 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
         const response = await api.get(`/api/market/chart/${symbol}?interval=${interval.value}`);
         if (response.data && Array.isArray(response.data)) {
           const formattedData: CandlestickData[] = response.data.map((bar: any) => ({
-            time: (typeof bar.time === 'number' && bar.time > 9999999999 ? Math.floor(bar.time / 1000) : (typeof bar.time === 'number' ? bar.time : Math.floor(Date.parse(bar.time) / 1000))) as Time,
-            open: bar.open,
-            high: bar.high,
-            low: bar.low,
-            close: bar.close,
-          })).sort((a, b) => (a.time as number) - (b.time as number));
+            time: toUnixTime(bar.time) as Time,
+            open: Number(bar.open),
+            high: Number(bar.high),
+            low: Number(bar.low),
+            close: Number(bar.close),
+          })).filter((bar) => Number.isFinite(bar.open) && Number.isFinite(bar.high) && Number.isFinite(bar.low) && Number.isFinite(bar.close)).sort((a, b) => (a.time as number) - (b.time as number));
 
-          // Ensure unique times
           const uniqueData: CandlestickData[] = [];
-          const times = new Set();
-          for (const d of formattedData) {
-            if (!times.has(d.time)) {
-              times.add(d.time);
-              uniqueData.push(d);
+          const seenTimes = new Set<Time>();
+          for (const bar of formattedData) {
+            if (!seenTimes.has(bar.time)) {
+              seenTimes.add(bar.time);
+              uniqueData.push(bar);
             }
           }
+
+          historyRef.current = uniqueData;
 
           if (uniqueData.length > 0) {
             candlestickSeries.setData(uniqueData);
@@ -164,38 +185,71 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
         chartRef.current.remove();
         chartRef.current = null;
       }
+      seriesRef.current = null;
+      historyRef.current = [];
     };
   }, [symbol, theme, interval]);
 
-  // Live updates
   useEffect(() => {
     if (!socket || !seriesRef.current) return;
 
-    const handleMarketUpdate = (updates: any[]) => {
-      updates.forEach((update) => {
-        if (update.symbol.replace('/', '') === symbol) {
-          const tradePrice = update.price || update.bid;
-          const timestamp = update.timestamp || Date.now();
-          const tickTime = Math.floor(timestamp / 1000);
+    const handleMarketUpdate = (updates: any[] = []) => {
+      if (!Array.isArray(updates) || updates.length === 0) return;
 
-          // Snap to current interval candle
-          const candleTime = (tickTime - (tickTime % interval.seconds)) as Time;
+      const activeSymbol = normalizeSymbol(symbol);
 
-          const bar = {
-            time: candleTime,
-            open: update.open || tradePrice,
-            high: update.high || tradePrice,
-            low: update.low || tradePrice,
-            close: tradePrice,
+      for (const update of updates) {
+        if (!update || normalizeSymbol(update.symbol) !== activeSymbol) continue;
+
+        const price = Number(update.price ?? update.bid ?? update.ask ?? update.close ?? NaN);
+        if (!Number.isFinite(price) || price <= 0) continue;
+
+        const timestamp = Number(update.timestamp ?? update.time ?? Date.now());
+        const candleTime = Math.floor(timestamp / 1000 / interval.seconds) * interval.seconds as Time;
+
+        const existingIndex = historyRef.current.findIndex((bar) => bar.time === candleTime);
+        const lastBar = historyRef.current[historyRef.current.length - 1];
+        const lastBarTime = Number(lastBar?.time ?? 0);
+
+        if (existingIndex >= 0) {
+          const existingBar = historyRef.current[existingIndex];
+          const updatedBar: CandlestickData = {
+            ...existingBar,
+            high: Math.max(existingBar.high, price),
+            low: Math.min(existingBar.low, price),
+            close: price,
           };
 
+          historyRef.current[existingIndex] = updatedBar;
+
           try {
-            seriesRef.current?.update(bar);
-          } catch (e) {
-            // Usually happens if the time is older than the last bar
+            seriesRef.current?.update(updatedBar);
+          } catch {
+            // Ignore stale or out-of-order updates.
           }
+          continue;
         }
-      });
+
+        if (lastBar && candleTime <= lastBarTime) {
+          continue;
+        }
+
+        const nextBar: CandlestickData = {
+          time: candleTime,
+          open: price,
+          high: price,
+          low: price,
+          close: price,
+        };
+
+        historyRef.current.push(nextBar);
+
+        try {
+          seriesRef.current?.update(nextBar);
+        } catch {
+          // Ignore stale or out-of-order updates.
+        }
+      }
     };
 
     socket.on('market:update', handleMarketUpdate);
