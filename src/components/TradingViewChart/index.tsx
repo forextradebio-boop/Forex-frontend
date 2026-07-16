@@ -195,6 +195,19 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
               uniqueData.push(bar);
             }
           }
+          
+          // Client-side fix for flat candles from backend (especially for Yahoo Finance fallback)
+          for (let i = 1; i < uniqueData.length; i++) {
+            const prev = uniqueData[i - 1];
+            const curr = uniqueData[i];
+            
+            // Detect flat candle
+            if (curr.open === curr.high && curr.open === curr.low && curr.open === curr.close) {
+              curr.open = prev.close;
+              curr.high = Math.max(curr.open, curr.close);
+              curr.low = Math.min(curr.open, curr.close);
+            }
+          }
 
           console.log(`[TradingViewChart] Loaded ${uniqueData.length} candles for ${symbol} ${interval.value}.`);
           console.log('First 10 candles:');
@@ -294,9 +307,9 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
 
         const nextBar: CandlestickData = {
           time: candleTime,
-          open: price,
-          high: price,
-          low: price,
+          open: lastBar ? lastBar.close : price,
+          high: Math.max(lastBar ? lastBar.close : price, price),
+          low: Math.min(lastBar ? lastBar.close : price, price),
           close: price,
         };
 
