@@ -39,6 +39,24 @@ const toUnixTime = (value: unknown): Time => {
   return Math.floor(Date.now() / 1000) as Time;
 };
 
+const getSymbolPriceFormat = (sym: string) => {
+  const upper = sym.toUpperCase();
+  if (upper.includes('JPY')) {
+    return { type: 'price', precision: 3, minMove: 0.001 };
+  }
+  if (upper.includes('XAU')) {
+    return { type: 'price', precision: 2, minMove: 0.01 };
+  }
+  if (upper.includes('XAG')) {
+    return { type: 'price', precision: 3, minMove: 0.001 };
+  }
+  if (upper.includes('BTC') || upper.includes('ETH')) {
+    return { type: 'price', precision: 2, minMove: 0.01 };
+  }
+  // Default Forex
+  return { type: 'price', precision: 5, minMove: 0.00001 };
+};
+
 export const TradingViewChart: React.FC<ChartContainerProps> = ({
   symbol = 'EURUSD',
   theme = 'Dark',
@@ -49,6 +67,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
   const seriesRef = useRef<ISeriesApi<"Candlestick"> | null>(null);
   const historyRef = useRef<CandlestickData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isEmpty, setIsEmpty] = useState(false);
   const interval = TIMEFRAMES.find(t => t.value === intervalValue) || TIMEFRAMES[2];
   const { socket } = useSocket();
   const { marketEnabled } = useMarket();
@@ -136,6 +155,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
       wickUpColor: theme === 'Dark' ? '#26A69A' : '#10B981',
       wickDownColor: theme === 'Dark' ? '#EF5350' : '#EF4444',
       wickVisible: true,
+      priceFormat: getSymbolPriceFormat(symbol),
     });
     seriesRef.current = candlestickSeries;
 
@@ -144,13 +164,28 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
       try {
         const response = await api.get(`/api/market/chart/${symbol}?interval=${interval.value}`);
         if (response.data && Array.isArray(response.data)) {
-          const formattedData: CandlestickData[] = response.data.map((bar: any) => ({
-            time: toUnixTime(bar.time) as Time,
-            open: Number(bar.open),
-            high: Number(bar.high),
-            low: Number(bar.low),
-            close: Number(bar.close),
-          })).filter((bar) => Number.isFinite(bar.open) && Number.isFinite(bar.high) && Number.isFinite(bar.low) && Number.isFinite(bar.close)).sort((a, b) => (a.time as number) - (b.time as number));
+          const formattedData = response.data
+            .map((bar: any) => {
+              const o = Number(bar.open);
+              const h = Number(bar.high);
+              const l = Number(bar.low);
+              const c = Number(bar.close);
+              
+              // STEP 5: Repair invalid candles
+              const trueHigh = Math.max(o, h, l, c);
+              const trueLow = Math.min(o, h, l, c);
+
+              return {
+                time: toUnixTime(bar.time) as Time,
+                open: o,
+                high: trueHigh,
+                low: trueLow,
+                close: c,
+                volume: Number(bar.volume || 0)
+              };
+            })
+            .filter((bar: any) => Number.isFinite(bar.time) && Number.isFinite(bar.open) && Number.isFinite(bar.high) && Number.isFinite(bar.low) && Number.isFinite(bar.close) && bar.open > 0)
+            .sort((a: any, b: any) => (a.time as number) - (b.time as number));
 
           const uniqueData: CandlestickData[] = [];
           const seenTimes = new Set<Time>();
@@ -161,16 +196,28 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
             }
           }
 
+          console.log(`[TradingViewChart] Loaded ${uniqueData.length} candles for ${symbol} ${interval.value}.`);
+          console.log('First 10 candles:');
+          uniqueData.slice(0, 10).forEach((c: any, i) => {
+            console.log(`  ${i}: time=${c.time} open=${c.open} high=${c.high} low=${c.low} close=${c.close} vol=${c.volume}`);
+          });
+
           historyRef.current = uniqueData;
 
           if (uniqueData.length > 0) {
+            setIsEmpty(false);
             candlestickSeries.setData(uniqueData);
             chart.timeScale().fitContent();
             chart.timeScale().scrollToRealTime();
+          } else {
+            setIsEmpty(true);
           }
+        } else {
+          setIsEmpty(true);
         }
       } catch (error) {
         console.error('Failed to load chart data:', error);
+        setIsEmpty(true);
       } finally {
         setIsLoading(false);
       }
@@ -241,7 +288,7 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           continue;
         }
 
-        if (lastBar && candleTime <= lastBarTime) {
+        if (lastBar && Number(candleTime) <= lastBarTime) {
           continue;
         }
 
@@ -313,6 +360,15 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
       {isLoading && (
         <div className="absolute inset-0 z-10 flex items-center justify-center bg-lb-bg/50 backdrop-blur-sm">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-lb-accent"></div>
+        </div>
+      )}
+      {!isLoading && isEmpty && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-lb-bg/50 backdrop-blur-sm">
+          <div className="bg-lb-panel border border-lb-border px-6 py-4 rounded-xl shadow-lg flex flex-col items-center gap-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-gray-400" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <h3 className="text-md font-bold text-gray-300">No historical data</h3>
+            <p className="text-xs text-gray-500">Candles are currently unavailable for this symbol.</p>
+          </div>
         </div>
       )}
       {!marketEnabled && (
