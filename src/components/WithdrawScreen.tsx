@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useCreateWithdrawal } from '../hooks/useWithdrawals';
 import { useKyc } from '../hooks/useKyc';
-import { Upload, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useExchangeRate } from '../hooks/useExchangeRate';
+import { Upload, AlertCircle, CheckCircle2, IndianRupee } from 'lucide-react';
 
 interface WithdrawScreenProps {
   wallet?: {
@@ -18,6 +19,9 @@ export default function WithdrawScreen({ wallet }: WithdrawScreenProps) {
   const [currency, setCurrency] = useState<'USD' | 'INR' | 'EUR'>('USD');
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { data: exchangeRateData } = useExchangeRate();
+  const currentRate = exchangeRateData?.currentRate || 85;
 
   const availableBalance = wallet?.freeMargin || 0;
 
@@ -76,16 +80,26 @@ export default function WithdrawScreen({ wallet }: WithdrawScreenProps) {
       <div className="bg-lb-bg/50 border border-lb-border/50 rounded-2xl p-6 mb-8 relative z-10 flex flex-col gap-4">
         <div className="flex justify-between items-center pb-4 border-b border-lb-border/50">
           <div className="text-xs text-lb-text-muted font-bold uppercase tracking-widest">Account Balance</div>
-          <div className="text-lg font-black text-lb-text flex items-baseline gap-1">
-            <span className="text-lb-text-muted text-sm">$</span>
-            {(wallet?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <div className="text-right">
+            <div className="text-lg font-black text-lb-text flex items-baseline justify-end gap-1">
+              <span className="text-lb-text-muted text-sm">$</span>
+              {(wallet?.balance || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+            <div className="text-[10px] text-lb-text-muted font-bold mt-1">
+              ≈ ₹{((wallet?.balance || 0) * currentRate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
           </div>
         </div>
         <div className="flex justify-between items-center">
           <div className="text-xs text-purple-400 font-bold uppercase tracking-widest">Free Margin (Available)</div>
-          <div className="text-2xl font-black text-lb-text flex items-baseline gap-1">
-            <span className="text-purple-500 text-lg">$</span>
-            {availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <div className="text-right">
+            <div className="text-2xl font-black text-lb-text flex items-baseline justify-end gap-1">
+              <span className="text-purple-500 text-lg">$</span>
+              {availableBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+            <div className="text-[10px] text-lb-text-muted font-bold mt-1">
+              ≈ ₹{(availableBalance * currentRate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
           </div>
         </div>
       </div>

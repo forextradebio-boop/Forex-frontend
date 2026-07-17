@@ -33,7 +33,8 @@ export const OneClickTrading: React.FC<OneClickTradingProps> = ({
   oneClickEnabled,
   setOneClickEnabled
 }) => {
-  const { marketEnabled } = useMarket();
+  const { platformStatus } = useMarket();
+  const marketEnabled = platformStatus.globalTradingStatus === 'ON';
   const spread = (liveAsk && liveBid) ? (liveAsk - liveBid).toFixed(5) : '-';
 
   return (
@@ -116,18 +117,20 @@ export const OneClickTrading: React.FC<OneClickTradingProps> = ({
         <button 
           onClick={() => executeOrder('SELL')}
           disabled={isPlacingOrder || liveBid === 0 || !marketEnabled}
-          className="flex flex-col items-center justify-center py-2.5 rounded-xl bg-lb-down/10 hover:bg-lb-down text-lb-down hover:text-lb-text border border-lb-down/30 hover:border-lb-down hover:shadow-[0_0_15px_rgba(244,63,94,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 group"
+          className="flex flex-col items-center justify-center py-2.5 rounded-xl bg-lb-down/10 hover:bg-lb-down text-lb-down hover:text-lb-text border border-lb-down/30 hover:border-lb-down hover:shadow-[0_0_15px_rgba(244,63,94,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 group relative"
         >
           <span className="font-extrabold text-sm uppercase tracking-wide">Sell</span>
           <span className="font-mono text-xs mt-0.5 group-hover:text-lb-text">{liveBid > 0 ? liveBid.toFixed(5) : '0.00000'}</span>
+          <span className="text-[8px] font-bold mt-0.5 text-lb-text-muted group-hover:text-lb-text/80">≈ ₹{liveBid > 0 ? (liveBid * 85).toFixed(2) : '0.00'}</span>
         </button>
         <button 
           onClick={() => executeOrder('BUY')}
           disabled={isPlacingOrder || liveAsk === 0 || !marketEnabled}
-          className="flex flex-col items-center justify-center py-2.5 rounded-xl bg-lb-accent/10 hover:bg-lb-accent text-lb-accent hover:text-lb-bg border border-lb-accent/30 hover:border-lb-accent hover:shadow-[0_0_15px_rgba(20,184,166,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 group"
+          className="flex flex-col items-center justify-center py-2.5 rounded-xl bg-lb-accent/10 hover:bg-lb-accent text-lb-accent hover:text-lb-bg border border-lb-accent/30 hover:border-lb-accent hover:shadow-[0_0_15px_rgba(20,184,166,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 group relative"
         >
           <span className="font-extrabold text-sm uppercase tracking-wide">Buy</span>
           <span className="font-mono text-xs mt-0.5 group-hover:text-lb-bg">{liveAsk > 0 ? liveAsk.toFixed(5) : '0.00000'}</span>
+          <span className="text-[8px] font-bold mt-0.5 text-lb-text-muted group-hover:text-lb-bg/80">≈ ₹{liveAsk > 0 ? (liveAsk * 85).toFixed(2) : '0.00'}</span>
         </button>
       </div>
     </div>

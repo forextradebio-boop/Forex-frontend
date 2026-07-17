@@ -6,12 +6,14 @@ import { SymbolData } from '../types';
 
 export function useMarketStream(initialSymbols: SymbolData[] = []) {
   const { socket } = useSocket();
-  const { marketEnabled } = useMarket();
+  const { platformStatus } = useMarket();
   const [symbols, setSymbols] = useState<SymbolData[]>(initialSymbols);
+
+  const graphEnabled = platformStatus.globalGraphStatus === 'LIVE';
 
   useEffect(() => {
     const fetchWatchList = async () => {
-      if (!marketEnabled) return;
+      if (!graphEnabled) return;
       try {
         const syms = await marketService.getWatch();
         if (syms?.length) {
@@ -22,10 +24,10 @@ export function useMarketStream(initialSymbols: SymbolData[] = []) {
       }
     };
     fetchWatchList();
-  }, [marketEnabled]);
+  }, [graphEnabled]);
 
   useEffect(() => {
-    if (!socket || !marketEnabled) return;
+    if (!socket || !graphEnabled) return;
 
     const handleMarketUpdate = (data: SymbolData[]) => {
       if (data?.length) {
@@ -45,7 +47,7 @@ export function useMarketStream(initialSymbols: SymbolData[] = []) {
       socket.off('market:update', handleMarketUpdate);
       socket.off('prices', handleMarketUpdate);
     };
-  }, [socket, marketEnabled]);
+  }, [socket, graphEnabled]);
 
   return { symbols, setSymbols };
 }

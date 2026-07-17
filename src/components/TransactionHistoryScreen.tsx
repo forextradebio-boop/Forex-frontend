@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useTransactions } from '../hooks/useTransactions';
+import { useExchangeRate } from '../hooks/useExchangeRate';
 import { ArrowDownLeft, ArrowUpRight, ArrowRightLeft, Clock, AlertCircle } from 'lucide-react';
 
 export default function TransactionHistoryScreen() {
   const { data: transactions, isLoading, isError, refetch } = useTransactions();
   const [filter, setFilter] = useState<'ALL' | 'DEPOSIT' | 'WITHDRAW' | 'TRADE'>('ALL');
+
+  const { data: exchangeRateData } = useExchangeRate();
+  const currentRate = exchangeRateData?.currentRate || 85;
 
   if (isError) {
     return (
@@ -83,9 +87,19 @@ export default function TransactionHistoryScreen() {
                   <div className={`font-black font-mono text-base ${isDeposit ? 'text-lb-accent' : isWithdraw ? 'text-lb-text' : 'text-lb-text'}`}>
                     {isDeposit ? '+' : isWithdraw ? '-' : ''}${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
                   </div>
-                  <div className="flex items-center justify-end gap-1.5 mt-1">
-                    <div className={`w-1.5 h-1.5 rounded-full ${tx.status === 'APPROVED' ? 'bg-lb-accent' : tx.status === 'REJECTED' ? 'bg-lb-down' : 'bg-amber-500 animate-pulse'}`}></div>
-                    <span className="text-[10px] font-bold text-lb-text-muted uppercase tracking-wider">{tx.status}</span>
+                  <div className="text-[10px] text-lb-text-muted font-bold">
+                    ≈ ₹{(tx.amount * currentRate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </div>
+                  <div className="flex flex-col items-end gap-1.5 mt-1">
+                    <div className="flex items-center gap-1.5">
+                      <div className={`w-1.5 h-1.5 rounded-full ${tx.status === 'APPROVED' ? 'bg-lb-accent' : tx.status === 'REJECTED' ? 'bg-lb-down' : tx.status === 'BLOCKED' ? 'bg-purple-500' : 'bg-amber-500 animate-pulse'}`}></div>
+                      <span className="text-[10px] font-bold text-lb-text-muted uppercase tracking-wider">{tx.status}</span>
+                    </div>
+                    {(tx.status === 'REJECTED' || tx.status === 'BLOCKED') && tx.description && (
+                      <span className="text-[10px] text-lb-down/80 max-w-[200px] text-right truncate" title={tx.description}>
+                        {tx.description}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>

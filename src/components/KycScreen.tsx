@@ -7,33 +7,30 @@ export default function KycScreen() {
   const submitKycMutation = useSubmitKyc();
 
   const [form, setForm] = useState({
-    documentType: 'AADHAR',
-    documentNumber: '',
-    fullName: '',
-    dob: '',
+    aadharNumber: '',
+    aadharDocument: '',
+    panNumber: '',
+    panDocument: '',
+    accountHolderName: '',
+    bankName: '',
+    accountNumber: '',
+    ifscCode: '',
   });
 
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const [documents, setDocuments] = useState([
-    { type: 'FRONT_SIDE', url: '' },
-    { type: 'BACK_SIDE', url: '' },
-    { type: 'SELFIE', url: '' },
-  ]);
-
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
-    if (documents.some(d => !d.url)) {
-      setErrorMsg("Please upload all required documents (Front, Back, and Selfie URLs)");
+    if (!form.aadharDocument || !form.panDocument) {
+      setErrorMsg("Please provide image URLs for both Aadhaar and PAN cards.");
       return;
     }
 
     submitKycMutation.mutate(
-      { ...form, documents },
+      form,
       {
         onSuccess: () => {
           setToastMessage("KYC Submitted Successfully!");
@@ -44,12 +41,6 @@ export default function KycScreen() {
         }
       }
     );
-  };
-
-  const handleDocUrlChange = (index: number, url: string) => {
-    const newDocs = [...documents];
-    newDocs[index].url = url;
-    setDocuments(newDocs);
   };
 
   if (isError) {
@@ -71,7 +62,7 @@ export default function KycScreen() {
     );
   }
 
-  const isSubmitted = kyc && kyc.status !== 'NOT_SUBMITTED';
+  const isSubmitted = kyc && kyc.status !== 'UNSUBMITTED';
   const statusColor = kyc?.status === 'APPROVED' ? 'text-lb-accent bg-lb-accent/10 border-lb-accent/20' :
                       kyc?.status === 'REJECTED' ? 'text-lb-down bg-lb-down/10 border-lb-down/20' :
                       'text-amber-400 bg-amber-400/10 border-amber-400/20';
@@ -79,7 +70,7 @@ export default function KycScreen() {
                      kyc?.status === 'REJECTED' ? XCircle : Clock;
 
   return (
-    <div className="max-w-2xl mx-auto w-full space-y-6 relative">
+    <div className="max-w-2xl mx-auto w-full space-y-6 relative pb-12">
       
       {/* Toast Notification */}
       {toastMessage && (
@@ -114,7 +105,7 @@ export default function KycScreen() {
           <AlertCircle className="w-5 h-5 text-lb-down mt-0.5" />
           <div>
             <p className="text-lb-down font-bold text-sm">Verification Rejected</p>
-            <p className="text-lb-down/80 text-xs mt-1">{kyc.rejectionReason || "Your documents did not meet the guidelines. Please resubmit."}</p>
+            <p className="text-lb-down/80 text-xs mt-1">{kyc.adminNotes || "Your documents did not meet the guidelines. Please resubmit."}</p>
             <button onClick={() => window.location.reload()} className="mt-3 px-4 py-2 bg-lb-down hover:bg-lb-down/80 text-lb-text font-bold text-xs rounded-lg transition-colors">
               Submit New Documents
             </button>
@@ -125,46 +116,52 @@ export default function KycScreen() {
       {/* Form or Preview */}
       {(!isSubmitted || kyc?.status === 'REJECTED') ? (
         <form onSubmit={handleSubmit} className="bg-lb-panel border border-lb-border rounded-3xl p-6 shadow-2xl space-y-6">
-          <h3 className="text-sm font-black text-lb-text uppercase tracking-wider border-b border-lb-border/50 pb-4">Personal Details</h3>
+          <h3 className="text-sm font-black text-lb-text uppercase tracking-wider border-b border-lb-border/50 pb-4">Government ID Details</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Full Name (As per ID)</label>
-              <input type="text" required value={form.fullName} onChange={e => setForm({...form, fullName: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all" placeholder="John Doe" />
+              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Aadhaar Number</label>
+              <input type="text" required value={form.aadharNumber} onChange={e => setForm({...form, aadharNumber: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all font-mono" placeholder="1234 5678 9012" />
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Date of Birth</label>
-              <input type="date" required value={form.dob} onChange={e => setForm({...form, dob: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all" />
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Document Type</label>
-              <select value={form.documentType} onChange={e => setForm({...form, documentType: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all">
-                <option value="AADHAR">Aadhaar Card</option>
-                <option value="PAN">PAN Card</option>
-                <option value="PASSPORT">Passport</option>
-              </select>
-            </div>
-            <div className="space-y-1.5">
-              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Document Number</label>
-              <input type="text" required value={form.documentNumber} onChange={e => setForm({...form, documentNumber: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all font-mono" placeholder="ABCD123456" />
+              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">PAN Number</label>
+              <input type="text" required value={form.panNumber} onChange={e => setForm({...form, panNumber: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all font-mono" placeholder="ABCDE1234F" />
             </div>
           </div>
 
-          <h3 className="text-sm font-black text-lb-text uppercase tracking-wider border-b border-lb-border/50 pb-4 pt-4">Upload Documents</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Aadhaar Image URL</label>
+              <input type="url" required value={form.aadharDocument} onChange={e => setForm({...form, aadharDocument: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all" placeholder="https://..." />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">PAN Image URL</label>
+              <input type="url" required value={form.panDocument} onChange={e => setForm({...form, panDocument: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all" placeholder="https://..." />
+            </div>
+          </div>
+
+          <h3 className="text-sm font-black text-lb-text uppercase tracking-wider border-b border-lb-border/50 pb-4 pt-4">Bank Account Details</h3>
           
-          <div className="space-y-4">
-            {documents.map((doc, idx) => (
-              <div key={idx} className="bg-lb-bg/50 border border-lb-border/50 rounded-xl p-4">
-                <label className="text-xs text-lb-text-muted font-bold uppercase tracking-wider mb-2 block">{doc.type.replace('_', ' ')} (Image URL)</label>
-                <div className="flex items-center gap-3">
-                  <div className="relative flex-1">
-                    <UploadCloud className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-lb-text-muted" />
-                    <input type="url" required value={doc.url} onChange={e => handleDocUrlChange(idx, e.target.value)} className="w-full bg-lb-panel border border-lb-border rounded-lg pl-10 pr-4 py-2 text-sm text-lb-text outline-none focus:border-lb-accent" placeholder="https://..." />
-                  </div>
-                  {doc.url && <div className="w-10 h-10 rounded overflow-hidden border border-lb-border bg-black flex-shrink-0"><img src={doc.url} alt="" className="w-full h-full object-cover" /></div>}
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Account Holder Name</label>
+              <input type="text" required value={form.accountHolderName} onChange={e => setForm({...form, accountHolderName: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all" placeholder="John Doe" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Bank Name</label>
+              <input type="text" required value={form.bankName} onChange={e => setForm({...form, bankName: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all" placeholder="e.g. HDFC Bank" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Account Number</label>
+              <input type="text" required value={form.accountNumber} onChange={e => setForm({...form, accountNumber: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all font-mono" placeholder="1234567890" />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">IFSC Code</label>
+              <input type="text" required value={form.ifscCode} onChange={e => setForm({...form, ifscCode: e.target.value})} className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 outline-none transition-all font-mono" placeholder="HDFC0001234" />
+            </div>
           </div>
 
           {errorMsg && (
@@ -174,48 +171,60 @@ export default function KycScreen() {
           )}
 
           <button type="submit" disabled={submitKycMutation.isPending} className="w-full py-4 bg-lb-accent hover:bg-lb-accent/80 disabled:opacity-50 text-lb-bg font-black rounded-xl text-sm transition-all shadow-sm">
-            {submitKycMutation.isPending ? 'Uploading...' : 'Submit Documents'}
+            {submitKycMutation.isPending ? 'Uploading...' : 'Submit Verification'}
           </button>
         </form>
       ) : (
         <div className="bg-lb-panel border border-lb-border rounded-3xl p-6 shadow-2xl">
           <h3 className="text-sm font-black text-lb-text uppercase tracking-wider border-b border-lb-border/50 pb-4 mb-6">Submitted Information</h3>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             <div className="bg-lb-bg rounded-xl p-3 border border-lb-border">
-              <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider mb-1">Name</div>
-              <div className="text-sm font-bold text-lb-text truncate">{kyc?.fullName}</div>
+              <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider mb-1">Aadhaar Number</div>
+              <div className="text-sm font-bold text-lb-text font-mono truncate">{kyc?.aadharNumber || "N/A"}</div>
             </div>
             <div className="bg-lb-bg rounded-xl p-3 border border-lb-border">
-              <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider mb-1">Type</div>
-              <div className="text-sm font-bold text-lb-text truncate">{kyc?.documentType}</div>
+              <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider mb-1">PAN Number</div>
+              <div className="text-sm font-bold text-lb-text font-mono truncate">{kyc?.panNumber || "N/A"}</div>
             </div>
-            <div className="bg-lb-bg rounded-xl p-3 border border-lb-border">
-              <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider mb-1">Number</div>
-              <div className="text-sm font-bold text-lb-text font-mono truncate">{kyc?.documentNumber}</div>
-            </div>
-            <div className="bg-lb-bg rounded-xl p-3 border border-lb-border">
-              <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider mb-1">Submitted On</div>
-              <div className="text-sm font-bold text-lb-text truncate">{new Date(kyc?.createdAt || Date.now()).toLocaleDateString()}</div>
+            <div className="bg-lb-bg rounded-xl p-3 border border-lb-border md:col-span-2">
+              <div className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider mb-1">Bank Details</div>
+              <div className="text-sm font-bold text-lb-text truncate">
+                {kyc?.bankName} - {kyc?.accountNumber} ({kyc?.ifscCode})
+              </div>
+              <div className="text-xs text-lb-text-muted truncate mt-1">Holder: {kyc?.accountHolderName}</div>
             </div>
           </div>
 
           <h3 className="text-sm font-black text-lb-text uppercase tracking-wider border-b border-lb-border/50 pb-4 mb-6">Document Previews</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {kyc?.documents.map((doc, idx) => (
-              <div key={idx} className="bg-lb-bg border border-lb-border rounded-2xl p-2 relative group overflow-hidden">
-                <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-lb-text uppercase tracking-widest z-10 border border-lb-border/50">
-                  {doc.type.replace('_', ' ')}
-                </div>
-                <div className="aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center">
-                  {doc.url ? (
-                    <img src={doc.url} alt={doc.type} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  ) : (
-                    <FileText className="w-8 h-8 text-lb-text-muted" />
-                  )}
-                </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            
+            <div className="bg-lb-bg border border-lb-border rounded-2xl p-2 relative group overflow-hidden">
+              <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-lb-text uppercase tracking-widest z-10 border border-lb-border/50">
+                Aadhaar Card
               </div>
-            ))}
+              <div className="aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center">
+                {kyc?.aadharDocument ? (
+                  <img src={kyc.aadharDocument} alt="Aadhaar" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  <FileText className="w-8 h-8 text-lb-text-muted" />
+                )}
+              </div>
+            </div>
+
+            <div className="bg-lb-bg border border-lb-border rounded-2xl p-2 relative group overflow-hidden">
+              <div className="absolute top-2 left-2 bg-black/80 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold text-lb-text uppercase tracking-widest z-10 border border-lb-border/50">
+                PAN Card
+              </div>
+              <div className="aspect-video w-full rounded-xl overflow-hidden bg-black flex items-center justify-center">
+                {kyc?.panDocument ? (
+                  <img src={kyc.panDocument} alt="PAN" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  <FileText className="w-8 h-8 text-lb-text-muted" />
+                )}
+              </div>
+            </div>
+
           </div>
           
         </div>

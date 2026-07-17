@@ -15,7 +15,7 @@ const ProTradingDashboard = lazy(() => import("./components/ProTradingDashboard"
 export default function App() {
   const { user: userProfile, loading: authLoading } = useAuth();
   const { socket } = useSocket();
-  const { marketEnabled } = useMarket();
+  const { platformStatus } = useMarket();
 
   // Live updates states
   const [walletMetrics, setWalletMetrics] = useState<UserWallet>({ balance: 0, equity: 0, margin: 0, freeMargin: 0, pnl: 0 });
@@ -124,8 +124,12 @@ export default function App() {
 
   // Handle Order entry placements
   const handlePlaceOrder = React.useCallback(async (orderPayload: any) => {
-    if (!marketEnabled) {
-      alert("Market is closed.");
+    if (platformStatus.globalTradingStatus === 'OFF') {
+      alert("Trading is currently disabled by administrator.");
+      return;
+    }
+    if (platformStatus.globalMarketStatus === 'MAINTENANCE' || platformStatus.globalMarketStatus === 'HOLIDAY') {
+      alert(`Market is currently ${platformStatus.globalMarketStatus.toLowerCase()}.`);
       return;
     }
     try {

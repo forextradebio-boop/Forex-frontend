@@ -81,7 +81,7 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-y-auto bg-lb-panel">
+      <div className="flex-1 overflow-auto bg-lb-panel">
         <table className="w-full text-left text-xs whitespace-nowrap">
           <thead className="sticky top-0 z-10 font-bold bg-lb-bg text-lb-text-muted shadow-sm border-b border-lb-border">
             <tr>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { UserWallet } from '../types';
+import { useExchangeRate } from '../hooks/useExchangeRate';
 
 interface Props {
   wallet: UserWallet;
@@ -12,6 +13,9 @@ export default function WalletCard({ wallet }: Props) {
     if (!allowNegative && val < 0) return 0;
     return val;
   };
+
+  const { data: exchangeRateData } = useExchangeRate();
+  const currentRate = exchangeRateData?.currentRate || 85;
 
   const balance = sanitizeValue(wallet.balance);
   const equity = sanitizeValue(wallet.equity);
@@ -40,6 +44,9 @@ export default function WalletCard({ wallet }: Props) {
             <div className="text-4xl md:text-6xl font-black text-lb-text tracking-tighter flex items-baseline gap-2">
               <span className="text-lb-text-muted font-medium text-3xl">$</span>
               {formatMoney(balance)}
+            </div>
+            <div className="mt-1 text-lb-text-muted text-sm font-semibold">
+              ≈ ₹{formatMoney(balance * currentRate)}
             </div>
           </div>
           

@@ -26,14 +26,11 @@ const socketInstance = io(SOCKET_URL, {
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isConnected, setIsConnected] = useState(socketInstance.connected);
   const { user } = useAuth();
-  const { marketEnabled } = useMarket();
   const mounted = useRef(false);
 
   useEffect(() => {
     mounted.current = true;
-    if (marketEnabled) {
-      socketInstance.connect();
-    }
+    socketInstance.connect();
 
     const onConnect = () => {
       setIsConnected(true);
@@ -56,27 +53,12 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, []); // Only bind events once
 
-  // Handle connection toggling when market status changes
-  useEffect(() => {
-    if (!mounted.current) return;
-    
-    if (marketEnabled) {
-      if (!socketInstance.connected) {
-        socketInstance.connect();
-      }
-    } else {
-      if (socketInstance.connected) {
-        socketInstance.disconnect();
-      }
-    }
-  }, [marketEnabled]);
-
   // Handle re-subscribing if user logs in after socket is already connected
   useEffect(() => {
-    if (isConnected && user?.id && marketEnabled) {
+    if (isConnected && user?.id) {
       socketInstance.emit('subscribe', user.id);
     }
-  }, [user?.id, isConnected, marketEnabled]);
+  }, [user?.id, isConnected]);
 
   return (
     <SocketContext.Provider value={{ socket: socketInstance, isConnected }}>

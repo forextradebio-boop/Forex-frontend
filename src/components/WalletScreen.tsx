@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '../hooks/useWallet';
+import { useExchangeRate } from '../hooks/useExchangeRate';
 import WalletCard from './WalletCard';
 import DepositScreen from './DepositScreen';
 import WithdrawScreen from './WithdrawScreen';
@@ -22,9 +23,12 @@ export default function WalletScreen({ initialTab = 'dashboard', onBack }: Walle
   const [targetCurrency, setTargetCurrency] = useState<string>('USD');
   const [isFunding, setIsFunding] = useState(false);
 
+  const { data: exchangeRateData } = useExchangeRate();
+  const currentRate = exchangeRateData?.currentRate || 85;
+
   const exchangeRates: Record<string, { rate: number; symbol: string; name: string }> = {
     USD: { rate: 1.00, symbol: '$', name: 'US Dollar' },
-    INR: { rate: 95.11, symbol: '₹', name: 'Indian Rupee' },
+    INR: { rate: currentRate, symbol: '₹', name: 'Indian Rupee' },
     EUR: { rate: 0.92, symbol: '€', name: 'Euro' },
     GBP: { rate: 0.79, symbol: '£', name: 'British Pound' },
     JPY: { rate: 151.20, symbol: '¥', name: 'Japanese Yen' },

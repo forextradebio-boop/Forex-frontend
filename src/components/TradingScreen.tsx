@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axios';
 import { RefreshCw, TrendingUp, TrendingDown, Clock, CheckCircle2, XCircle, FileText, AlertCircle, Crosshair } from 'lucide-react';
 import { Order } from '../types';
+import { useSocket } from '../contexts/SocketContext';
 
 const SYMBOLS = ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'XAUUSD'];
 const ORDER_TYPES = ['BUY', 'SELL', 'BUY_LIMIT', 'SELL_LIMIT', 'BUY_STOP', 'SELL_STOP'];
@@ -18,6 +19,28 @@ export default function TradingScreen() {
     volume: '0.01',
     targetPrice: ''
   });
+
+  const { data: symbolsData, isLoading: isLoadingSymbols } = useQuery({
+    queryKey: ['symbols'],
+    queryFn: async () => {
+      const { getSymbols } = await import('../services/market');
+      const data = await getSymbols();
+      return data;
+    }
+  });
+
+  const activeSymbols = useMemo(() => {
+    return symbolsData?.symbols || [];
+  }, [symbolsData]);
+
+  const selectedSymbolData = useMemo(() => {
+    return activeSymbols.find((s: any) => s.symbol === form.symbol);
+  }, [activeSymbols, form.symbol]);
+
+  const isTradingDisabled = useMemo(() => {
+    if (!selectedSymbolData) return false;
+    return !selectedSymbolData.tradingEnabled || selectedSymbolData.status !== 'OPEN';
+  }, [selectedSymbolData]);
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -40,10 +63,30 @@ export default function TradingScreen() {
     }
   });
 
+  const { socket } = useSocket();
+
+  React.useEffect(() => {
+    const handleMarketStatusUpdated = () => {
+      queryClient.invalidateQueries({ queryKey: ['symbols'] });
+    };
+    
+    if (socket) {
+      socket.on('MARKET_STATUS_UPDATED', handleMarketStatusUpdated);
+      return () => {
+        socket.off('MARKET_STATUS_UPDATED', handleMarketStatusUpdated);
+      };
+    }
+  }, [socket, queryClient]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSuccessMsg(null);
+
+    if (isTradingDisabled) {
+      setErrorMsg(`Trading is currently disabled for ${form.symbol}.`);
+      return;
+    }
 
     const volume = parseFloat(form.volume);
     const targetPrice = parseFloat(form.targetPrice);
@@ -75,6 +118,13 @@ export default function TradingScreen() {
     }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, [orders, activeTab]);
 
+  // When symbols load, ensure form.symbol is valid
+  React.useEffect(() => {
+    if (activeSymbols.length > 0 && !activeSymbols.find((s: any) => s.symbol === form.symbol)) {
+      setForm(prev => ({ ...prev, symbol: activeSymbols[0].symbol }));
+    }
+  }, [activeSymbols, form.symbol]);
+
   return (
     <div className="flex flex-col lg:flex-row h-full bg-lb-panel font-sans text-lb-text">
       
@@ -105,8 +155,26 @@ export default function TradingScreen() {
               onChange={e => setForm({...form, symbol: e.target.value})}
               className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm font-bold text-lb-text focus:border-lb-accent outline-none transition-all"
             >
-              {SYMBOLS.map(sym => <option key={sym} value={sym}>{sym}</option>)}
+              {isLoadingSymbols ? (
+                <option>Loading...</option>
+              ) : activeSymbols.length === 0 ? (
+                <option>No Markets Available</option>
+              ) : (
+                activeSymbols.map((sym: any) => <option key={sym.symbol} value={sym.symbol}>{sym.symbol}</option>)
+              )}
             </select>
+            {selectedSymbolData && (
+              <div className="flex justify-between items-center px-1 mt-1">
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
+                  selectedSymbolData.status === 'OPEN' ? 'bg-emerald-500/10 text-emerald-500' :
+                  selectedSymbolData.status === 'PAUSED' ? 'bg-amber-500/10 text-amber-500' :
+                  'bg-rose-500/10 text-rose-500'
+                }`}>
+                  MARKET {selectedSymbolData.status}
+                </span>
+                {!selectedSymbolData.tradingEnabled && <span className="text-[10px] text-rose-500 font-bold">Trading Disabled</span>}
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -147,12 +215,13 @@ export default function TradingScreen() {
           <div className="pt-4">
             <button 
               type="submit" 
-              disabled={createOrderMutation.isPending}
+              disabled={createOrderMutation.isPending || isTradingDisabled}
               className={`w-full py-4 font-black rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 ${
+                isTradingDisabled ? 'bg-lb-border text-lb-text-muted shadow-none cursor-not-allowed' :
                 form.type.includes('BUY') ? 'bg-lb-accent hover:bg-lb-accent text-black shadow-[0_0_15px_rgba(20,184,166,0.3)]' : 'bg-lb-down hover:bg-rose-400 text-lb-text shadow-[0_0_15px_rgba(244,63,94,0.3)]'
               }`}
             >
-              {createOrderMutation.isPending ? 'Processing...' : `Place ${form.type.replace('_', ' ')}`}
+              {createOrderMutation.isPending ? 'Processing...' : isTradingDisabled ? 'Market Closed' : `Place ${form.type.replace('_', ' ')}`}
             </button>
           </div>
 

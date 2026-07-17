@@ -43,7 +43,8 @@ export const MobileOrderScreen: React.FC<MobileOrderScreenProps> = ({
   liveFreeMargin = 0,
   liveMargin = 0
 }) => {
-  const { marketEnabled } = useMarket();
+  const { platformStatus } = useMarket();
+  const marketEnabled = platformStatus.globalTradingStatus === 'ON';
 
   // Highlight flash state for bid/ask changes
   const [bidColor, setBidColor] = useState('text-lb-down');
@@ -181,10 +182,12 @@ export const MobileOrderScreen: React.FC<MobileOrderScreenProps> = ({
           <div className="flex flex-col items-center flex-1">
             <span className="text-[12px] text-lb-text-muted mb-1 font-semibold tracking-wider">BID</span>
             {renderPriceLarge(liveBid, bidColor)}
+            <span className="text-[10px] text-lb-text-muted mt-2 font-semibold">≈ ₹{liveBid ? (liveBid * 85).toFixed(2) : '0.00'}</span>
           </div>
           <div className="flex flex-col items-center flex-1">
             <span className="text-[12px] text-lb-text-muted mb-1 font-semibold tracking-wider">ASK</span>
             {renderPriceLarge(liveAsk, askColor)}
+            <span className="text-[10px] text-lb-text-muted mt-2 font-semibold">≈ ₹{liveAsk ? (liveAsk * 85).toFixed(2) : '0.00'}</span>
           </div>
         </div>
 

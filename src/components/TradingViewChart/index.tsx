@@ -70,7 +70,8 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
   const [isEmpty, setIsEmpty] = useState(false);
   const interval = TIMEFRAMES.find(t => t.value === intervalValue) || TIMEFRAMES[2];
   const { socket } = useSocket();
-  const { marketEnabled } = useMarket();
+  const { platformStatus } = useMarket();
+  const graphEnabled = platformStatus.globalGraphStatus === 'LIVE';
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
@@ -384,14 +385,10 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
           </div>
         </div>
       )}
-      {!marketEnabled && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-lb-bg/60 backdrop-blur-sm">
-          <div className="bg-lb-panel/90 border border-lb-border px-8 py-6 rounded-2xl shadow-2xl flex flex-col items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-lb-down/10 flex items-center justify-center border border-lb-down/30">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" className="text-lb-down" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></svg>
-            </div>
-            <h2 className="text-xl font-black text-lb-text tracking-wide">Market is currently closed.</h2>
-            <p className="text-sm text-lb-text-muted font-medium text-center">Live price updates and trading are disabled.</p>
+      {!graphEnabled && (
+        <div className="absolute inset-0 bg-lb-bg/50 backdrop-blur-sm z-50 flex items-center justify-center pointer-events-none">
+          <div className="bg-lb-panel/90 border border-lb-border px-4 py-2 rounded-lg shadow-xl backdrop-blur-md">
+            <span className="text-lb-text font-bold text-sm tracking-widest uppercase">Market data temporarily paused by administrator.</span>
           </div>
         </div>
       )}
