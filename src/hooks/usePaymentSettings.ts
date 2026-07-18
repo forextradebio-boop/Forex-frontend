@@ -6,7 +6,11 @@ export const usePaymentSettings = () => {
     queryKey: ['paymentSettings'],
     queryFn: getPaymentSettings,
     staleTime: 0,
+    refetchOnMount: true,
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: 5000,
+    refetchIntervalInBackground: true,
   });
 };
 
