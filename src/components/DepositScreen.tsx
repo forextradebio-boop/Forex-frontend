@@ -172,9 +172,29 @@ export default function DepositScreen() {
                 <div className="flex flex-col items-center gap-4">
                   <div className="p-5 bg-white rounded-3xl shadow-xl">
                     {settings.qrImage ? (
-                      <img src={getQrImageUrl(settings.qrImage)} alt="UPI QR" className="h-36 w-36 object-contain" />
+                      <img
+                        src={getQrImageUrl(settings.qrImage)}
+                        alt="UPI QR"
+                        className="h-36 w-36 object-contain"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          if (target.src.includes('/api/uploads/')) {
+                            target.src = target.src.replace('/api/uploads/', '/uploads/');
+                          }
+                        }}
+                      />
                     ) : settings.qrCodeUrl ? (
-                      <img src={getQrImageUrl(settings.qrCodeUrl)} alt="UPI QR" className="h-36 w-36 object-contain" />
+                      <img
+                        src={getQrImageUrl(settings.qrCodeUrl)}
+                        alt="UPI QR"
+                        className="h-36 w-36 object-contain"
+                        onError={(e) => {
+                          const target = e.currentTarget as HTMLImageElement;
+                          if (target.src.includes('/api/uploads/')) {
+                            target.src = target.src.replace('/api/uploads/', '/uploads/');
+                          }
+                        }}
+                      />
                     ) : (
                       <QrCode className="w-36 h-36 text-slate-200" />
                     )}
