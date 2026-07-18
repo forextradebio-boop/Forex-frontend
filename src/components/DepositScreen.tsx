@@ -14,6 +14,14 @@ const depositCurrencies = [
   { value: 'USDT', label: 'USDT - Tether' },
 ];
 
+const getQrImageUrl = (imagePath?: string) => {
+  if (!imagePath) return '';
+  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+  const base = (import.meta.env.VITE_API_URL as string | undefined) || 'https://forex-backend-63xj.onrender.com';
+  const normalizedBase = base.replace(/\/api$/, '').replace(/\/$/, '');
+  return `${normalizedBase}${imagePath.startsWith('/') ? imagePath : `/${imagePath}`}`;
+};
+
 export default function DepositScreen() {
   const { data: paymentSettings, isLoading: loadingSettings } = usePaymentSettings();
   const { data: wallet } = useWallet();
@@ -150,9 +158,9 @@ export default function DepositScreen() {
                 <div className="flex flex-col items-center gap-4">
                   <div className="p-5 bg-white rounded-3xl shadow-xl">
                     {settings.qrImage ? (
-                      <img src={`${api.defaults.baseURL?.replace('/api', '')}${settings.qrImage}`} alt="UPI QR" className="h-36 w-36 object-contain" />
+                      <img src={getQrImageUrl(settings.qrImage)} alt="UPI QR" className="h-36 w-36 object-contain" />
                     ) : settings.qrCodeUrl ? (
-                      <img src={settings.qrCodeUrl} alt="UPI QR" className="h-36 w-36 object-contain" />
+                      <img src={getQrImageUrl(settings.qrCodeUrl)} alt="UPI QR" className="h-36 w-36 object-contain" />
                     ) : (
                       <QrCode className="w-36 h-36 text-slate-200" />
                     )}
