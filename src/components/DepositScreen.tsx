@@ -19,17 +19,21 @@ const getQrImageUrl = (imagePath?: string) => {
   if (/^https?:\/\//i.test(imagePath)) return imagePath;
 
   const base = (import.meta.env.VITE_API_URL as string | undefined) || 'https://forex-backend-63xj.onrender.com';
-  const normalizedBase = base.replace(/\/$/, '');
+  const normalizedBase = base.replace(/\/$/, '').replace(/\/api$/, '');
 
   if (imagePath.startsWith('/uploads/')) {
-    return `${normalizedBase.replace(/\/api$/, '')}/api/uploads/${imagePath.split('/uploads/')[1]}`;
+    return `${normalizedBase}/api/uploads/${imagePath.split('/uploads/')[1]}`;
   }
 
   if (imagePath.startsWith('/api/uploads/')) {
-    return `${normalizedBase.replace(/\/api$/, '')}${imagePath}`;
+    return `${normalizedBase}${imagePath}`;
   }
 
-  return `${normalizedBase}${imagePath.startsWith('/') ? imagePath : `/${imagePath}`}`;
+  if (imagePath.startsWith('/')) {
+    return `${normalizedBase}${imagePath}`;
+  }
+
+  return `${normalizedBase}/${imagePath}`;
 };
 
 export default function DepositScreen() {
