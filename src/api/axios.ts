@@ -13,6 +13,16 @@ api.interceptors.request.use((config) => {
   if (token) {
       (config.headers as any).Authorization = `Bearer ${token}`;
   }
+
+  const url = config.url || '';
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    const baseUrl = typeof config.baseURL === 'string' ? config.baseURL : '';
+    const baseHasApi = baseUrl.includes('/api');
+    if (!baseHasApi && !url.startsWith('/api') && !url.startsWith('/uploads')) {
+      config.url = `/api${url.startsWith('/') ? url : `/${url}`}`;
+    }
+  }
+
   return config;
 }, (error) => {
   return Promise.reject(error);
