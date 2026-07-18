@@ -17,8 +17,18 @@ const depositCurrencies = [
 const getQrImageUrl = (imagePath?: string) => {
   if (!imagePath) return '';
   if (/^https?:\/\//i.test(imagePath)) return imagePath;
+
   const base = (import.meta.env.VITE_API_URL as string | undefined) || 'https://forex-backend-63xj.onrender.com';
-  const normalizedBase = base.replace(/\/api$/, '').replace(/\/$/, '');
+  const normalizedBase = base.replace(/\/$/, '');
+
+  if (imagePath.startsWith('/uploads/')) {
+    return `${normalizedBase.replace(/\/api$/, '')}/api/uploads/${imagePath.split('/uploads/')[1]}`;
+  }
+
+  if (imagePath.startsWith('/api/uploads/')) {
+    return `${normalizedBase.replace(/\/api$/, '')}${imagePath}`;
+  }
+
   return `${normalizedBase}${imagePath.startsWith('/') ? imagePath : `/${imagePath}`}`;
 };
 
