@@ -18,7 +18,7 @@ const getQrImageUrl = (imagePath?: string) => {
   if (!imagePath) return '';
   if (/^https?:\/\//i.test(imagePath)) return imagePath;
 
-  const base = (import.meta.env.VITE_API_URL as string | undefined) || 'https://forex-backend-63xj.onrender.com';
+  const base = (import.meta.env.VITE_API_URL as string | undefined) || 'https://forex-backend-iem1.onrender.com';
   const normalizedBase = base.replace(/\/$/, '').replace(/\/api$/, '');
 
   if (imagePath.startsWith('/uploads/')) {
