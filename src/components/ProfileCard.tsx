@@ -57,7 +57,7 @@ export default function ProfileCard({ profile, wallet, onEditClick }: Props) {
                 {profile.name}
               </h2>
               <p className="text-lb-text-muted font-mono text-sm mt-1">@{profile.username || 'user'}</p>
-              <p className="text-lb-text-muted font-mono text-sm mt-1">{profile.email}</p>
+              <p className="text-lb-text-muted font-mono text-sm mt-1">{profile.email || 'Email not set'}</p>
             </div>
             
             <button 
