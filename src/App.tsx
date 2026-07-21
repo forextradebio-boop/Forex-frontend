@@ -103,13 +103,21 @@ export default function App() {
           timestamp: item.updatedAt || item.createdAt,
           historyType: 'trade',
         })),
-        ...(transactions || []).map((tx: any) => ({
-          ...tx,
-          id: tx.id || tx._id || tx._id?.toString(),
-          entryDate: tx.createdAt,
-          timestamp: tx.createdAt,
-          historyType: 'transaction',
-        })),
+        ...(transactions || [])
+          .filter((tx: any) => {
+            const type = tx.type?.toUpperCase();
+            if (type === 'DEPOSIT' || type === 'WITHDRAWAL' || type === 'WITHDRAW') {
+              return tx.status?.toUpperCase() === 'APPROVED';
+            }
+            return true;
+          })
+          .map((tx: any) => ({
+            ...tx,
+            id: tx.id || tx._id || tx._id?.toString(),
+            entryDate: tx.createdAt,
+            timestamp: tx.createdAt,
+            historyType: 'transaction',
+          })),
       ].sort((a: any, b: any) => new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime());
 
       setClosedHistory(historyItems);
