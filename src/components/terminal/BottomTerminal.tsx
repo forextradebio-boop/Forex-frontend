@@ -26,8 +26,16 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
   const historyWithBalance = React.useMemo(() => {
     if (activeTab !== 'history') return [];
     
+    // Filter out non-approved deposits and withdrawals
+    const validHistory = closedHistory.filter(item => {
+      if ((item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL' || item.type === 'WITHDRAW') && item.status !== 'APPROVED') {
+        return false;
+      }
+      return true;
+    });
+    
     // Sort oldest first
-    const sorted = [...closedHistory].sort((a, b) => {
+    const sorted = [...validHistory].sort((a, b) => {
       const timeA = new Date(a.timestamp || a.entryDate || a.createdAt || 0).getTime();
       const timeB = new Date(b.timestamp || b.entryDate || b.createdAt || 0).getTime();
       return timeA - timeB;
