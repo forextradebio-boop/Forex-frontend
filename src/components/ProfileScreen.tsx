@@ -22,7 +22,8 @@ export default function ProfileScreen() {
     name: '',
     phone: '',
     country: '',
-    avatar: ''
+    avatar: '',
+    email: ''
   });
   const [securityForm, setSecurityForm] = useState({
     username: '',
@@ -43,7 +44,8 @@ export default function ProfileScreen() {
         name: profile.name,
         phone: profile.phone || '',
         country: profile.country || '',
-        avatar: profile.avatar || ''
+        avatar: profile.avatar || '',
+        email: profile.email || ''
       });
       setIsEditModalOpen(true);
     }
@@ -373,10 +375,10 @@ export default function ProfileScreen() {
                 <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Email Address</label>
                 <input 
                   type="email" 
-                  value={profile.email} 
-                  disabled
-                  className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text-muted cursor-not-allowed font-mono"
-                  title="Email cannot be changed"
+                  value={editForm.email}
+                  onChange={e => setEditForm({...editForm, email: e.target.value})}
+                  className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:outline-none focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 transition-all font-mono"
+                  placeholder="your@email.com"
                 />
               </div>
 
@@ -414,16 +416,6 @@ export default function ProfileScreen() {
                 />
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-[10px] text-lb-text-muted font-bold uppercase tracking-wider">Avatar URL</label>
-                <input 
-                  type="url" 
-                  value={editForm.avatar}
-                  onChange={e => setEditForm({...editForm, avatar: e.target.value})}
-                  className="w-full bg-lb-bg border border-lb-border rounded-xl px-4 py-3 text-sm text-lb-text focus:outline-none focus:border-lb-accent focus:ring-1 focus:ring-lb-accent/50 transition-all font-mono"
-                  placeholder="https://example.com/avatar.png"
-                />
-              </div>
 
               <div className="pt-4 flex gap-3">
                 <button 
