@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useWallet } from '../hooks/useWallet';
-import { useExchangeRate } from '../hooks/useExchangeRate';
 import WalletCard from './WalletCard';
 import DepositScreen from './DepositScreen';
 import WithdrawScreen from './WithdrawScreen';
 import TransactionHistoryScreen from './TransactionHistoryScreen';
 import { Wallet, RefreshCw, AlertCircle, TrendingUp, Download, Upload, ArrowLeft } from 'lucide-react';
-import { fundWallet } from '../services/wallet';
 
 export type WalletSubTab = 'dashboard' | 'deposit' | 'withdraw' | 'transactions';
 
@@ -18,45 +16,6 @@ interface WalletScreenProps {
 export default function WalletScreen({ initialTab = 'dashboard', onBack }: WalletScreenProps) {
   const { data: wallet, isLoading, isError, refetch, isFetching } = useWallet();
   const [activeSubTab, setActiveSubTab] = useState<WalletSubTab>(initialTab);
-  const [convAmount, setConvAmount] = useState<string>('');
-  const [sourceCurrency, setSourceCurrency] = useState<string>('INR');
-  const [targetCurrency, setTargetCurrency] = useState<string>('USD');
-  const [isFunding, setIsFunding] = useState(false);
-
-  const { data: exchangeRateData } = useExchangeRate();
-  const currentRate = exchangeRateData?.currentRate || 85;
-
-  const exchangeRates: Record<string, { rate: number; symbol: string; name: string }> = {
-    USD: { rate: 1.00, symbol: '$', name: 'US Dollar' },
-    INR: { rate: currentRate, symbol: '₹', name: 'Indian Rupee' },
-    EUR: { rate: 0.92, symbol: '€', name: 'Euro' },
-    GBP: { rate: 0.79, symbol: '£', name: 'British Pound' },
-    JPY: { rate: 151.20, symbol: '¥', name: 'Japanese Yen' },
-    AUD: { rate: 1.53, symbol: 'A$', name: 'Australian Dollar' },
-    CAD: { rate: 1.36, symbol: 'C$', name: 'Canadian Dollar' },
-    CNY: { rate: 7.23, symbol: '¥', name: 'Chinese Yuan' },
-    AED: { rate: 3.67, symbol: 'د.إ', name: 'UAE Dirham' }
-  };
-  
-  const currentSourceRate = exchangeRates[sourceCurrency].rate;
-  const currentSourceSymbol = exchangeRates[sourceCurrency].symbol;
-  const currentTargetRate = exchangeRates[targetCurrency].rate;
-  const currentTargetSymbol = exchangeRates[targetCurrency].symbol;
-
-  const calculateTarget = (amountStr: string) => {
-    if (!amountStr) return '0.00';
-    const amount = parseFloat(amountStr);
-    if (isNaN(amount)) return '0.00';
-    const inUSD = amount / currentSourceRate;
-    return (inUSD * currentTargetRate).toFixed(2);
-  };
-
-  const calculateUSD = (amountStr: string) => {
-    if (!amountStr) return '0.00';
-    const amount = parseFloat(amountStr);
-    if (isNaN(amount)) return '0.00';
-    return (amount / currentSourceRate).toFixed(2);
-  };
 
   useEffect(() => {
     setActiveSubTab(initialTab);
@@ -192,95 +151,6 @@ export default function WalletScreen({ initialTab = 'dashboard', onBack }: Walle
                   </div>
                 </div>
               </button>
-            </div>
-
-            {/* Currency Converter Widget */}
-            <div className="bg-lb-bg/50 border border-lb-border/80 rounded-2xl p-6 relative overflow-hidden mt-4 transition-all hover:border-lb-accent/30 hover:bg-lb-bg">
-              <div className="relative z-10">
-                <h3 className="text-lg font-black text-lb-text flex items-center gap-2 mb-4">
-                  <RefreshCw className="w-5 h-5 text-lb-accent" /> Universal Currency Calculator
-                </h3>
-                <div className="flex flex-col md:flex-row items-center gap-4">
-                  <div className="flex-1 w-full bg-lb-panel border border-lb-border rounded-xl px-3 py-2 flex items-center focus-within:border-lb-accent transition-colors">
-                    <select
-                      value={sourceCurrency}
-                      onChange={(e) => setSourceCurrency(e.target.value)}
-                      className="bg-transparent border-none text-lb-text-muted font-bold text-sm focus:outline-none cursor-pointer hover:text-lb-text pr-2 border-r border-lb-border/50"
-                    >
-                      {Object.keys(exchangeRates).map(code => (
-                        <option key={code} value={code} className="bg-lb-panel text-lb-text">{code}</option>
-                      ))}
-                    </select>
-                    <span className="text-lb-text-muted font-bold ml-3">{currentSourceSymbol}</span>
-                    <input 
-                      type="number" 
-                      value={convAmount}
-                      onChange={e => setConvAmount(e.target.value)}
-                      placeholder="Amount"
-                      className="bg-transparent border-none text-right font-mono text-lb-text font-bold focus:outline-none w-full ml-2"
-                    />
-                  </div>
-                  <div className="text-lb-text-muted font-bold mx-2 flex items-center justify-center">
-                    <ArrowLeft className="w-4 h-4 hidden md:block" />
-                    <span className="hidden md:block mx-1">≈</span>
-                    <ArrowLeft className="w-4 h-4 hidden md:block rotate-180" />
-                    <span className="md:hidden">=</span>
-                  </div>
-                  <div className="flex-1 w-full bg-lb-panel border border-lb-border rounded-xl px-4 py-2 flex items-center focus-within:border-lb-accent transition-colors">
-                    <select
-                      value={targetCurrency}
-                      onChange={(e) => setTargetCurrency(e.target.value)}
-                      className="bg-transparent border-none text-lb-text-muted font-bold text-sm focus:outline-none cursor-pointer hover:text-lb-text pr-2 border-r border-lb-border/50"
-                    >
-                      {Object.keys(exchangeRates).map(code => (
-                        <option key={`target-${code}`} value={code} className="bg-lb-panel text-lb-text">{code}</option>
-                      ))}
-                    </select>
-                    <span className="text-lb-text-muted font-bold ml-3">{currentTargetSymbol}</span>
-                    <div className="bg-transparent border-none text-right font-mono text-lb-accent font-bold text-lg focus:outline-none w-full ml-2">
-                      {calculateTarget(convAmount)}
-                    </div>
-                  </div>
-                </div>
-                <p className="text-xs text-lb-text-muted mt-4 text-center">Estimated Exchange Rate: 1 {sourceCurrency} ≈ {currentTargetSymbol}{(currentTargetRate / currentSourceRate).toFixed(4)} {targetCurrency}</p>
-                <div className="flex gap-3 mt-5">
-                  <button 
-                    onClick={() => {
-                      const usdAmt = calculateUSD(convAmount);
-                      if (parseFloat(usdAmt) > 0) {
-                        sessionStorage.setItem('prefillDepositAmount', usdAmt);
-                      }
-                      setActiveSubTab('deposit');
-                    }}
-                    className="flex-1 bg-lb-panel border border-lb-border hover:border-lb-accent text-lb-text font-black py-3.5 px-3 rounded-xl transition-all flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-95 text-sm"
-                  >
-                    Request Deposit
-                  </button>
-                  <button 
-                    disabled={isFunding || !convAmount || parseFloat(convAmount) <= 0}
-                    onClick={async () => {
-                      const usdAmt = calculateUSD(convAmount);
-                      if (parseFloat(usdAmt) > 0) {
-                        setIsFunding(true);
-                        try {
-                          await fundWallet(parseFloat(usdAmt));
-                          await refetch();
-                          setConvAmount('');
-                        } catch (err) {
-                          console.error(err);
-                          alert("Failed to instantly add funds.");
-                        } finally {
-                          setIsFunding(false);
-                        }
-                      }
-                    }}
-                    className="flex-[1.5] bg-lb-accent hover:bg-lb-accent/90 text-lb-bg font-black py-3.5 px-3 rounded-xl transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(20,184,166,0.3)] hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                  >
-                    {isFunding ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
-                    Instant Add {calculateTarget(convAmount)} {targetCurrency}
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         ) : activeSubTab === 'deposit' ? (
