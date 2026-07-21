@@ -9,6 +9,8 @@ import * as transactionService from "./services/transaction";
 import { UserWallet, Position } from "./types";
 import { useMarket } from "./contexts/MarketContext";
 
+import { PullToRefresh } from './components/PullToRefresh';
+
 // Lazy load the massive dashboard to optimize initial bundle size
 const ProTradingDashboard = lazy(() => import("./components/ProTradingDashboard"));
 
@@ -168,18 +170,24 @@ export default function App() {
     }
   }, []);
 
+  const handleRefresh = async () => {
+    await fetchClientPortfolioStats();
+  };
+
   if (authLoading) return null;
 
   return (
-    <Suspense fallback={<div className="h-[100dvh] w-full flex items-center justify-center bg-[#0b0e14] text-white">Loading Terminal...</div>}>
-      <ProTradingDashboard
-        wallet={walletMetrics}
-        positions={activePositions}
-        closedHistory={closedHistory}
-        userId={userProfile?.id || "USER_GUEST"}
-        onPlaceOrder={handlePlaceOrder}
-        onClosePosition={handleClosePosition}
-      />
-    </Suspense>
+    <PullToRefresh onRefresh={handleRefresh}>
+      <Suspense fallback={<div className="h-[100dvh] w-full flex items-center justify-center bg-[#0b0e14] text-white">Loading Terminal...</div>}>
+        <ProTradingDashboard
+          wallet={walletMetrics}
+          positions={activePositions}
+          closedHistory={closedHistory}
+          userId={userProfile?.id || "USER_GUEST"}
+          onPlaceOrder={handlePlaceOrder}
+          onClosePosition={handleClosePosition}
+        />
+      </Suspense>
+    </PullToRefresh>
   );
 }
