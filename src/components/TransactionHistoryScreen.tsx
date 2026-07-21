@@ -21,6 +21,8 @@ export default function TransactionHistoryScreen() {
   }
 
   const filteredData = transactions?.filter(t => {
+    if (t.status?.toUpperCase() === 'PENDING') return false;
+    
     if (filter === 'ALL') return true;
     if (filter === 'DEPOSIT') return t.type === 'DEPOSIT' || (t.type === 'ADMIN_ADJUSTMENT' && t.amount > 0);
     if (filter === 'WITHDRAW') return t.type === 'WITHDRAW' || t.type === 'WITHDRAWAL' || (t.type === 'ADMIN_ADJUSTMENT' && t.amount < 0);
