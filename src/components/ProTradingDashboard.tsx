@@ -181,6 +181,11 @@ const ProTradingDashboard = ({
   // Filtered History for Mobile List & Footer
   const filteredHistory = useMemo(() => {
     return closedHistory.filter(item => {
+      // Filter out non-approved deposits and withdrawals
+      if ((item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL' || item.type === 'WITHDRAW') && item.status !== 'APPROVED') {
+        return false;
+      }
+
       if (historyFilter === 'ALL') return true;
       const itemDate = parseHistoryDate(item.timestamp ?? item.entryDate);
       const now = new Date();
