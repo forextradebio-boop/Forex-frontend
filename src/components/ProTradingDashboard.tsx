@@ -411,7 +411,7 @@ const ProTradingDashboard = ({
            {/* Mobile Positions List */}
            <div className="flex-1 overflow-y-auto bg-lb-bg pb-32 px-4 flex flex-col gap-2">
              {positions.map(p => (
-               <div key={p.id} className="bg-lb-panel border border-lb-border rounded-2xl flex flex-col overflow-hidden">
+               <div key={p.id} className="bg-lb-panel border border-lb-border rounded-2xl flex flex-col overflow-hidden shrink-0">
                  <div className="px-4 py-3 flex justify-between items-center cursor-pointer hover:bg-lb-panel-hover transition" 
                       onClick={() => {
                         setExpandedPositionId(p.id);
@@ -506,7 +506,7 @@ const ProTradingDashboard = ({
                    })
                    .map((item, idx) => {
                      const historyDate = parseHistoryDate(item.timestamp ?? item.entryDate);
-                     return <div key={idx} className="px-4 py-3 rounded-2xl border border-lb-border flex justify-between items-start bg-lb-panel">
+                      return <div key={idx} className="px-4 py-3 rounded-2xl border border-lb-border flex justify-between items-start bg-lb-panel shrink-0">
                           {item.type === 'DEPOSIT' || item.type === 'WITHDRAWAL' || item.type === 'WITHDRAW' || item.type === 'ADMIN_ADJUSTMENT' ? (
                             <>
                               <div className="flex flex-col gap-0.5">
