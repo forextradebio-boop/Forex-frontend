@@ -385,7 +385,7 @@ const ProTradingDashboard = ({
            />
         </div>
 
-        <div className={`flex-1 flex flex-col bg-lb-bg overflow-y-auto ${activeMobileTab !== 'trade' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
+        <div className={`flex-1 flex flex-col bg-lb-bg overflow-hidden ${activeMobileTab !== 'trade' ? 'hidden md:hidden' : 'flex md:hidden'}`}>
            {/* Top Header replacement for Trade Tab */}
            <div className="p-4 pt-6 flex flex-col bg-lb-panel mx-4 mt-4 rounded-2xl shadow-lg border border-lb-border">
              <div className="flex justify-center items-start w-full">
