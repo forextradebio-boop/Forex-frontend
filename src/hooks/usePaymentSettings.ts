@@ -5,12 +5,13 @@ export const usePaymentSettings = () => {
   return useQuery({
     queryKey: ['paymentSettings'],
     queryFn: getPaymentSettings,
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
     refetchOnMount: true,
-    refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
-    refetchInterval: 5000,
-    refetchIntervalInBackground: true,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
   });
 };
 
