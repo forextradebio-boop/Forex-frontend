@@ -155,7 +155,7 @@ export default function App() {
         if (res) await fetchClientPortfolioStats();
       }
     } catch (err: any) {
-      alert(`Reject logic: ${err.response?.data?.error || err.message}`);
+      alert(`${err.response?.data?.error || err.message}`);
       throw err;
     }
   }, []);
