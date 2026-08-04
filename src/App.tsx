@@ -101,6 +101,7 @@ export default function App() {
         ...(closedPositions || []).map((item: any) => ({
           ...item,
           id: item.id || item._id || item._id?.toString(),
+          size: item.volume,
           entryDate: item.updatedAt || item.createdAt,
           timestamp: item.updatedAt || item.createdAt,
           historyType: 'trade',
