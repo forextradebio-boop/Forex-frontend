@@ -13,8 +13,7 @@ const SocketContext = createContext<SocketContextValue>({ socket: null, isConnec
 
 export const useSocket = () => useContext(SocketContext);
 
-const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
-const socketUrl = isLocal ? "http://localhost:8000" : "https://forex-backend-iem1.onrender.com";
+const socketUrl = "https://forex-backend-iem1.onrender.com";
 
 // Create singleton outside component to prevent double-connect in StrictMode
 const socketInstance = io(socketUrl, {
