@@ -535,7 +535,7 @@ const ProTradingDashboard = ({
                               <div className="flex flex-col gap-0.5">
                                 <div className="flex items-baseline gap-1">
                                   <span className="font-semibold text-lb-text text-[15px]">{item.symbol}</span>
-                                  <span className={`text-[12px] px-1.5 py-0.5 rounded ${item.side === 'BUY' ? 'bg-lb-accent/10 text-lb-accent' : 'bg-lb-down/10 text-lb-down'}`}>{item.side?.toLowerCase()} {item.size?.toFixed(2) || '0.10'}</span>
+                                  <span className={`text-[12px] px-1.5 py-0.5 rounded ${item.side === 'BUY' ? 'bg-lb-accent/10 text-lb-accent' : 'bg-lb-down/10 text-lb-down'}`}>{item.side?.toLowerCase()} {(item.size ?? item.volume)?.toFixed(2) || '0.10'}</span>
                                 </div>
                                 <span className="text-[13px] text-lb-text-muted font-mono tracking-tight">{formatPrice(item.entryPrice || item.openPrice)} → {formatPrice(item.closePrice)}</span>
                               </div>
