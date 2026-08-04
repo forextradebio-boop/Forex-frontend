@@ -1,5 +1,5 @@
-const LIVE_API_BASE_URL = "https://forex-backend-iem1.onrender.com/api";
-const LOCAL_API_BASE_URL = "http://localhost:8000/api";
+const LIVE_API_BASE_URL = "https://forex-backend-iem1.onrender.com";
+const LOCAL_API_BASE_URL = "http://localhost:8000";
 const LIVE_SOCKET_URL = "https://forex-backend-iem1.onrender.com";
 const LOCAL_SOCKET_URL = "http://localhost:8000";
 
