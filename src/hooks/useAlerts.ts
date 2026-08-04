@@ -6,7 +6,6 @@ export const useAlerts = () => {
   return useQuery<PriceAlert[]>({
     queryKey: ['alerts'],
     queryFn: getAlerts,
-    refetchInterval: 5000,
   });
 };
 
