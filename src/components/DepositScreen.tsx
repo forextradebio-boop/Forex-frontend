@@ -16,7 +16,7 @@ const depositCurrencies = [
 
 const getQrImageUrl = (imagePath?: string) => {
   if (!imagePath) return '';
-  if (/^https?:\/\//i.test(imagePath)) return imagePath;
+  if (/^https?:\/\//i.test(imagePath) || imagePath.startsWith('data:')) return imagePath;
 
   const base = (import.meta.env.VITE_API_URL as string | undefined) || 'https://forex-backend-iem1.onrender.com';
   const normalizedBase = base.replace(/\/$/, '').replace(/\/api$/, '');

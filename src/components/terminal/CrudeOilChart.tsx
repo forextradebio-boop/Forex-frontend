@@ -194,13 +194,15 @@ export const CrudeOilChart: React.FC<CrudeOilChartProps> = ({ onBackClick }) => 
       seriesRef.current = candlestickSeries;
     }
 
-    const candleData: CandlestickData[] = chartData.candles.map((candle) => ({
-      time: (Math.floor(candle.timestamp / 1000)) as Time,
-      open: candle.open,
-      high: candle.high,
-      low: candle.low,
-      close: candle.close,
-    }));
+    const candleData: CandlestickData[] = chartData.candles
+      .filter((candle) => candle.open != null && candle.high != null && candle.low != null && candle.close != null)
+      .map((candle) => ({
+        time: (Math.floor(candle.timestamp / 1000)) as Time,
+        open: candle.open,
+        high: candle.high,
+        low: candle.low,
+        close: candle.close,
+      }));
 
     if (seriesRef.current && candleData.length > 0) {
       seriesRef.current.setData(candleData);
@@ -478,12 +480,12 @@ export const CrudeOilChart: React.FC<CrudeOilChartProps> = ({ onBackClick }) => 
           <tbody>
             {chartData.candles.slice(-10).reverse().map((candle, idx) => (
               <tr key={idx} className="border-t border-lb-border/50 hover:bg-lb-bg/30 transition-colors">
-                <td className="py-2 px-1 text-lb-text">{new Date(candle.timestamp).toLocaleDateString()}</td>
-                <td className="text-right py-2 px-1 text-lb-text-muted font-mono">${candle.open.toFixed(2)}</td>
-                <td className="text-right py-2 px-1 text-lb-up font-mono font-semibold">${candle.high.toFixed(2)}</td>
-                <td className="text-right py-2 px-1 text-lb-down font-mono font-semibold">${candle.low.toFixed(2)}</td>
-                <td className="text-right py-2 px-1 text-lb-text font-mono font-semibold">${candle.close.toFixed(2)}</td>
-                <td className="text-right py-2 px-1 text-lb-text-muted font-mono">{(candle.volume / 1000).toFixed(0)}K</td>
+                <td className="py-2 px-1 text-lb-text">{candle.timestamp ? new Date(candle.timestamp).toLocaleDateString() : 'N/A'}</td>
+                <td className="text-right py-2 px-1 text-lb-text-muted font-mono">${(candle.open || 0).toFixed(2)}</td>
+                <td className="text-right py-2 px-1 text-lb-up font-mono font-semibold">${(candle.high || 0).toFixed(2)}</td>
+                <td className="text-right py-2 px-1 text-lb-down font-mono font-semibold">${(candle.low || 0).toFixed(2)}</td>
+                <td className="text-right py-2 px-1 text-lb-text font-mono font-semibold">${(candle.close || 0).toFixed(2)}</td>
+                <td className="text-right py-2 px-1 text-lb-text-muted font-mono">{((candle.volume || 0) / 1000).toFixed(0)}K</td>
               </tr>
             ))}
           </tbody>
