@@ -5,6 +5,5 @@ export const useTransactions = () => {
   return useQuery({
     queryKey: ['transactions'],
     queryFn: getTransactions,
-    refetchInterval: 5000,
   });
 };
