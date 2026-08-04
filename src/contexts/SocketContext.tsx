@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { SOCKET_URL } from '../api/config';
+
 import { useAuth } from './AuthContext';
 import { useMarket } from './MarketContext';
 
@@ -13,8 +13,11 @@ const SocketContext = createContext<SocketContextValue>({ socket: null, isConnec
 
 export const useSocket = () => useContext(SocketContext);
 
+const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const socketUrl = isLocal ? "http://localhost:8000" : "https://forex-backend-iem1.onrender.com";
+
 // Create singleton outside component to prevent double-connect in StrictMode
-const socketInstance = io(SOCKET_URL, {
+const socketInstance = io(socketUrl, {
   autoConnect: false,
   reconnection: true,
   reconnectionAttempts: Infinity,
