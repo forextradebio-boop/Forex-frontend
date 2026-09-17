@@ -16,9 +16,16 @@ export const getQuote = async (symbol: string): Promise<Record<string, MarketQuo
   return res.data;
 };
 
+let watchPromise: Promise<MarketTicker[]> | null = null;
+let watchCacheTime = 0;
+
 export const getWatch = async (): Promise<MarketTicker[]> => {
-  const res = await api.get('/api/market/watch');
-  return res.data;
+  if (watchPromise && Date.now() - watchCacheTime < 5000) {
+    return watchPromise;
+  }
+  watchCacheTime = Date.now();
+  watchPromise = api.get('/api/market/watch').then(res => res.data);
+  return watchPromise;
 };
 
 export const getSymbolDetail = async (symbol: string): Promise<MarketTicker> => {
