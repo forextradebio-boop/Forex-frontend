@@ -57,7 +57,7 @@ const getSymbolPriceFormat = (sym: string) => {
   return { type: 'price', precision: 5, minMove: 0.00001 };
 };
 
-export const TradingViewChart: React.FC<ChartContainerProps> = ({
+export const TradingViewChart: React.FC<ChartContainerProps> = React.memo(({
   symbol = 'EURUSD',
   theme = 'Dark',
   intervalValue = '15m'
@@ -395,4 +395,4 @@ export const TradingViewChart: React.FC<ChartContainerProps> = ({
       <div ref={chartContainerRef} className="w-full h-full min-h-[320px] overflow-hidden" />
     </div>
   );
-};
+});

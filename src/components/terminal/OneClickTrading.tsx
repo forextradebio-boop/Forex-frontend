@@ -18,7 +18,7 @@ interface OneClickTradingProps {
   setOneClickEnabled: (enabled: boolean) => void;
 }
 
-export const OneClickTrading: React.FC<OneClickTradingProps> = ({
+export const OneClickTrading: React.FC<OneClickTradingProps> = React.memo(({
   selectedSymbol,
   liveBid,
   liveAsk,
@@ -135,4 +135,4 @@ export const OneClickTrading: React.FC<OneClickTradingProps> = ({
       </div>
     </div>
   );
-};
+});

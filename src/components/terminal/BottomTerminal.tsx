@@ -13,7 +13,7 @@ interface BottomTerminalProps {
   onClosePosition: (id: string) => void;
 }
 
-export const BottomTerminal: React.FC<BottomTerminalProps> = ({
+export const BottomTerminal: React.FC<BottomTerminalProps> = React.memo(({
   positions,
   closedHistory,
   onClosePosition
@@ -197,4 +197,4 @@ export const BottomTerminal: React.FC<BottomTerminalProps> = ({
       </div>
     </div>
   );
-};
+});

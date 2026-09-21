@@ -9,7 +9,7 @@ interface TerminalHeaderProps {
   freeMargin: number;
 }
 
-export const TerminalHeader: React.FC<TerminalHeaderProps> = ({
+export const TerminalHeader: React.FC<TerminalHeaderProps> = React.memo(({
   isConnected,
   balance,
   equity,
@@ -60,4 +60,4 @@ export const TerminalHeader: React.FC<TerminalHeaderProps> = ({
       </div>
     </header>
   );
-};
+});
