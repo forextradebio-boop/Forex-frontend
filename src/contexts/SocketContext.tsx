@@ -13,7 +13,9 @@ const SocketContext = createContext<SocketContextValue>({ socket: null, isConnec
 
 export const useSocket = () => useContext(SocketContext);
 
-const socketUrl = "https://forex-backend-iem1.onrender.com";
+import { SOCKET_URL } from '../api/config';
+
+const socketUrl = SOCKET_URL;
 
 // Create singleton outside component to prevent double-connect in StrictMode
 const socketInstance = io(socketUrl, {
