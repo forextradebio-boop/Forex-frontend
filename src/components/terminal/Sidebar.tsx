@@ -1,5 +1,5 @@
 import React from 'react';
-import { User, Activity, BookOpen, Mail, Book, Calendar, Users, TrendingUp, HelpCircle, Info, ChevronRight, X, LogOut, Download, Upload, RefreshCw, Power, Sun, Moon, Settings, Bell, Globe } from 'lucide-react';
+import { User, Activity, BookOpen, Mail, Book, Calendar, Users, TrendingUp, HelpCircle, Info, ChevronRight, X, LogOut, Download, Upload, RefreshCw, Power, Sun, Moon, Monitor, Settings, Bell, Globe } from 'lucide-react';
 import { useMarket } from '../../contexts/MarketContext';
 import { useTheme } from '../../theme';
 
@@ -10,6 +10,7 @@ interface SidebarProps {
   onClose: () => void;
   onGetStarted: () => void;
   onNavigateWallet?: (tab: WalletSubTab) => void;
+  onNavigateTrade?: () => void;
   onNavigateProfile?: () => void;
   onNavigateNews: () => void;
   onNavigateCalendar?: () => void;
@@ -22,7 +23,7 @@ interface SidebarProps {
   onLogout?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted, onNavigateWallet, onNavigateProfile, onNavigateNews, onNavigateCalendar, onNavigateAbout, userProfile, onLogout }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted, onNavigateWallet, onNavigateTrade, onNavigateProfile, onNavigateNews, onNavigateCalendar, onNavigateAbout, userProfile, onLogout }) => {
   const { marketEnabled, toggleMarket } = useMarket();
   const { themeMode, setThemeMode } = useTheme();
 
@@ -82,7 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
         {/* Menu Items */}
         <div className="flex-1 overflow-y-auto py-4">
           <div className="flex flex-col px-2 gap-0.5">
-            <MenuItem icon={<Activity size={20} />} label="Trade" onClick={() => console.log('Trade clicked')} />
+            <MenuItem icon={<Activity size={20} />} label="Trade" onClick={() => { onClose(); onNavigateTrade?.(); }} />
             <MenuItem icon={<BookOpen size={20} />} label="News" onClick={() => { onClose(); onNavigateNews?.(); }} />
             <MenuItem icon={<Download size={20} />} label="Deposit" onClick={() => { onClose(); onNavigateWallet?.('deposit'); }} />
             <MenuItem icon={<Upload size={20} />} label="Withdraw" onClick={() => { onClose(); onNavigateWallet?.('withdraw'); }} />
@@ -91,21 +92,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
             <MenuItem icon={<Calendar size={20} />} label="Economic calendar" isAds onClick={() => { onClose(); onNavigateCalendar?.(); }} />
             
             {/* Theme Toggle */}
-            <div className="flex items-center justify-between px-4 py-3.5 hover:bg-lb-accent/10 active:bg-lb-accent/20 rounded-xl transition-all duration-300 w-full group my-1 border border-lb-border/50 bg-lb-bg/50">
+            <div className="flex items-center justify-between px-4 py-3.5 hover:bg-lb-accent/10 active:bg-lb-accent/20 rounded-xl transition-all duration-300 w-full group my-1 border border-lb-border/50 bg-lb-bg/50 cursor-pointer" onClick={() => setThemeMode(themeMode === 'white' ? 'navy' : themeMode === 'navy' ? 'system' : 'white')}>
               <div className="flex items-center gap-4">
                 <div className="text-lb-accent transition-colors duration-300">
-                  {themeMode === 'white' ? <Sun size={20} /> : <Moon size={20} />}
+                  {themeMode === 'white' ? <Sun size={20} /> : themeMode === 'navy' ? <Moon size={20} /> : <Monitor size={20} />}
                 </div>
                 <span className="text-[14px] font-bold text-lb-text/80 group-hover:text-lb-text transition-all duration-300">
-                  {themeMode === 'white' ? 'Light Theme' : 'Dark Theme'}
+                  {themeMode === 'white' ? 'Light Theme' : themeMode === 'navy' ? 'Navy Dark' : 'Pure Black'}
                 </span>
               </div>
-              <button 
-                onClick={() => setThemeMode(themeMode === 'white' ? 'navy' : 'white')}
-                className={`relative w-12 h-6 rounded-full transition-colors duration-300 ease-in-out focus:outline-none ${themeMode === 'navy' ? 'bg-lb-accent' : 'bg-lb-border'}`}
+              <div 
+                className={`relative w-12 h-6 rounded-full transition-colors duration-300 ease-in-out focus:outline-none ${themeMode === 'white' ? 'bg-lb-border' : 'bg-lb-accent'}`}
               >
-                <div className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ease-in-out ${themeMode === 'navy' ? 'translate-x-6' : 'translate-x-0'}`} />
-              </button>
+                <div className={`absolute left-1 top-1 w-4 h-4 rounded-full bg-white transition-transform duration-300 ease-in-out ${themeMode === 'white' ? 'translate-x-0' : themeMode === 'navy' ? 'translate-x-3' : 'translate-x-6'}`} />
+              </div>
             </div>
 
             {/* <MenuItem icon={<Globe size={20} />} label="Language" onClick={() => {}} />

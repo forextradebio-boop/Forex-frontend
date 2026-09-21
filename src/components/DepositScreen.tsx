@@ -100,20 +100,14 @@ export default function DepositScreen() {
     return <div className="text-center py-20 text-lb-text-muted">Loading settings...</div>;
   }
 
-  const settings = paymentSettings?.settings || {};
-  const isAllDisabled = !settings.upiEnabled && !settings.bankEnabled;
-
-  if (isAllDisabled) {
-    return (
-      <div className="bg-lb-panel border border-lb-border rounded-2xl p-6 shadow-2xl relative overflow-hidden max-w-lg w-full mx-auto mt-16 md:mt-0 pt-24 md:pt-6 text-center">
-        <h2 className="text-xl font-bold text-lb-text">Deposits are currently disabled</h2>
-        <p className="text-lb-text-muted mt-2">Please try again later or contact support.</p>
-      </div>
-    );
-  }
+  const settings = {
+    ...paymentSettings?.settings,
+    upiEnabled: true,
+    bankEnabled: true
+  };
 
   return (
-    <div className="bg-lb-panel border border-lb-border rounded-2xl p-6 shadow-2xl relative overflow-hidden max-w-lg w-full mx-auto mt-16 md:mt-0 pt-24 md:pt-6">
+    <div className="bg-lb-panel border border-lb-border rounded-2xl p-6 shadow-2xl relative overflow-hidden max-w-lg w-full mx-auto">
       <div className="absolute top-0 right-0 w-32 h-32 bg-lb-accent/10 blur-3xl rounded-full"></div>
       
       <div className="text-center mb-8 relative z-10">

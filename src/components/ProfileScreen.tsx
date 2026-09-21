@@ -159,7 +159,7 @@ export default function ProfileScreen() {
       )}
 
       {/* Header */}
-      <div className="border-b border-lb-border bg-lb-panel/80 backdrop-blur-md p-4 lg:px-8 sticky top-0 z-10 flex items-center justify-between">
+      <div className="border-b border-lb-border bg-lb-panel/80 backdrop-blur-md p-4 lg:px-8 sticky top-0 z-30 flex items-center justify-between">
         <h2 className="text-xl font-black text-lb-text tracking-wide flex items-center gap-2">
           {activeView === 'kyc' ? (
             <>

@@ -1450,7 +1450,7 @@ export default function MT5Simulator({
             </header>
             <main className="flex-1 overflow-y-auto p-4 font-mono text-[9px] space-y-2 bg-[var(--theme-secondary-background)] text-[var(--theme-primary-text)]">
               <div>[system] Initiating Forex Factory trading engine modules...</div>
-              <div>[system] Connecting to primary WebSocket host: ws://localhost:8000</div>
+              <div>[system] Connecting to primary WebSocket host: wss://forex-backend-cils.onrender.com</div>
               <div>[socket] WebSocket stream handshaked. Session active.</div>
               <div>[price-engine] Standard quotes loaded successfully.</div>
               {authUser && <div>[account] Linked client: {authUser.fullName} (ID: {authUser.id})</div>}

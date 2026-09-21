@@ -216,6 +216,7 @@ const ProTradingDashboard = ({
         onClose={() => setIsSidebarOpen(false)} 
         onGetStarted={() => { setIsSidebarOpen(false); setAuthFlowState('REGISTER'); }}
         onNavigateWallet={(tab) => { setWalletPageTab(tab); setActiveView('wallet'); setIsSidebarOpen(false); }}
+        onNavigateTrade={() => { setActiveView('terminal'); setActiveMobileTab('trade'); setIsSidebarOpen(false); }}
         onNavigateProfile={() => { setActiveView('profile'); setIsSidebarOpen(false); }}
         onNavigateNews={() => { setActiveView('news'); setIsSidebarOpen(false); }}
         onNavigateCalendar={() => { setActiveView('calendar'); setIsSidebarOpen(false); }}
@@ -240,7 +241,7 @@ const ProTradingDashboard = ({
         </div>
       )}
       {activeView === 'news' && (
-        <div className="flex-1 flex flex-col min-h-0 bg-lb-bg text-lb-text">
+        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-lb-bg text-lb-text">
           <div className="border-b border-lb-border bg-lb-panel/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
             <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-lb-panel hover:bg-lb-panel-hover border border-lb-border rounded-xl text-lb-text transition">
               Back to Terminal
@@ -251,7 +252,7 @@ const ProTradingDashboard = ({
         </div>
       )}
       {activeView === 'calendar' && (
-        <div className="flex-1 flex flex-col min-h-0 bg-lb-bg text-lb-text">
+        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-lb-bg text-lb-text">
           <div className="border-b border-lb-border bg-lb-panel/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
             <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-lb-panel hover:bg-lb-panel-hover border border-lb-border rounded-xl text-lb-text transition">
               Back to Terminal
@@ -262,7 +263,7 @@ const ProTradingDashboard = ({
         </div>
       )}
       {activeView === 'profile' && (
-        <div className="flex-1 flex flex-col min-h-0 bg-lb-bg text-lb-text">
+        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-lb-bg text-lb-text">
           <div className="border-b border-lb-border bg-lb-panel/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
             <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-lb-panel hover:bg-lb-panel-hover border border-lb-border rounded-xl text-lb-text transition">
               Back to Terminal
@@ -273,7 +274,7 @@ const ProTradingDashboard = ({
         </div>
       )}
       {activeView === 'about' && (
-        <div className="flex-1 flex flex-col min-h-0 bg-lb-bg text-lb-text">
+        <div className="flex-1 flex flex-col min-h-0 overflow-y-auto bg-lb-bg text-lb-text">
           <div className="border-b border-lb-border bg-lb-panel/90 backdrop-blur-md p-4 sticky top-0 z-20 flex items-center justify-between gap-4">
             <button onClick={() => setActiveView('terminal')} className="px-4 py-2 bg-lb-panel hover:bg-lb-panel-hover border border-lb-border rounded-xl text-lb-text transition">
               Back to Terminal
@@ -357,7 +358,7 @@ const ProTradingDashboard = ({
         {/* MOBILE: Conditional Rendering based on Tabs */}
         {/* DESKTOP CENTER: Chart + OCT */}
         <main className={`flex-1 flex flex-col relative min-w-0 ${activeMobileTab !== 'chart' ? 'hidden md:flex' : 'flex'}`}>
-          <TradingViewChart symbol={selectedSymbol} theme={themeMode === 'navy' ? 'Dark' : 'Light'} intervalValue={chartInterval} />
+          <TradingViewChart symbol={selectedSymbol} theme={(themeMode === 'navy' || themeMode === 'system') ? 'Dark' : 'Light'} intervalValue={chartInterval} />
           
           {/* Desktop Overlay OCT */}
           <div className="hidden md:block absolute top-4 right-4 shadow-2xl rounded-xl z-10">

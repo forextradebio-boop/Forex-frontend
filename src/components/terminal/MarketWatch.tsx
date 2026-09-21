@@ -65,7 +65,7 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
     });
   };
 
-  const categories = ['Favorites', 'Forex', 'Metals', 'Crypto', 'Crude Oil'];
+  const categories = ['Favorites', 'Forex', 'Crypto', 'Metals', 'Crude Oil'];
 
   const filteredSymbols = useMemo(() => {
     // Skip filtering for Crude Oil - it has its own custom view

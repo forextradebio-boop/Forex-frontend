@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { whiteTheme } from './light';
 import { navyTheme } from './dark';
+import { systemTheme } from './system';
 
 export type Theme = typeof whiteTheme;
-export type ThemeMode = 'white' | 'navy';
+export type ThemeMode = 'white' | 'navy' | 'system';
 
 interface ThemeContextType {
   theme: Theme;
@@ -15,11 +16,11 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    const saved = localStorage.getItem('ff_theme');
-    return saved === 'white' ? 'white' : 'navy';
+    const saved = localStorage.getItem('ff_theme') as ThemeMode;
+    return saved === 'white' ? 'white' : saved === 'system' ? 'system' : 'navy';
   });
 
-  const theme = themeMode === 'white' ? whiteTheme : navyTheme;
+  const theme = themeMode === 'white' ? whiteTheme : themeMode === 'system' ? systemTheme : navyTheme;
 
   useEffect(() => {
     localStorage.setItem('ff_theme', themeMode);
@@ -32,8 +33,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
     root.classList.toggle('white-theme', themeMode === 'white');
     root.classList.toggle('navy-theme', themeMode === 'navy');
+    root.classList.toggle('system-theme', themeMode === 'system');
     root.classList.toggle('light-mode', themeMode === 'white');
-    root.classList.toggle('dark-mode', themeMode === 'navy');
+    root.classList.toggle('dark-mode', themeMode === 'navy' || themeMode === 'system');
   }, [themeMode, theme]);
 
   return (

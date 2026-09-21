@@ -54,10 +54,10 @@ export default function WalletScreen({ initialTab = 'dashboard', onBack }: Walle
   }
 
   return (
-    <div className="flex flex-col h-screen bg-lb-panel font-sans text-lb-text relative" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div className="flex flex-col h-full overflow-y-auto bg-lb-panel font-sans text-lb-text relative">
       
       {/* Header */}
-      <div className="border-b border-lb-border bg-lb-panel/80 backdrop-blur-md p-4 lg:px-8 sticky top-0 z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="border-b border-lb-border bg-lb-panel/80 backdrop-blur-md p-4 lg:px-8 sticky top-0 z-30 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           {onBack && (
             <button onClick={onBack} className="p-2 rounded-lg bg-lb-bg border border-lb-border text-lb-text hover:text-lb-text transition">
@@ -107,7 +107,7 @@ export default function WalletScreen({ initialTab = 'dashboard', onBack }: Walle
         </div>
       </div>
 
-      <div className="flex-1 p-4 lg:p-8 max-w-5xl mx-auto w-full space-y-8 pt-20 md:pt-8 overflow-y-auto pb-28">
+      <div className="flex-1 p-4 lg:p-8 max-w-5xl mx-auto w-full space-y-8 pt-4 pb-28">
         
         {activeSubTab === 'dashboard' ? (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">

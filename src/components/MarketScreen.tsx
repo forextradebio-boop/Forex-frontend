@@ -14,7 +14,7 @@ import {
 import { useMarketStream } from '../hooks/useMarketStream';
 import { MarketTicker } from '../types';
 
-type MarketTab = 'OVERVIEW' | 'FOREX' | 'CRYPTO' | 'METALS';
+type MarketTab = 'OVERVIEW' | 'CRYPTO' | 'FOREX' | 'METALS';
 
 export default function MarketScreen() {
   const [activeTab, setActiveTab] = useState<MarketTab>('OVERVIEW');
@@ -64,7 +64,7 @@ export default function MarketScreen() {
         </div>
 
         <div className="flex bg-lb-bg rounded p-1">
-          {(['OVERVIEW', 'FOREX', 'CRYPTO', 'METALS'] as const).map(tab => (
+          {(['OVERVIEW', 'CRYPTO', 'FOREX', 'METALS'] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
