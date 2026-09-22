@@ -21,9 +21,8 @@ export default function TransactionHistoryScreen() {
   }
 
   const filteredData = transactions?.filter(t => {
-    const isPending = t.status === 'PENDING';
-    const isDepositOrWithdraw = t.type === 'DEPOSIT' || t.type === 'WITHDRAW' || t.type === 'WITHDRAWAL';
-    if (isPending && isDepositOrWithdraw) return false;
+    const isPendingOrRejected = t.status === 'PENDING' || t.status === 'REJECTED' || t.status === 'BLOCKED';
+    if (isPendingOrRejected) return false;
 
     if (filter === 'ALL') return true;
     if (filter === 'DEPOSIT') return t.type === 'DEPOSIT' || (t.type === 'ADMIN_ADJUSTMENT' && t.amount > 0);
@@ -88,12 +87,24 @@ export default function TransactionHistoryScreen() {
                 </div>
 
                 <div className="text-right">
-                  <div className={`font-black font-mono text-base ${isDeposit ? 'text-lb-accent' : isWithdraw ? 'text-lb-text' : 'text-lb-text'}`}>
-                    {isDeposit ? '+' : isWithdraw ? '-' : ''}${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                  </div>
-                  <div className="text-[10px] text-lb-text-muted font-bold">
-                    ≈ ₹{(tx.amount * currentRate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </div>
+                  {tx.displayCurrency === 'INR' ? (
+                    <div className={`font-black font-mono text-base ${isDeposit ? 'text-lb-accent' : isWithdraw ? 'text-lb-text' : 'text-lb-text'}`}>
+                      {isDeposit ? '+' : isWithdraw ? '-' : ''}₹{(tx.amount * currentRate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </div>
+                  ) : tx.displayCurrency === 'USDT' ? (
+                    <div className={`font-black font-mono text-base ${isDeposit ? 'text-lb-accent' : isWithdraw ? 'text-lb-text' : 'text-lb-text'}`}>
+                      {isDeposit ? '+' : isWithdraw ? '-' : ''}${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </div>
+                  ) : (
+                    <>
+                      <div className={`font-black font-mono text-base ${isDeposit ? 'text-lb-accent' : isWithdraw ? 'text-lb-text' : 'text-lb-text'}`}>
+                        {isDeposit ? '+' : isWithdraw ? '-' : ''}${tx.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                      </div>
+                      <div className="text-[10px] text-lb-text-muted font-bold">
+                        ≈ ₹{(tx.amount * currentRate).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </div>
+                    </>
+                  )}
                   <div className="flex flex-col items-end gap-1.5 mt-1">
                     <div className="flex items-center gap-1.5">
                       <div className={`w-1.5 h-1.5 rounded-full ${tx.status === 'APPROVED' ? 'bg-lb-accent' : tx.status === 'REJECTED' ? 'bg-lb-down' : tx.status === 'BLOCKED' ? 'bg-purple-500' : 'bg-amber-500 animate-pulse'}`}></div>
