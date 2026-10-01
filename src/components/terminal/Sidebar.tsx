@@ -78,27 +78,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, onGetStarted,
               Get started
             </button>
           )}
-
-          {/* VPS Status Indicator */}
-          <div className="relative z-10 mt-3 flex items-center gap-3 bg-lb-bg/60 border border-emerald-500/20 rounded-xl p-3 shadow-[0_0_15px_rgba(16,185,129,0.05)] backdrop-blur-sm">
-            <div className="relative flex items-center justify-center">
-              <Server className="w-5 h-5 text-emerald-500" />
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
-              <div className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full"></div>
-            </div>
-            <div className="flex flex-col flex-1">
-              <div className="flex items-center justify-between w-full">
-                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">VPS Active</span>
-                <div className="flex items-center gap-1.5 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                  <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(16,185,129,0.8)]"></div>
-                  <span className="text-[9px] font-black text-emerald-500">12ms</span>
-                </div>
-              </div>
-              <span className="text-[12px] font-black text-lb-text mt-0.5 flex items-center gap-1.5">
-                Riyadh, Saudi Arabia <span className="text-[10px]">🇸🇦</span>
-              </span>
-            </div>
-          </div>
         </div>
 
         {/* Menu Items */}
