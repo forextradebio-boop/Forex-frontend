@@ -68,10 +68,7 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
   const categories = ['Favorites', 'Metals', 'Crypto', 'Forex', 'Crude Oil'];
 
   const filteredSymbols = useMemo(() => {
-    // Skip filtering for Crude Oil - it has its own custom view
-    if (activeCategory === 'Crude Oil') {
-      return [];
-    }
+    // Standard filtering for all categories
 
     let filtered = symbols;
     
@@ -108,7 +105,7 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
             </button>
           ))}
         </div>
-        {activeCategory !== 'Crude Oil' && (
+        {true && (
           <div className="relative">
             <Search className="w-4 h-4 absolute left-2 top-1/2 -translate-y-1/2 text-lb-text-muted" />
             <input
@@ -124,10 +121,7 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
       
       {/* Table Body - Advanced View MT5 Style */}
       <div className="flex-1 overflow-y-auto no-scrollbar">
-        {/* Crude Oil Special View */}
-        {activeCategory === 'Crude Oil' ? (
-          <CrudeOilChart />
-        ) : filteredSymbols.length === 0 ? (
+        {filteredSymbols.length === 0 ? (
           <div className="p-4 text-center text-xs text-lb-text-muted">
             {activeCategory === 'Favorites' ? 'No favorites added yet.' : 'No symbols found.'}
           </div>
