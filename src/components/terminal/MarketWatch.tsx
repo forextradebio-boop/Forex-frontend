@@ -10,7 +10,7 @@ interface MarketWatchProps {
   onLongPressSymbol?: (symbolObj: SymbolData) => void;
 }
 
-const PriceFlashCell = React.memo(({ price, isAsk }: { price: number; isAsk?: boolean }) => {
+const PriceFlashCell = React.memo(({ price, digits = 5 }: { price: number; digits?: number }) => {
   const prevPrice = useRef(price);
   const [flashClass, setFlashClass] = useState('');
 
@@ -28,7 +28,7 @@ const PriceFlashCell = React.memo(({ price, isAsk }: { price: number; isAsk?: bo
 
   return (
     <span className={`px-1 rounded font-mono font-bold tracking-tight ${flashClass}`}>
-      {price.toFixed(5)}
+      {price.toFixed(digits)}
     </span>
   );
 });
@@ -129,6 +129,7 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
           filteredSymbols.map(sym => {
             const rawSymbol = sym.symbol.replace('/', '');
             const isSelected = selectedSymbol === rawSymbol;
+            const digits = rawSymbol === 'XAGUSD' ? 3 : rawSymbol === 'USOIL' ? 2 : 5;
             let spread = '-';
             if (sym.spread != null) {
                 spread = sym.spread.toFixed(1);
@@ -217,13 +218,13 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
                       <div className="flex flex-col items-end">
                         <span className="text-[9px] text-lb-text-muted">Bid</span>
                         <span className={`text-[15px] ${isPositive ? 'text-lb-up' : 'text-lb-down'}`}>
-                          <PriceFlashCell price={sym.bid || sym.price || 0} />
+                          <PriceFlashCell price={sym.bid || sym.price || 0} digits={digits} />
                         </span>
                       </div>
                       <div className="flex flex-col items-end">
                         <span className="text-[9px] text-lb-text-muted">Ask</span>
                         <span className={`text-[15px] ${isPositive ? 'text-lb-up' : 'text-lb-down'}`}>
-                          <PriceFlashCell price={sym.ask || sym.price || 0} isAsk={true} />
+                          <PriceFlashCell price={sym.ask || sym.price || 0} digits={digits} />
                         </span>
                       </div>
                     </div>
@@ -231,8 +232,8 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
 
                   {/* Bottom Row: Low / High */}
                   <div className="flex justify-between items-center px-1 text-[10px] text-lb-text-muted">
-                    <span>L: {sym.low?.toFixed(5) || '0.00000'}</span>
-                    <span>H: {sym.high?.toFixed(5) || '0.00000'}</span>
+                    <span>L: {sym.low?.toFixed(digits) || '0.00000'}</span>
+                    <span>H: {sym.high?.toFixed(digits) || '0.00000'}</span>
                   </div>
                   
                 </div>

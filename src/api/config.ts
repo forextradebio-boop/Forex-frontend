@@ -1,5 +1,5 @@
-const LIVE_API_BASE_URL = "https://forex-backend-cils.onrender.com";
-const LIVE_SOCKET_URL = "https://forex-backend-cils.onrender.com";
+const isDevelopment = import.meta.env.DEV;
 
-export const API_BASE_URL = LIVE_API_BASE_URL;
-export const SOCKET_URL = LIVE_SOCKET_URL;
+// Use the Render backend for both development and production.
+export const API_BASE_URL = "https://forex-backend-cils.onrender.com";
+export const SOCKET_URL = "https://forex-backend-cils.onrender.com";
