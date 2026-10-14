@@ -129,7 +129,7 @@ export const MarketWatch = React.memo(({ selectedSymbol, onSelectSymbol, onLongP
           filteredSymbols.map(sym => {
             const rawSymbol = sym.symbol.replace('/', '');
             const isSelected = selectedSymbol === rawSymbol;
-            const digits = rawSymbol === 'XAGUSD' ? 3 : rawSymbol === 'USOIL' ? 2 : 5;
+            const digits = rawSymbol === 'XAGUSD' ? 3 : (rawSymbol === 'USOIL' || rawSymbol === 'XAUUSD') ? 2 : 5;
             let spread = '-';
             if (sym.spread != null) {
                 spread = sym.spread.toFixed(1);
